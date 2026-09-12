@@ -129,7 +129,7 @@ const siteSettings: SiteSettings = {
 		successMessage: null,
 		privacyPolicySlug: null,
 	},
-	analytics: { provider: 'none' },
+	analytics: { provider: 'none', domain: null, websiteId: null, scriptHost: null },
 	geo: { _type: 'geopoint', lat: 52.2297, lng: 21.0122 },
 };
 

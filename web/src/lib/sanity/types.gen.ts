@@ -250,6 +250,7 @@ export type SiteSettings = {
 	analytics?: {
 		provider?: 'none' | 'plausible' | 'umami';
 		domain?: string;
+		websiteId?: string;
 		scriptHost?: string;
 	};
 };
@@ -448,7 +449,7 @@ export type AllSanitySchemaTypes =
 
 // Source: ../web/src/lib/sanity/queries.ts
 // Variable: SITE_SETTINGS_QUERY
-// Query: *[_id == "siteSettings"][0]{		companyName,		tagline,		nip,		address,		geo,		phone,		email,		openingHours[]{ _key, days, closed, opens, closes },		social[]{ _key, platform, url },		logo {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		mimeType,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		defaultOgImage {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		mimeType,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		contactForm{			consentLabel,			privacyNotice,			successMessage,			"privacyPolicySlug": privacyPolicyPage->slug.current		},		analytics	}
+// Query: *[_id == "siteSettings"][0]{		companyName,		tagline,		nip,		address,		geo,		phone,		email,		openingHours[]{ _key, days, closed, opens, closes },		social[]{ _key, platform, url },		logo {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		mimeType,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		defaultOgImage {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		mimeType,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		contactForm{			consentLabel,			privacyNotice,			successMessage,			"privacyPolicySlug": privacyPolicyPage->slug.current		},		analytics{ provider, domain, websiteId, scriptHost }	}
 export type SITE_SETTINGS_QUERY_RESULT =
 	| {
 			companyName: null;
@@ -523,9 +524,10 @@ export type SITE_SETTINGS_QUERY_RESULT =
 				privacyPolicySlug: string | null;
 			} | null;
 			analytics: {
-				provider?: 'none' | 'plausible' | 'umami';
-				domain?: string;
-				scriptHost?: string;
+				provider: 'none' | 'plausible' | 'umami' | null;
+				domain: string | null;
+				websiteId: string | null;
+				scriptHost: string | null;
 			} | null;
 	  }
 	| null;
@@ -829,7 +831,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 // Query TypeMap
 declare global {
 	interface SanityQueries {
-		'\n\t*[_id == "siteSettings"][0]{\n\t\tcompanyName,\n\t\ttagline,\n\t\tnip,\n\t\taddress,\n\t\tgeo,\n\t\tphone,\n\t\temail,\n\t\topeningHours[]{ _key, days, closed, opens, closes },\n\t\tsocial[]{ _key, platform, url },\n\t\tlogo {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\tmimeType,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tdefaultOgImage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\tmimeType,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tcontactForm{\n\t\t\tconsentLabel,\n\t\t\tprivacyNotice,\n\t\t\tsuccessMessage,\n\t\t\t"privacyPolicySlug": privacyPolicyPage->slug.current\n\t\t},\n\t\tanalytics\n\t}\n': SITE_SETTINGS_QUERY_RESULT;
+		'\n\t*[_id == "siteSettings"][0]{\n\t\tcompanyName,\n\t\ttagline,\n\t\tnip,\n\t\taddress,\n\t\tgeo,\n\t\tphone,\n\t\temail,\n\t\topeningHours[]{ _key, days, closed, opens, closes },\n\t\tsocial[]{ _key, platform, url },\n\t\tlogo {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\tmimeType,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tdefaultOgImage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\tmimeType,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tcontactForm{\n\t\t\tconsentLabel,\n\t\t\tprivacyNotice,\n\t\t\tsuccessMessage,\n\t\t\t"privacyPolicySlug": privacyPolicyPage->slug.current\n\t\t},\n\t\tanalytics{ provider, domain, websiteId, scriptHost }\n\t}\n': SITE_SETTINGS_QUERY_RESULT;
 		'\n\t*[_id == "navigation"][0]{\n\t\tmainMenu[] {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n},\n\t\tfooterMenu[] {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n}\n\t}\n': NAVIGATION_QUERY_RESULT;
 		'\n\t*[_type == "page" && defined(slug.current)]{\n\t\t"slug": slug.current,\n\t\t_updatedAt,\n\t\t"noindex": seo.noindex == true\n\t}\n': PAGE_INDEX_QUERY_RESULT;
 		'\n\t*[_type == "redirect" && defined(from) && defined(to)]{ from, to, permanent }\n': REDIRECTS_QUERY_RESULT;

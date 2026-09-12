@@ -124,7 +124,7 @@ export const SITE_SETTINGS_QUERY = defineQuery(/* groq */ `
 			successMessage,
 			"privacyPolicySlug": privacyPolicyPage->slug.current
 		},
-		analytics
+		analytics{ provider, domain, websiteId, scriptHost }
 	}
 `);
 

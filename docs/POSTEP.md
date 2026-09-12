@@ -746,3 +746,118 @@ datasecie: 23/23, 0 skryptów.
 **Do rozważenia:** CLAUDE.md nadal mówi „Wyspa `client:visible` tylko dla menu
 mobilnego i accordionu FAQ" — nie edytowałem (plik ma Twoje niezacommitowane
 zmiany).
+
+## Faza 5 — Formularz i analityka — 2026-09-13
+
+### Decyzje
+
+| Temat | Decyzja | Uzasadnienie |
+| --- | --- | --- |
+| Backend formularza | **Worker Cloudflare** (`web/worker/index.ts`, `main` w wrangler.toml), nie Pages Function | Repo wdraża się przepływem Workers (faza 1) — Pages Functions tam nie istnieją. `run_worker_first = ["/api/*"]`: Worker dostaje tylko API, resztę serwują assety. |
+| E-mail | **Resend przez `fetch` do REST API**, bez SDK | Ustalone w fazie 0. Zero nowych zależności. SMTP z Workera wymagałby biblioteki socketów; Cloudflare Email Routing przejmuje MX klienta. |
+| Rate limiting | **Natywny binding `[[ratelimits]]`**, dwa limitery: 5/min na IP, 20/min na stronę | Bez KV i Durable Objects. Dokumentacja odradza klucz z IP (NAT) — stąd łagodny limit IP + globalny limit strony, który chroni pulę Resend przy rotacji IP. |
+| Umiejscowienie | **9. typ sekcji `contact`** | Zgoda właściciela (łamie zamkniętą listę 8 sekcji). Klient wstawia formularz na dowolną podstronę. |
+| Mapa | **Karta dojazdu z linkami Google Maps URLs, bez mapy i bez iframe'a** | Zmiana względem PLAN.md („statyczny obrazek + klik → mapa"), decyzja właściciela po ustaleniach niżej. |
+| Analityka | **Plausible i Umami**, wybór w Studio (schema z fazy 2) | Oba bez ciasteczek → bez baneru. Dodane brakujące pole `websiteId` — Umami identyfikuje stronę po UUID, nie po domenie. |
+
+**Dlaczego nie mapa z podglądem** (sprawdzone w dokumentacji, nie z pamięci):
+- Zasady kafelków OSMF dopuszczają „normalne przeglądanie przez człowieka" i zakazują
+  pobierania z wyprzedzeniem — podgląd generowany przy każdym buildzie (bez cache na
+  Cloudflare) to szara strefa.
+- Google Static Maps zabrania zapisywania obrazu, a ładowanie go od Google w
+  przeglądarce to zapytanie do Google przed kliknięciem.
+- Maps Embed API oficjalnie wymaga klucza; wariant `maps?q=…&output=embed` jest
+  nieudokumentowany.
+
+### Co powstało
+
+- **Studio:** `sections/contact.ts` (tytuł, lead, „Pokaż dane kontaktowe", „Pokaż dojazd");
+  w Ustawieniach grupa „Formularz kontaktowy": treść zgody, klauzula informacyjna,
+  link do polityki prywatności, komunikat po wysłaniu — wszystkie opcjonalne
+  (wymagane zablokowałyby publikację Ustawień, np. przy zmianie telefonu).
+  Adresat maili NIE jest w Studio — to sekret Workera.
+- **`web/src/lib/contact-form.ts`** — jedno źródło nazw pól, limitów i walidacji
+  dla HTML i Workera.
+- **`web/src/lib/privacy.ts`** — puste pola w Studio = wzór zgody i klauzuli złożony
+  z danych firmy (administrator, adres, NIP, e-mail).
+- **`ContactForm.astro`** — działa bez JS (natywna walidacja, POST → 303 →
+  `#kontakt-wyslano`, komunikat przez `:target`); JS dodaje wysyłkę bez przeładowania,
+  błędy przy polach (`aria-invalid`, `aria-describedby`), region `role="status"`,
+  fokus na wyniku, blokadę podwójnej wysyłki. Honeypot poza ekranem, nazwa odporna
+  na autouzupełnianie. Treść zgody i czas trafiają do maila jako dowód zgody.
+- **`MapCard.astro`** — „Pokaż na mapie" / „Wyznacz trasę" (Google Maps URLs,
+  `api=1`, bez klucza, nowa karta). Zero JS, zero zapytań do Google ze strony.
+- **`Analytics.astro`** — tylko w buildzie produkcyjnym, `defer`; Umami z
+  `data-domains` = domena z brand.ts (podglądy się nie liczą). Brak ID → ostrzeżenie
+  w logu builda zamiast zepsutego tagu.
+- **Worker** — kolejność: Origin + rozmiar → honeypot (udaje sukces) → walidacja →
+  rate limit (liczy tylko poprawne zgłoszenia) → wysyłka. Klucz limitu zawiera host,
+  więc kilka stron klientów na jednym koncie nie dzieli limitów. W logach tylko statusy.
+- **`wrangler.toml`**: `main`, `binding`, `run_worker_first`, dwa `[[ratelimits]]`,
+  `[observability]`. Sekrety `RESEND_API_KEY`, `CONTACT_TO`, `CONTACT_FROM` — jako
+  Secret, nie `[vars]`: zwykłe zmienne z panelu wrangler kasuje przy deployu
+  (`keep_vars`). `.dev.vars.example` + wpis w `.gitignore`.
+
+### Poprawki przy okazji
+
+- **Fade-in sekcji bez `translate`.** Przesunięcie o 2rem zmieniało geometrię w chwili
+  liczenia celu przewijania do kotwicy — komunikat formularza po przekierowaniu
+  lądował 32 px pod sticky headerem. Zmierzone: scrollY 1056 z animacją vs 1024 bez;
+  po poprawce cel na 80 px w obu trybach.
+- **Ramki pól formularza w kolorze `muted`** — `border` z brand.ts ma 1,26:1, a WCAG
+  1.4.11 wymaga 3:1 dla granic pól. `muted` jako kolor tekstu musi mieć ≥ 4,5:1,
+  więc warunek trzyma się przy każdej poprawnej palecie klienta (dziś 7,56:1).
+
+### Budżet JS (CLAUDE.md: 10 kB nieskompresowane)
+
+| Skrypt | Rozmiar | Gdzie | Czego CSS nie potrafi |
+| --- | --- | --- | --- |
+| Karuzela (`Carousel.astro`) | 1 691 B (774 gzip) | strony z galerią-karuzelą | przyciski poprzedni/następny, Home/End |
+| Formularz (`ContactForm.astro`) | 1 174 B (576 gzip) | strony z sekcją Kontakt | wysyłka bez przeładowania, zachowanie treści przy błędzie serwera |
+| Plausible (zewnętrzny) | 2 841 B (1 291 gzip) | wszystkie, gdy włączony | — (analityka) |
+| Umami (zewnętrzny) | nie zmierzone — `cloud.umami.is` nie rozwiązuje się z tej maszyny | wszystkie, gdy włączony | — |
+
+Najgorszy przypadek (karuzela + formularz + Plausible): **5,7 kB / 10 kB**.
+Demo: `/o-nas` 1 174 B, pozostałe strony 0 B. Realny dataset: 0 skryptów.
+
+### Weryfikacja
+
+- `pnpm check`, lint, format, `tsc` studio — czysto. Build realny i demo: SEO 4/4,
+  0 plików `.js`.
+- **Logika Workera (Node, prawdziwy moduł + atrapy bindingów), 28/28:** kształt
+  żądania do Resend (`to` tablica, `reply_to`, treść zgody z czasem), 303 bez JS,
+  otwarte przekierowanie (`//evil`, `https://evil` → `/`), honeypot bez maila i bez
+  zużycia limitu, obcy Origin 403, walidacja 422, limit IP 5/min, inna strona klienta
+  z tym samym IP nie blokowana, rotacja IP zatrzymana limitem strony, Resend 401 → 502,
+  brak sekretu → 500, znaki sterujące w temacie, 405/413, multipart, logi bez PII.
+- **Formularz w Chrome 152 (harness: dist + Worker), 22/22:** kolejność Taba,
+  honeypot nigdy nie dostaje fokusu, klauzula z właściwym administratorem, etykiety,
+  natywna blokada pustego formularza, sukces (fokus, region live, reset), błąd pola
+  z serwera (`a@b`), awaria wysyłki z zapasowym telefonem, limit, podwójne kliknięcie
+  = 1 mail, 0 zapytań do obcych hostów, brak iframe'a, 390 px bez poziomego scrolla,
+  ścieżka bez JS (303 → `:target`, komunikat nie pod headerem).
+- **`wrangler deploy --dry-run` (4.131.1 przez npx, bez dodawania zależności):**
+  konfiguracja przyjęta, bindingi `CONTACT_RATE_LIMIT_IP` (5/60s),
+  `CONTACT_RATE_LIMIT_SITE` (20/60s), `ASSETS`; bundel Workera 6,77 KiB.
+- **`wrangler dev` (workerd):** `/o-nas/` → 307 `/o-nas`, 404 dla nieznanych ścieżek,
+  wszystkie ścieżki Workera jak w harnessie, **prawdziwe API Resend** z fałszywym
+  kluczem → 401 → 502, limit IP po 5 próbach.
+- Analityka, 4 warianty w buildzie: Plausible chmura (domena z brand.ts), Plausible
+  self-hosted, Umami chmura (`data-website-id` + `data-domains`), Umami bez ID →
+  brak tagu + ostrzeżenie.
+
+### Niezweryfikowane / do zrobienia
+
+- **Prawdziwa wysyłka maila** — wymaga konta Resend ze zweryfikowaną domeną
+  (SPF/DKIM). Do checklisty wdrożenia (faza 7).
+- **Klauzula informacyjna to wzór techniczny, nie porada prawna.** Okres
+  przechowywania (12 mies.) i odbiorcy (Cloudflare, Resend) do potwierdzenia u klienta.
+- **Realny dataset nie ma sekcji Kontakt** — fixtures mają ją na „O nas";
+  `pnpm seed` jej nie wgrał, bo nie był uruchamiany po zmianach (nie uruchamiałem
+  bez pytania — nadpisuje dokumenty demo).
+- Rate limiting na produkcji jest „ostatecznie spójny" i lokalny dla lokalizacji
+  Cloudflare — hamulec na spam, nie precyzyjny licznik.
+- Ostrzeżenie „Umami bez ID" drukuje się raz na stronę (4× w demo).
+- Lighthouse — faza 6.
+- **CLAUDE.md** nadal mówi „8 typów sekcji" — nie edytowałem (Twoje niezacommitowane
+  zmiany). PLAN.md mówi o Pages Function i mapie z podglądem — rozbieżność opisana wyżej.

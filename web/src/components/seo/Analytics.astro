@@ -1,0 +1,49 @@
+---
+import type { SiteSettings } from '~/lib/content';
+
+/**
+ * Analityka bez ciasteczek — Plausible albo Umami, wybierane w Ustawieniach
+ * strony. Bez baneru zgody: żaden z nich nie zapisuje identyfikatora
+ * w przeglądarce (Umami tylko ODCZYTUJE `localStorage['umami.disabled']`).
+ *
+ * - Tylko w buildzie produkcyjnym — `astro dev` nie zawyża statystyk.
+ * - `defer` — skrypt nie blokuje renderowania i nie wpływa na LCP.
+ * - Umami: `data-domains` = domena z brand.ts, więc podglądy (*.workers.dev)
+ *   i localhost po `astro preview` się nie liczą.
+ * - Budżet JS: Plausible ~2,8 kB, Umami ~3 kB nieskompresowane (zewnętrzny
+ *   skrypt, ale liczymy go do budżetu — patrz POSTEP.md).
+ *
+ * Brak wymaganego identyfikatora = brak skryptu + ostrzeżenie w logu builda,
+ * a nie zepsuty tag.
+ */
+interface Props {
+	analytics: SiteSettings['analytics'];
+}
+
+const { analytics } = Astro.props;
+const siteHost = Astro.site?.hostname ?? '';
+const selfHosted = analytics?.scriptHost?.replace(/\/+$/, '');
+
+let script: { src: string; attrs: Record<string, string> } | null = null;
+
+if (import.meta.env.PROD && analytics?.provider === 'plausible') {
+	const domain = analytics.domain?.trim() || siteHost;
+	script = {
+		src: `${selfHosted ?? 'https://plausible.io'}/js/script.js`,
+		attrs: { 'data-domain': domain },
+	};
+}
+
+if (import.meta.env.PROD && analytics?.provider === 'umami') {
+	if (analytics.websiteId) {
+		script = {
+			src: `${selfHosted ?? 'https://cloud.umami.is'}/script.js`,
+			attrs: { 'data-website-id': analytics.websiteId, 'data-domains': siteHost },
+		};
+	} else {
+		console.warn('[analytics] Umami wybrane, ale brak „Identyfikatora strony" — skrypt pominięty.');
+	}
+}
+---
+
+{script && <script is:inline defer src={script.src} {...script.attrs}></script>}

@@ -319,8 +319,22 @@ export const siteSettings = defineType({
 					name: 'domain',
 					title: 'Domena w panelu analityki',
 					type: 'string',
-					description: 'Dokładnie tak, jak wpisana w Plausible albo Umami, np. example.pl',
-					hidden: ({ parent }) => !parent?.provider || parent.provider === 'none',
+					description: 'Dokładnie tak, jak wpisana w panelu Plausible, np. example.pl',
+					hidden: ({ parent }) => parent?.provider !== 'plausible',
+				}),
+				defineField({
+					name: 'websiteId',
+					title: 'Identyfikator strony w Umami',
+					type: 'string',
+					description:
+						'W panelu Umami: Ustawienia → Strony → Edytuj → „Website ID". Umami rozpoznaje stronę po tym identyfikatorze, nie po domenie.',
+					hidden: ({ parent }) => parent?.provider !== 'umami',
+					validation: (rule) =>
+						rule
+							.regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i, {
+								name: 'UUID',
+							})
+							.error('Identyfikator ma postać 8-4-4-4-12 znaków, np. 3f2a9c1e-…'),
 				}),
 				defineField({
 					name: 'scriptHost',

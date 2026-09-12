@@ -2,6 +2,7 @@
 import { Font } from 'astro:assets';
 import Footer from '~/components/layout/Footer.astro';
 import Header from '~/components/layout/Header.astro';
+import Analytics from '~/components/seo/Analytics.astro';
 import JsonLd from '~/components/seo/JsonLd.astro';
 import Seo from '~/components/seo/Seo.astro';
 import { brand, themeCss } from '~/config/brand';
@@ -77,6 +78,7 @@ const canonical = new URL(canonicalPath, site).href;
 
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 		<JsonLd data={jsonLdGraph([...siteGraph, ...jsonLd])} />
+		<Analytics analytics={settings.analytics} />
 		<slot name="head" />
 	</head>
 	<body class="flex min-h-screen flex-col">
