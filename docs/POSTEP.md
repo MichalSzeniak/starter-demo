@@ -576,3 +576,17 @@ Każda strona ma pełny `<head>`, JSON-LD składany warunkowo, obraz OG z tytuł
 i logo generowany przy buildzie, sitemapa bez noindex, robots, `_redirects`
 z CMS — a build odmawia wypuszczenia strony bez h1, tytułu, opisu, canonicala
 lub og:image. Następny krok: faza 5 (formularz i analityka), po Twoim „dalej".
+
+---
+
+## Poza fazami — skrypt seed (2026-09-12)
+
+`pnpm --filter studio seed` zasila dataset treściami demo z `web/src/lib/sanity/fixtures.ts`
+(jedyne źródło; skrypt przekłada kształt wyników zapytań na dokumenty,
+wgrywa obrazy z `web/public/demo`, `createOrReplace` z deterministycznymi `_id`).
+`--dry-run [--verbose]` bez sieci, `seed:clean [--yes]` sprząta dokumenty i assety
+oznaczone `source.name = starter-demo-seed`. Token z `SANITY_WRITE_TOKEN` w `studio/.env`.
+
+**Dla fazy 7:** `nowy-klient` NIE uruchamia seeda — świeży projekt klienta startuje
+z pustym datasetem. Nie zweryfikowano na realnym projekcie (brak `SANITY_STUDIO_PROJECT_ID`);
+sprawdzony wyłącznie dry-run i transformacja struktur.
