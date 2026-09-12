@@ -100,9 +100,19 @@ Pierwotnie ustawiłem `format: 'file'` (zakładałem, że mapowanie 1:1 na
 i breadcrumbów. Przy `'directory'` sprawdzone na buildzie:
 `/` → `https://example.pl/`, `/o-nas` → `https://example.pl/o-nas`.
 
-> Do potwierdzenia na realnym deploymencie (faza 7, checklist wdrożeniowy):
-> zachowanie Cloudflare Pages przy `foo/index.html` opisuję z dokumentacji,
-> nie ze zmierzonego zachowania tego konkretnego projektu.
+> **Domknięte po fakcie (2026-09-12).** Cloudflare uruchomił dla tego repo
+> przepływ Workers, nie Pages, więc zachowanie normalizacji ustala
+> `html_handling` w `wrangler.toml`, a nie domyślne reguły Pages.
+>
+> Moje pierwotne założenie („CDN i tak normalizuje do braku ukośnika") było
+> BŁĘDNE dla tego przepływu: domyślne `html_handling = "auto-trailing-slash"`
+> serwuje pliki indeksowe katalogów (`o-nas/index.html`) **z** ukośnikiem na
+> końcu. Przy `build.format: 'directory'` dałoby to rozjazd — canonical
+> `/o-nas`, realnie serwowane `/o-nas/`.
+>
+> Dlatego `wrangler.toml` ustawia jawnie `html_handling = "drop-trailing-slash"`.
+> Zweryfikowane w `config-schema.json` wranglera 4.131.1 i w dokumentacji
+> Cloudflare. Sam deployment nadal wymaga potwierdzenia na `*.workers.dev`.
 
 **Font przez `fonts` w `astro.config.ts`, nie przez plik w repo.**
 Astro 7 ma stabilne API `fonts` + komponent `<Font>` z `astro:assets`.
