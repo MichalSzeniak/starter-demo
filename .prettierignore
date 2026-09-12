@@ -1,0 +1,14 @@
+node_modules/
+dist/
+web/dist/
+studio/dist/
+.astro/
+.sanity/
+pnpm-lock.yaml
+web/src/lib/sanity/types.gen.ts
+
+# Dokumenty projektowe i zainstalowane skille — nie formatujemy cudzych plików.
+docs/
+.agents/
+.claude/
+skills-lock.json

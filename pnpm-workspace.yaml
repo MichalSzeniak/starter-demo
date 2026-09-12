@@ -1,0 +1,15 @@
+packages:
+  - web
+  - studio
+
+# Skrypty instalacyjne uruchamiamy tylko tam, gdzie są naprawdę potrzebne.
+# esbuild rozpakowuje natywny binarek wykorzystywany przez Sanity CLI.
+allowBuilds:
+  esbuild: true
+
+peerDependencyRules:
+  allowedVersions:
+    # eslint-plugin-astro 3.1.0 wymaga jednocześnie jsx-a11y >=6.10.2 i eslint >=10,
+    # a jsx-a11y 6.10.2 (najnowszy) deklaruje jeszcze tylko eslint <=9.
+    # Deklaracje upstreamu są sprzeczne; flat config działa poprawnie.
+    eslint-plugin-jsx-a11y>eslint: '10'

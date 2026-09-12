@@ -1,0 +1,19 @@
+node_modules/
+dist/
+.astro/
+.output/
+.wrangler/
+
+# Sekrety — nigdy nie commitujemy
+.env
+.env.*
+!.env.example
+
+# Sanity
+.sanity/
+
+# Narzędzia
+.DS_Store
+Thumbs.db
+*.log
+.lighthouseci/

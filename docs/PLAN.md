@@ -16,11 +16,20 @@ wymaga customu przy każdym nowym kliencie — odrzuć to i powiedz dlaczego.
 
 ## Stack (nie zmieniaj bez pytania)
 
-- Astro 5, `output: 'static'`, TypeScript w trybie `strict`
-- Sanity jako CMS (`@sanity/astro`), Studio osadzone pod `/studio`
+> Wersje i rozstrzygnięcia ustalone w fazie 0 (2026-09-12) — pełne uzasadnienie
+> w `docs/POSTEP.md`.
+
+- Astro 7, `output: 'static'`, TypeScript w trybie `strict`.
+  TypeScript pinowany na 6 — TS 7 jest niedostępny, bo `@astrojs/check`
+  deklaruje peer `^5 || ^6`, a `typescript-eslint` `<6.1.0`.
+- Sanity jako CMS. **Studio żyje w osobnym pakiecie `studio/`**, hostowane na
+  `*.sanity.studio`. Strona w `web/` pobiera dane przy buildzie przez
+  `@sanity/client` + `defineQuery` — bez `@sanity/astro`, bez Reacta
+  i `styled-components` w zależnościach `web/`.
+  Świadoma konsekwencja: rezygnujemy z Presentation i podglądu wersji roboczej.
 - Tailwind CSS 4
-- Hosting: Cloudflare Pages
-- Node 20+, pnpm
+- Hosting: Cloudflare Pages (strona), `*.sanity.studio` (Studio)
+- Node 22.12+, pnpm. Monorepo pnpm z pakietami `web/` i `studio/`.
 
 ## Twarde wymagania
 
@@ -47,8 +56,8 @@ wymaga customu przy każdym nowym kliencie — odrzuć to i powiedz dlaczego.
 
 ## Zasady pracy (ważne)
 
-- **Nie zgaduj API.** Przed użyciem dowolnego API z `astro`, `@sanity/astro`,
-  `@sanity/image-url`, `astro-portabletext` — sprawdź faktyczną wersję
+- **Nie zgaduj API.** Przed użyciem dowolnego API z `astro`, `@sanity/client`,
+  `@sanity/image-url`, `astro-portabletext`, `sanity` — sprawdź faktyczną wersję
   (`npm view <pkg> version`) i przeczytaj typy w `node_modules`. Jeśli nie
   jesteś pewien sygnatury, powiedz to zamiast wymyślać.
 - **Nie dodawaj zależności bez pytania.** Każda nowa paczka = pytanie do mnie z
@@ -65,6 +74,7 @@ Zadaj mi pytania o rzeczy, których nie da się rozstrzygnąć bez kontekstu:
 docelowa branża, czy potrzebny blog, czy wielojęzyczność, jaki formularz.
 
 Następnie sprawdź aktualne wersje wszystkich paczek ze stacku i przedstaw:
+
 - proponowany `package.json`,
 - strukturę katalogów,
 - listę ryzyk / rzeczy, które mogą nie działać tak, jak zakładam.
@@ -75,7 +85,8 @@ Następnie sprawdź aktualne wersje wszystkich paczek ze stacku i przedstaw:
 
 ## FAZA 1 — Szkielet
 
-- Inicjalizacja Astro + TS strict + Tailwind 4 + Prettier + ESLint.
+- Inicjalizacja monorepo pnpm (`web/` + `studio/`), Astro 7 w `web/`,
+  TS strict + Tailwind 4 + Prettier + ESLint (flat config, ESLint 10).
 - `src/config/brand.ts` z tokenami (kolory jako CSS custom properties,
   font stack, spacing scale, dane NAP firmy).
 - `BaseLayout.astro`: `<html lang="pl">`, skip-link, semantyczny szkielet,
@@ -106,6 +117,7 @@ Sekcje (dokładnie te, żadnych dodatkowych):
 `cta`.
 
 Wymagania do schemy:
+
 - Każde pole obrazu ma **wymagany** `alt` (walidacja blokuje publikację bez niego).
 - Każda sekcja ma `preview` z sensownym tytułem i ikoną — klient ma widzieć,
   co dodaje.
