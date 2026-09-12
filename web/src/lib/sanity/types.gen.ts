@@ -256,6 +256,7 @@ export type SiteSettings = {
 		city: string;
 		country: string;
 	};
+	geo?: Geopoint;
 	phone: string;
 	email: string;
 	openingHours?: Array<{
@@ -295,6 +296,13 @@ export type SanityImageHotspot = {
 	y: number;
 	height: number;
 	width: number;
+};
+
+export type Geopoint = {
+	_type: 'geopoint';
+	lat?: number;
+	lng?: number;
+	alt?: number;
 };
 
 export type SanityImagePaletteSwatch = {
@@ -387,13 +395,6 @@ export type SanityImageAsset = {
 	source?: SanityAssetSourceData;
 };
 
-export type Geopoint = {
-	_type: 'geopoint';
-	lat?: number;
-	lng?: number;
-	alt?: number;
-};
-
 export type AllSanitySchemaTypes =
 	| Cta
 	| Gallery
@@ -417,24 +418,25 @@ export type AllSanitySchemaTypes =
 	| SiteSettings
 	| SanityImageCrop
 	| SanityImageHotspot
+	| Geopoint
 	| SanityImagePaletteSwatch
 	| SanityImagePalette
 	| SanityImageDimensions
 	| SanityImageMetadata
 	| SanityFileAsset
 	| SanityAssetSourceData
-	| SanityImageAsset
-	| Geopoint;
+	| SanityImageAsset;
 
 // Source: ../web/src/lib/sanity/queries.ts
 // Variable: SITE_SETTINGS_QUERY
-// Query: *[_id == "siteSettings"][0]{		companyName,		tagline,		nip,		address,		phone,		email,		openingHours[]{ _key, days, closed, opens, closes },		social[]{ _key, platform, url },		logo {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		defaultOgImage {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		analytics	}
+// Query: *[_id == "siteSettings"][0]{		companyName,		tagline,		nip,		address,		geo,		phone,		email,		openingHours[]{ _key, days, closed, opens, closes },		social[]{ _key, platform, url },		logo {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		defaultOgImage {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		analytics	}
 export type SITE_SETTINGS_QUERY_RESULT =
 	| {
 			companyName: null;
 			tagline: null;
 			nip: null;
 			address: null;
+			geo: null;
 			phone: null;
 			email: null;
 			openingHours: null;
@@ -453,6 +455,7 @@ export type SITE_SETTINGS_QUERY_RESULT =
 				city: string;
 				country: string;
 			} | null;
+			geo: Geopoint | null;
 			phone: string;
 			email: string;
 			openingHours: Array<{
@@ -536,17 +539,29 @@ export type NAVIGATION_QUERY_RESULT =
 	| null;
 
 // Source: ../web/src/lib/sanity/queries.ts
-// Variable: PAGE_SLUGS_QUERY
-// Query: *[_type == "page" && defined(slug.current)]{ "slug": slug.current }
-export type PAGE_SLUGS_QUERY_RESULT = Array<{
+// Variable: PAGE_INDEX_QUERY
+// Query: *[_type == "page" && defined(slug.current)]{		"slug": slug.current,		_updatedAt,		"noindex": seo.noindex == true	}
+export type PAGE_INDEX_QUERY_RESULT = Array<{
 	slug: string;
+	_updatedAt: string;
+	noindex: boolean | false;
+}>;
+
+// Source: ../web/src/lib/sanity/queries.ts
+// Variable: REDIRECTS_QUERY
+// Query: *[_type == "redirect" && defined(from) && defined(to)]{ from, to, permanent }
+export type REDIRECTS_QUERY_RESULT = Array<{
+	from: string;
+	to: string;
+	permanent: boolean | null;
 }>;
 
 // Source: ../web/src/lib/sanity/queries.ts
 // Variable: PAGE_BY_SLUG_QUERY
-// Query: *[_type == "page" && slug.current == $slug][0]{		_id,		title,		"slug": slug.current,		seo{			metaTitle,			metaDescription,			noindex,			ogImage {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}}		},		sections[]{	_key,	_type,	_type == "hero" => {		heading,		lead,		image {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		buttons[] {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current }}}	},	_type == "textImage" => {		heading,		body []{	...,	markDefs[]{		...,		_type == "link" => {	kind,	href,	newTab,	page->{ "slug": slug.current }}	}},		image {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		imagePosition	},	_type == "features" => {		heading,		lead,		items[]{ _key, title, description }	},	_type == "pricing" => {		heading,		lead,		plans[]{			_key,			name,			price,			unit,			description,			includes,			recommended,			button {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current }}}		}	},	_type == "testimonials" => {		heading,		items[]{ _key, quote, author, role, avatar {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}} }	},	_type == "faq" => {		heading,		items[]{ _key, question, answer []{	...,	markDefs[]{		...,		_type == "link" => {	kind,	href,	newTab,	page->{ "slug": slug.current }}	}} }	},	_type == "gallery" => {		heading,		images[] {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}}	},	_type == "cta" => {		heading,		lead,		button {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current }}}	}}	}
+// Query: *[_type == "page" && slug.current == $slug][0]{		_id,		_updatedAt,		title,		"slug": slug.current,		seo{			metaTitle,			metaDescription,			noindex,			ogImage {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}}		},		sections[]{	_key,	_type,	_type == "hero" => {		heading,		lead,		image {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		buttons[] {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current }}}	},	_type == "textImage" => {		heading,		body []{	...,	markDefs[]{		...,		_type == "link" => {	kind,	href,	newTab,	page->{ "slug": slug.current }}	}},		image {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		imagePosition	},	_type == "features" => {		heading,		lead,		items[]{ _key, title, description }	},	_type == "pricing" => {		heading,		lead,		plans[]{			_key,			name,			price,			unit,			description,			includes,			recommended,			button {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current }}}		}	},	_type == "testimonials" => {		heading,		items[]{ _key, quote, author, role, avatar {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}} }	},	_type == "faq" => {		heading,		items[]{ _key, question, answer []{	...,	markDefs[]{		...,		_type == "link" => {	kind,	href,	newTab,	page->{ "slug": slug.current }}	}} }	},	_type == "gallery" => {		heading,		images[] {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}}	},	_type == "cta" => {		heading,		lead,		button {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current }}}	}}	}
 export type PAGE_BY_SLUG_QUERY_RESULT = {
 	_id: string;
+	_updatedAt: string;
 	title: string;
 	slug: string;
 	seo: {
@@ -772,10 +787,11 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 // Query TypeMap
 declare global {
 	interface SanityQueries {
-		'\n\t*[_id == "siteSettings"][0]{\n\t\tcompanyName,\n\t\ttagline,\n\t\tnip,\n\t\taddress,\n\t\tphone,\n\t\temail,\n\t\topeningHours[]{ _key, days, closed, opens, closes },\n\t\tsocial[]{ _key, platform, url },\n\t\tlogo {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tdefaultOgImage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tanalytics\n\t}\n': SITE_SETTINGS_QUERY_RESULT;
+		'\n\t*[_id == "siteSettings"][0]{\n\t\tcompanyName,\n\t\ttagline,\n\t\tnip,\n\t\taddress,\n\t\tgeo,\n\t\tphone,\n\t\temail,\n\t\topeningHours[]{ _key, days, closed, opens, closes },\n\t\tsocial[]{ _key, platform, url },\n\t\tlogo {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tdefaultOgImage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tanalytics\n\t}\n': SITE_SETTINGS_QUERY_RESULT;
 		'\n\t*[_id == "navigation"][0]{\n\t\tmainMenu[] {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n},\n\t\tfooterMenu[] {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n}\n\t}\n': NAVIGATION_QUERY_RESULT;
-		'\n\t*[_type == "page" && defined(slug.current)]{ "slug": slug.current }\n': PAGE_SLUGS_QUERY_RESULT;
-		'\n\t*[_type == "page" && slug.current == $slug][0]{\n\t\t_id,\n\t\ttitle,\n\t\t"slug": slug.current,\n\t\tseo{\n\t\t\tmetaTitle,\n\t\t\tmetaDescription,\n\t\t\tnoindex,\n\t\t\togImage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n}\n\t\t},\n\t\tsections[]{\n\t_key,\n\t_type,\n\t_type == "hero" => {\n\t\theading,\n\t\tlead,\n\t\timage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tbuttons[] {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n}\n\t},\n\t_type == "textImage" => {\n\t\theading,\n\t\tbody []{\n\t...,\n\tmarkDefs[]{\n\t\t...,\n\t\t_type == "link" => {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n\t}\n},\n\t\timage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\timagePosition\n\t},\n\t_type == "features" => {\n\t\theading,\n\t\tlead,\n\t\titems[]{ _key, title, description }\n\t},\n\t_type == "pricing" => {\n\t\theading,\n\t\tlead,\n\t\tplans[]{\n\t\t\t_key,\n\t\t\tname,\n\t\t\tprice,\n\t\t\tunit,\n\t\t\tdescription,\n\t\t\tincludes,\n\t\t\trecommended,\n\t\t\tbutton {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n}\n\t\t}\n\t},\n\t_type == "testimonials" => {\n\t\theading,\n\t\titems[]{ _key, quote, author, role, avatar {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n} }\n\t},\n\t_type == "faq" => {\n\t\theading,\n\t\titems[]{ _key, question, answer []{\n\t...,\n\tmarkDefs[]{\n\t\t...,\n\t\t_type == "link" => {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n\t}\n} }\n\t},\n\t_type == "gallery" => {\n\t\theading,\n\t\timages[] {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n}\n\t},\n\t_type == "cta" => {\n\t\theading,\n\t\tlead,\n\t\tbutton {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n}\n\t}\n}\n\t}\n': PAGE_BY_SLUG_QUERY_RESULT;
+		'\n\t*[_type == "page" && defined(slug.current)]{\n\t\t"slug": slug.current,\n\t\t_updatedAt,\n\t\t"noindex": seo.noindex == true\n\t}\n': PAGE_INDEX_QUERY_RESULT;
+		'\n\t*[_type == "redirect" && defined(from) && defined(to)]{ from, to, permanent }\n': REDIRECTS_QUERY_RESULT;
+		'\n\t*[_type == "page" && slug.current == $slug][0]{\n\t\t_id,\n\t\t_updatedAt,\n\t\ttitle,\n\t\t"slug": slug.current,\n\t\tseo{\n\t\t\tmetaTitle,\n\t\t\tmetaDescription,\n\t\t\tnoindex,\n\t\t\togImage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n}\n\t\t},\n\t\tsections[]{\n\t_key,\n\t_type,\n\t_type == "hero" => {\n\t\theading,\n\t\tlead,\n\t\timage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tbuttons[] {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n}\n\t},\n\t_type == "textImage" => {\n\t\theading,\n\t\tbody []{\n\t...,\n\tmarkDefs[]{\n\t\t...,\n\t\t_type == "link" => {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n\t}\n},\n\t\timage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\timagePosition\n\t},\n\t_type == "features" => {\n\t\theading,\n\t\tlead,\n\t\titems[]{ _key, title, description }\n\t},\n\t_type == "pricing" => {\n\t\theading,\n\t\tlead,\n\t\tplans[]{\n\t\t\t_key,\n\t\t\tname,\n\t\t\tprice,\n\t\t\tunit,\n\t\t\tdescription,\n\t\t\tincludes,\n\t\t\trecommended,\n\t\t\tbutton {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n}\n\t\t}\n\t},\n\t_type == "testimonials" => {\n\t\theading,\n\t\titems[]{ _key, quote, author, role, avatar {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n} }\n\t},\n\t_type == "faq" => {\n\t\theading,\n\t\titems[]{ _key, question, answer []{\n\t...,\n\tmarkDefs[]{\n\t\t...,\n\t\t_type == "link" => {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n\t}\n} }\n\t},\n\t_type == "gallery" => {\n\t\theading,\n\t\timages[] {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n}\n\t},\n\t_type == "cta" => {\n\t\theading,\n\t\tlead,\n\t\tbutton {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n}\n\t}\n}\n\t}\n': PAGE_BY_SLUG_QUERY_RESULT;
 	}
 }
 // Lets @sanity/client releases that predate the global registry read it too

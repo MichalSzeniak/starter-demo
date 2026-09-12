@@ -103,6 +103,7 @@ export const SITE_SETTINGS_QUERY = defineQuery(/* groq */ `
 		tagline,
 		nip,
 		address,
+		geo,
 		phone,
 		email,
 		openingHours[]{ _key, days, closed, opens, closes },
@@ -120,13 +121,24 @@ export const NAVIGATION_QUERY = defineQuery(/* groq */ `
 	}
 `);
 
-export const PAGE_SLUGS_QUERY = defineQuery(/* groq */ `
-	*[_type == "page" && defined(slug.current)]{ "slug": slug.current }
+/** Indeks stron: do getStaticPaths i do sitemapy (lastmod, wykluczenie noindex). */
+export const PAGE_INDEX_QUERY = defineQuery(/* groq */ `
+	*[_type == "page" && defined(slug.current)]{
+		"slug": slug.current,
+		_updatedAt,
+		"noindex": seo.noindex == true
+	}
+`);
+
+/** Przekierowania → plik _redirects dla Cloudflare. */
+export const REDIRECTS_QUERY = defineQuery(/* groq */ `
+	*[_type == "redirect" && defined(from) && defined(to)]{ from, to, permanent }
 `);
 
 export const PAGE_BY_SLUG_QUERY = defineQuery(/* groq */ `
 	*[_type == "page" && slug.current == $slug][0]{
 		_id,
+		_updatedAt,
 		title,
 		"slug": slug.current,
 		seo{

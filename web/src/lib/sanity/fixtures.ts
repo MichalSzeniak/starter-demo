@@ -1,6 +1,7 @@
 import type {
 	NAVIGATION_QUERY_RESULT,
 	PAGE_BY_SLUG_QUERY_RESULT,
+	REDIRECTS_QUERY_RESULT,
 	SITE_SETTINGS_QUERY_RESULT,
 } from './types.gen';
 
@@ -24,6 +25,7 @@ type ImageWithKey = Extract<Section, { _type: 'gallery' }>['images'][number];
 type Image = NonNullable<Extract<Section, { _type: 'hero' }>['image']>;
 type Link = Extract<Section, { _type: 'cta' }>['button']['link'];
 type Block = Extract<Section, { _type: 'faq' }>['items'][number]['answer'][number];
+type Redirect = REDIRECTS_QUERY_RESULT[number];
 
 let counter = 0;
 const key = () => `demo-${++counter}`;
@@ -115,6 +117,7 @@ const siteSettings: SiteSettings = {
 	logo: image('logo', 'Firma Demo — logo', 240, 80),
 	defaultOgImage: image('og', 'Firma Demo', 1200, 630),
 	analytics: { provider: 'none' },
+	geo: { _type: 'geopoint', lat: 52.2297, lng: 21.0122 },
 };
 
 const navigation: Navigation = {
@@ -131,6 +134,7 @@ const navigation: Navigation = {
 
 const home: Page = {
 	_id: 'demo-page-home',
+	_updatedAt: '2026-09-12T08:00:00Z',
 	title: 'Strona główna',
 	slug: '/',
 	seo: {
@@ -279,6 +283,7 @@ const home: Page = {
 
 const about: Page = {
 	_id: 'demo-page-about',
+	_updatedAt: '2026-09-12T08:00:00Z',
 	title: 'O nas',
 	slug: 'o-nas',
 	seo: {
@@ -348,6 +353,7 @@ const about: Page = {
 
 const pricing: Page = {
 	_id: 'demo-page-pricing',
+	_updatedAt: '2026-09-12T08:00:00Z',
 	title: 'Cennik',
 	slug: 'cennik',
 	seo: {
@@ -415,8 +421,16 @@ const pricing: Page = {
 	],
 };
 
+/** Przykładowe przekierowania ze starej strony — ćwiczą generowanie _redirects. */
+const redirects: Redirect[] = [
+	{ from: '/oferta.html', to: '/cennik', permanent: true },
+	{ from: '/o-firmie', to: '/o-nas', permanent: true },
+	{ from: '/promocja', to: '/', permanent: false },
+];
+
 export const demoContent = {
 	siteSettings,
 	navigation,
+	redirects,
 	pages: { '/': home, 'o-nas': about, cennik: pricing } as Record<string, Page>,
 };

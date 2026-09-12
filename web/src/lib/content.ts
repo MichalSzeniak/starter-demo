@@ -4,13 +4,15 @@ import { demoContent } from './sanity/fixtures';
 import {
 	NAVIGATION_QUERY,
 	PAGE_BY_SLUG_QUERY,
-	PAGE_SLUGS_QUERY,
+	PAGE_INDEX_QUERY,
+	REDIRECTS_QUERY,
 	SITE_SETTINGS_QUERY,
 } from './sanity/queries';
 import type {
 	NAVIGATION_QUERY_RESULT,
 	PAGE_BY_SLUG_QUERY_RESULT,
-	PAGE_SLUGS_QUERY_RESULT,
+	PAGE_INDEX_QUERY_RESULT,
+	REDIRECTS_QUERY_RESULT,
 	SITE_SETTINGS_QUERY_RESULT,
 } from './sanity/types.gen';
 
@@ -21,6 +23,8 @@ export type SiteSettings = Extract<
 >;
 export type Navigation = NonNullable<NAVIGATION_QUERY_RESULT>;
 export type Page = NonNullable<PAGE_BY_SLUG_QUERY_RESULT>;
+export type PageIndexEntry = PAGE_INDEX_QUERY_RESULT[number];
+export type Redirect = REDIRECTS_QUERY_RESULT[number];
 
 /**
  * Jedyne miejsce, przez które strona sięga po treści.
@@ -58,6 +62,7 @@ function settingsFromBrand(): SiteSettings {
 			city: company.city,
 			country: company.country,
 		},
+		geo: null,
 		phone: company.phone,
 		email: company.email,
 		openingHours: null,
@@ -88,11 +93,25 @@ export function getNavigation(): Promise<Navigation> {
 	});
 }
 
-export function getPageSlugs(): Promise<string[]> {
-	return once('pageSlugs', async () => {
-		if (contentSource === 'demo') return Object.keys(demoContent.pages);
-		const result = await sanityClient!.fetch<PAGE_SLUGS_QUERY_RESULT>(PAGE_SLUGS_QUERY);
-		return result.map((row) => row.slug).filter((slug): slug is string => Boolean(slug));
+/** Wszystkie strony ze slugiem — do getStaticPaths i sitemapy. */
+export function getPageIndex(): Promise<PageIndexEntry[]> {
+	return once('pageIndex', async () => {
+		if (contentSource === 'demo') {
+			return Object.values(demoContent.pages).map((page) => ({
+				slug: page.slug,
+				_updatedAt: page._updatedAt,
+				noindex: page.seo.noindex === true,
+			}));
+		}
+		const result = await sanityClient!.fetch<PAGE_INDEX_QUERY_RESULT>(PAGE_INDEX_QUERY);
+		return result.filter((row) => Boolean(row.slug));
+	});
+}
+
+export function getRedirects(): Promise<Redirect[]> {
+	return once('redirects', async () => {
+		if (contentSource === 'demo') return demoContent.redirects;
+		return sanityClient!.fetch<REDIRECTS_QUERY_RESULT>(REDIRECTS_QUERY);
 	});
 }
 

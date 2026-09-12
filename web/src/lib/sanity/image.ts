@@ -13,7 +13,7 @@ export interface ImageLike {
 		left?: number | null;
 		right?: number | null;
 	} | null;
-	hotspot?: unknown;
+	hotspot?: { x: number; y: number; width: number; height: number } | null;
 	asset?: {
 		_id: string;
 		url: string | null;
@@ -75,4 +75,27 @@ export function resolveImage(
 		.url();
 
 	return { src, width, height, alt, remote: true };
+}
+
+/**
+ * Adres kadru o zadanych wymiarach z CDN Sanity — do obrazów OG (1200×630).
+ * `fit('crop')` respektuje hotspot ustawiony w Studio. null dla obrazów demo.
+ */
+export function cdnCropUrl(
+	image: ImageLike | null | undefined,
+	width: number,
+	height: number,
+): string | null {
+	const asset = image?.asset;
+	if (!asset?.url || !asset.url.startsWith('http') || !builder) return null;
+	return builder
+		.image({
+			asset: { _id: asset._id },
+			crop: image?.crop ?? undefined,
+			hotspot: image?.hotspot ?? undefined,
+		})
+		.width(width)
+		.height(height)
+		.fit('crop')
+		.url();
 }
