@@ -442,3 +442,137 @@ Osiem sekcji renderuje się z jednego `SectionRenderer`, Portable Text ma własn
 komponenty, obrazy idą przez `astro:assets` z wymiarami i priorytetem, strona
 buduje się z demo bez projektu Sanity i odmawia builda produkcyjnego bez niego.
 Następny krok: faza 4 (warstwa SEO), po Twoim „dalej".
+
+---
+
+## Faza 4 — Warstwa SEO — 2026-09-12
+
+### Co powstało
+
+```
+web/src/components/seo/Seo.astro      title, description, canonical, robots, OG (pl_PL, 1200×630), Twitter card
+web/src/components/seo/JsonLd.astro   jeden <script type="application/ld+json"> z @graph, `<` → <
+web/src/lib/seo/jsonld.ts             Organization+LocalBusiness, WebSite, BreadcrumbList, FAQPage
+web/src/lib/seo/site-graph.ts         węzły wspólne (memoizowane; logo przez astro:assets)
+web/src/lib/seo/plain-text.ts         Portable Text → tekst (do FAQPage), bez zależności
+web/src/lib/seo/og-image.ts           wybór obrazu OG: własny → domyślny → generowany
+web/src/lib/seo/og.ts                 satori → SVG → sharp → PNG (tytuł, logo, nazwa, domena)
+web/src/lib/seo/og-fonts.ts           TTF z Google Fonts (latin+latin-ext) z cache
+web/src/pages/og/[id].png.ts          /og/<slug>.png dla każdej strony; `strona-glowna` = `/`
+web/src/pages/sitemap.xml.ts          bez noindex, lastmod z _updatedAt
+web/src/pages/robots.txt.ts           Allow: / + Sitemap
+web/src/pages/redirects.txt.ts        z dokumentów `redirect`, kod statusu zawsze jawny
+web/src/integrations/seo-guard.ts     astro:build:done — walidacja HTML (build failuje) + rename na _redirects
+studio: siteSettings.geo (geopoint)   współrzędne do GeoCoordinates
+queries: PAGE_INDEX_QUERY, REDIRECTS_QUERY, _updatedAt, geo
+```
+
+Nowa zależność `web/`: **satori 0.33.4** — ~11 MB unpacked razem z zależnościami
+(opentype.js 3,8 MB, harfbuzzjs 1,2 MB, yoga-layout 0,2 MB), zero natywnych
+binarek, wyłącznie build. Rasteryzacja przez **sharp**, który już był w drzewie
+(librsvg 2.62 potwierdzony). Odrzucone: `astro-og-canvas` (canvaskit-wasm 25 MB),
+`@resvg/resvg-js` (12 paczek platformowych po ~4,3 MB — zbędne przy sharpie).
+
+### Decyzje
+
+**Sitemap własnym endpointem, nie `@astrojs/sitemap`** (odstępstwo od litery
+PLAN-u, uzgodnione). Sprawdzone w `index.d.ts` paczki: `filter?(page: string)`
+dostaje wyłącznie URL, więc wykluczenie `noindex` wymagałoby kanału bocznego
+(plik tymczasowy albo drugi klient Sanity w konfiguracji). Endpoint ma ~30 linii,
+zero zależności i pełny dostęp do `content.ts`: `noindex` i `lastmod` wprost,
+ten sam kod dla Sanity i demo.
+
+**`_redirects` przez endpoint + rename.** Astro ignoruje trasy zaczynające się
+od `_`, więc generujemy `redirects.txt`, a `seo-guard` zmienia nazwę po buildzie.
+Zweryfikowane w dokumentacji Cloudflare: Workers Static Assets honoruje
+`_redirects` w katalogu assetów (składnia `źródło cel kod`, 301/302/303/307/308,
+limit 2 000 + 100). **Domyślny kod to 302**, dlatego zawsze wpisujemy jawnie:
+301 dla trwałych, 302 dla pozostałych.
+
+**Walidacja na wynikowym HTML, nie na danych z CMS.** `seo-guard` czyta każdy
+`.html` w `dist/` i wymaga: dokładnie jednego `<h1>`, niepustego `<title>`
+(≤ 60), `meta description` (≤ 155), absolutnego canonicala i absolutnego
+`og:image`. To jedyne miejsce, w którym widać efekt końcowy — np. drugi h1
+wstrzyknięty przez komponent, a nie przez treść. Build FAILUJE z raportem
+per strona.
+
+**Obraz OG: własny → domyślny → generowany.** Opis pola `defaultOgImage`
+w Studio obiecuje „używany, gdy podstrona nie ma własnego" — honorujemy to,
+więc generowanie z tytułu i logo jest opcją zerowego wysiłku, a nie nadpisuje
+świadomej decyzji klienta. Obrazy z Sanity idą przez `getImage` do lokalnego
+**JPG** (nie WebP — część serwisów społecznościowych nie renderuje WebP
+w podglądzie linku), z `fit('crop')`, czyli z hotspotem ze Studio.
+
+**Fonty do OG z Google Fonts, nie z fontsource.** To był najdłuższy problem
+fazy. Satori nie czyta WOFF2 (jedyny format, jaki Astro pobiera dla strony).
+Fontsource wystawia WOFF, ale podzielony na podzbiory, a satori — zweryfikowane
+trzema eksperymentami z podglądem PNG — bierze pierwszy font o danej nazwie
+i wadze i **nie sięga po drugi dla brakujących glifów**: `ł ż ę ą` renderowały
+się jako tofu. `loadAdditionalAsset` jest wołany z segmentem
+`łżćęśąźńĄĘŁŃŚŹŻ`, ale zwrócony font o tej samej nazwie nie jest używany;
+`lang` przyjmuje tylko zamkniętą listę (CJK, indyjskie); `fontFamily` musi być
+stringiem. Rozwiązanie: legacy endpoint `fonts.googleapis.com/css?family=…&subset=latin,latin-ext`
+z UA `node` zwraca **jeden pełny TTF** (143 kB na wagę) — to samo źródło co
+`fontProviders.google()` dla strony, więc OG i strona mają tę samą rodzinę.
+Cache w `node_modules/.cache/og-fonts`. Nieznana rodzina → Inter z ostrzeżeniem.
+
+**JSON-LD.** Jeden węzeł `@type: ['Organization', 'LocalBusiness']` —
+LocalBusiness jest podtypem Organization, dwa osobne węzły dublowałyby NAP.
+`openingHoursSpecification` pomija dni oznaczone „nieczynne", `vatID` = `PL` + NIP,
+`addressCountry` = `PL` dla „Polska", `sameAs` z profili społecznościowych.
+`BreadcrumbList` tylko na podstronach, `FAQPage` tylko gdy strona ma sekcję `faq`
+(odpowiedzi spłaszczone z Portable Text). Bez `schema-dts` — cztery typy węzłów
+nie uzasadniają zależności.
+
+**Generyczny `LocalBusiness`.** Branża demo pozostaje nieustalona (pytanie z fazy 0
+bez odpowiedzi), więc bez podtypu (`Dentist`, `Plumber`…). Dodanie pola
+`businessType` do `siteSettings` to zmiana na 10 linii — na życzenie.
+
+### Weryfikacja
+
+| Sprawdzenie | Wynik |
+|---|---|
+| `pnpm check` / studio / lint / `format:check` | czysto |
+| `DEMO_CONTENT=true pnpm build` | 4 strony w 3 s (z pobraniem fontów) |
+| `seo-guard` w logu builda | `Walidacja SEO: 4 stron OK`, `redirects.txt → _redirects` |
+| Walidator — 8 przypadków HTML (Node uruchamia TS natywnie) | 0 h1, 2 h1, brak opisu, canonical względny, brak og:image, title > 60, wszystko naraz — wszystkie złapane; poprawna strona przechodzi |
+| **Build ze stroną o dwóch `<h1>`** (tymczasowa, osobny katalog) | exit 1, raport `tmp-bad\index.html — liczba <h1>: 2` |
+| `<head>` na `/`, `/o-nas`, `/404` | title, description, canonical absolutny, `og:*` z obrazem 1200×630, `twitter:card summary_large_image`, `robots noindex` tylko na 404 |
+| JSON-LD | `@graph`: Organization+LocalBusiness (logo, geo, vatID, 2× sameAs, godziny bez niedzieli, PL), WebSite (`publisher` → `#organization`), BreadcrumbList tylko na `/o-nas`, FAQPage 3 pyt. na `/` i 2 na `/o-nas`; `<` w JSON: 0 |
+| `sitemap.xml` | 3 URL-e z `lastmod`, `noindex` respektowane |
+| `robots.txt` | `Allow: /`, `Sitemap: https://example.com/sitemap.xml` |
+| `_redirects` | `/oferta.html /cennik 301`, `/o-firmie /o-nas 301`, `/promocja / 302`; `redirects.txt` nie zostaje w `dist/` |
+| OG PNG (podgląd obrazu) | 3 pliki 24–37 kB; polskie znaki poprawne po przejściu na TTF z Google; logo rasteryzowane w 2× (SVG z `density`) |
+| `astro dev` | `/sitemap.xml`, `/robots.txt`, `/redirects.txt`, `/og/*.png` → 200 z właściwym `Content-Type` |
+| `cdn.sanity.io` w `<head>` | 0 |
+
+### Czego nie zweryfikowałem
+
+- **Realny dataset Sanity** — nadal wszystko na demo. Ścieżka „własny obraz OG
+  z Sanity → `getImage` → lokalny JPG" i logo w JSON-LD przez `getImage` są
+  sprawdzone typami i analogiczną ścieżką z fazy 3, ale nie na CDN Sanity.
+  W demo logo w JSON-LD to `/demo/logo.svg` (Google woli raster ≥ 112 px —
+  przy kliencie logo pójdzie przez `getImage` do PNG).
+- Rich Results Test / walidator schema.org — wymaga publicznego adresu.
+  Graf jest poprawnym JSON-em i ma kształt z dokumentacji, ale nie był
+  przepuszczony przez narzędzie Google.
+- `_redirects` na realnym deploymencie Workers — składnia z dokumentacji,
+  nie z testu na `*.workers.dev`.
+- Lighthouse — faza 6. Uwaga: JSON-LD to `<script type="application/ld+json">`,
+  przeglądarka go nie wykonuje; w `dist/` nadal 0 plików `.js`.
+
+### Do fazy 5–7
+
+- `robots.txt` nie blokuje robotów AI — decyzja właściciela strony; łatwo
+  dodać `User-agent: GPTBot / Disallow: /` w endpoincie.
+- Walidator nie sprawdza unikalności `metaTitle` między stronami (CLAUDE.md:
+  „unikalny metaTitle") — do dodania w `seo-guard` (zbiór tytułów, ~10 linii).
+- Kolizja: podstrona o slugu `strona-glowna` dałaby ten sam plik OG co `/`.
+- `brand.ts` nadal eksportuje nieużywane `fullAddress` i `phoneHref`.
+
+### Stan
+
+Każda strona ma pełny `<head>`, JSON-LD składany warunkowo, obraz OG z tytułem
+i logo generowany przy buildzie, sitemapa bez noindex, robots, `_redirects`
+z CMS — a build odmawia wypuszczenia strony bez h1, tytułu, opisu, canonicala
+lub og:image. Następny krok: faza 5 (formularz i analityka), po Twoim „dalej".
