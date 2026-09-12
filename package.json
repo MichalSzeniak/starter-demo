@@ -15,7 +15,8 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "typegen": "pnpm --filter studio run schema:extract && pnpm --filter studio exec sanity typegen generate"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

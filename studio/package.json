@@ -7,10 +7,11 @@
     "dev": "sanity dev --port 3333",
     "build": "sanity build",
     "deploy": "sanity deploy",
-    "schema:extract": "sanity schema extract --enforce-required-fields",
+    "schema:extract": "sanity schemas extract --enforce-required-fields --force",
     "check": "tsc --noEmit"
   },
   "dependencies": {
+    "@sanity/icons": "5.2.2",
     "@sanity/vision": "6.13.2",
     "react": "19.3.0",
     "react-dom": "19.3.0",

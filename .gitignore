@@ -17,3 +17,6 @@ dist/
 Thumbs.db
 *.log
 .lighthouseci/
+
+# Sanity TypeGen — artefakt pośredni, typy wynikowe commitujemy
+studio/schema.json
