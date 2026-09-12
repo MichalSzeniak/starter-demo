@@ -425,3 +425,360 @@ export type AllSanitySchemaTypes =
 	| SanityAssetSourceData
 	| SanityImageAsset
 	| Geopoint;
+
+// Source: ../web/src/lib/sanity/queries.ts
+// Variable: SITE_SETTINGS_QUERY
+// Query: *[_id == "siteSettings"][0]{		companyName,		tagline,		nip,		address,		phone,		email,		openingHours[]{ _key, days, closed, opens, closes },		social[]{ _key, platform, url },		logo {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		defaultOgImage {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		analytics	}
+export type SITE_SETTINGS_QUERY_RESULT =
+	| {
+			companyName: null;
+			tagline: null;
+			nip: null;
+			address: null;
+			phone: null;
+			email: null;
+			openingHours: null;
+			social: null;
+			logo: null;
+			defaultOgImage: null;
+			analytics: null;
+	  }
+	| {
+			companyName: string;
+			tagline: string | null;
+			nip: string | null;
+			address: {
+				street: string;
+				postalCode: string;
+				city: string;
+				country: string;
+			} | null;
+			phone: string;
+			email: string;
+			openingHours: Array<{
+				_key: string;
+				days: Array<string>;
+				closed: boolean | null;
+				opens: string | null;
+				closes: string | null;
+			}> | null;
+			social: Array<{
+				_key: string;
+				platform: 'facebook' | 'instagram' | 'linkedin' | 'tiktok' | 'x' | 'youtube';
+				url: string;
+			}> | null;
+			logo: {
+				_key: null;
+				alt: string | null;
+				hotspot: SanityImageHotspot | null;
+				crop: SanityImageCrop | null;
+				asset: {
+					_id: string;
+					url: string;
+					width: number | null;
+					height: number | null;
+				} | null;
+			} | null;
+			defaultOgImage: {
+				_key: null;
+				alt: string | null;
+				hotspot: SanityImageHotspot | null;
+				crop: SanityImageCrop | null;
+				asset: {
+					_id: string;
+					url: string;
+					width: number | null;
+					height: number | null;
+				} | null;
+			} | null;
+			analytics: {
+				provider?: 'none' | 'plausible' | 'umami';
+				domain?: string;
+				scriptHost?: string;
+			} | null;
+	  }
+	| null;
+
+// Source: ../web/src/lib/sanity/queries.ts
+// Variable: NAVIGATION_QUERY
+// Query: *[_id == "navigation"][0]{		mainMenu[] {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current }}},		footerMenu[] {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current }}}	}
+export type NAVIGATION_QUERY_RESULT =
+	| {
+			mainMenu: null;
+			footerMenu: null;
+	  }
+	| {
+			mainMenu: Array<{
+				_key: string;
+				label: string;
+				link: {
+					kind: 'external' | 'internal';
+					href: string | null;
+					newTab: boolean | null;
+					page: {
+						slug: string;
+					} | null;
+				};
+			}> | null;
+			footerMenu: Array<{
+				_key: string;
+				label: string;
+				link: {
+					kind: 'external' | 'internal';
+					href: string | null;
+					newTab: boolean | null;
+					page: {
+						slug: string;
+					} | null;
+				};
+			}> | null;
+	  }
+	| null;
+
+// Source: ../web/src/lib/sanity/queries.ts
+// Variable: PAGE_SLUGS_QUERY
+// Query: *[_type == "page" && defined(slug.current)]{ "slug": slug.current }
+export type PAGE_SLUGS_QUERY_RESULT = Array<{
+	slug: string;
+}>;
+
+// Source: ../web/src/lib/sanity/queries.ts
+// Variable: PAGE_BY_SLUG_QUERY
+// Query: *[_type == "page" && slug.current == $slug][0]{		_id,		title,		"slug": slug.current,		seo{			metaTitle,			metaDescription,			noindex,			ogImage {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}}		},		sections[]{	_key,	_type,	_type == "hero" => {		heading,		lead,		image {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		buttons[] {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current }}}	},	_type == "textImage" => {		heading,		body []{	...,	markDefs[]{		...,		_type == "link" => {	kind,	href,	newTab,	page->{ "slug": slug.current }}	}},		image {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		imagePosition	},	_type == "features" => {		heading,		lead,		items[]{ _key, title, description }	},	_type == "pricing" => {		heading,		lead,		plans[]{			_key,			name,			price,			unit,			description,			includes,			recommended,			button {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current }}}		}	},	_type == "testimonials" => {		heading,		items[]{ _key, quote, author, role, avatar {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}} }	},	_type == "faq" => {		heading,		items[]{ _key, question, answer []{	...,	markDefs[]{		...,		_type == "link" => {	kind,	href,	newTab,	page->{ "slug": slug.current }}	}} }	},	_type == "gallery" => {		heading,		images[] {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}}	},	_type == "cta" => {		heading,		lead,		button {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current }}}	}}	}
+export type PAGE_BY_SLUG_QUERY_RESULT = {
+	_id: string;
+	title: string;
+	slug: string;
+	seo: {
+		metaTitle: string;
+		metaDescription: string;
+		noindex: boolean | null;
+		ogImage: {
+			_key: null;
+			alt: string | null;
+			hotspot: SanityImageHotspot | null;
+			crop: SanityImageCrop | null;
+			asset: {
+				_id: string;
+				url: string;
+				width: number | null;
+				height: number | null;
+			} | null;
+		} | null;
+	};
+	sections: Array<
+		| {
+				_key: string;
+				_type: 'cta';
+				heading: string;
+				lead: string | null;
+				button: {
+					_key: null;
+					label: string;
+					link: {
+						kind: 'external' | 'internal';
+						href: string | null;
+						newTab: boolean | null;
+						page: {
+							slug: string;
+						} | null;
+					};
+				};
+		  }
+		| {
+				_key: string;
+				_type: 'faq';
+				heading: string | null;
+				items: Array<{
+					_key: string;
+					question: string;
+					answer: Array<{
+						children?: Array<{
+							marks?: Array<string>;
+							text?: string;
+							_type: 'span';
+							_key: string;
+						}>;
+						style?: 'h2' | 'h3' | 'normal';
+						listItem?: 'bullet' | 'number';
+						markDefs: Array<{
+							_key: string;
+							_type: 'link';
+							kind: 'external' | 'internal';
+							page: {
+								slug: string;
+							} | null;
+							href: string | null;
+							newTab: boolean | null;
+						}> | null;
+						level?: number;
+						_type: 'block';
+						_key: string;
+					}>;
+				}>;
+		  }
+		| {
+				_key: string;
+				_type: 'features';
+				heading: string | null;
+				lead: string | null;
+				items: Array<{
+					_key: string;
+					title: string;
+					description: string | null;
+				}>;
+		  }
+		| {
+				_key: string;
+				_type: 'gallery';
+				heading: string | null;
+				images: Array<{
+					_key: string;
+					alt: string | null;
+					hotspot: SanityImageHotspot | null;
+					crop: SanityImageCrop | null;
+					asset: {
+						_id: string;
+						url: string;
+						width: number | null;
+						height: number | null;
+					} | null;
+				}>;
+		  }
+		| {
+				_key: string;
+				_type: 'hero';
+				heading: string;
+				lead: string | null;
+				image: {
+					_key: null;
+					alt: string | null;
+					hotspot: SanityImageHotspot | null;
+					crop: SanityImageCrop | null;
+					asset: {
+						_id: string;
+						url: string;
+						width: number | null;
+						height: number | null;
+					} | null;
+				} | null;
+				buttons: Array<{
+					_key: string;
+					label: string;
+					link: {
+						kind: 'external' | 'internal';
+						href: string | null;
+						newTab: boolean | null;
+						page: {
+							slug: string;
+						} | null;
+					};
+				}> | null;
+		  }
+		| {
+				_key: string;
+				_type: 'pricing';
+				heading: string | null;
+				lead: string | null;
+				plans: Array<{
+					_key: string;
+					name: string;
+					price: string;
+					unit: string | null;
+					description: string | null;
+					includes: Array<string> | null;
+					recommended: boolean | null;
+					button: {
+						_key: null;
+						label: string;
+						link: {
+							kind: 'external' | 'internal';
+							href: string | null;
+							newTab: boolean | null;
+							page: {
+								slug: string;
+							} | null;
+						};
+					} | null;
+				}>;
+		  }
+		| {
+				_key: string;
+				_type: 'testimonials';
+				heading: string | null;
+				items: Array<{
+					_key: string;
+					quote: string;
+					author: string;
+					role: string | null;
+					avatar: {
+						_key: null;
+						alt: string | null;
+						hotspot: SanityImageHotspot | null;
+						crop: SanityImageCrop | null;
+						asset: {
+							_id: string;
+							url: string;
+							width: number | null;
+							height: number | null;
+						} | null;
+					} | null;
+				}>;
+		  }
+		| {
+				_key: string;
+				_type: 'textImage';
+				heading: string;
+				body: Array<{
+					children?: Array<{
+						marks?: Array<string>;
+						text?: string;
+						_type: 'span';
+						_key: string;
+					}>;
+					style?: 'h2' | 'h3' | 'normal';
+					listItem?: 'bullet' | 'number';
+					markDefs: Array<{
+						_key: string;
+						_type: 'link';
+						kind: 'external' | 'internal';
+						page: {
+							slug: string;
+						} | null;
+						href: string | null;
+						newTab: boolean | null;
+					}> | null;
+					level?: number;
+					_type: 'block';
+					_key: string;
+				}> | null;
+				image: {
+					_key: null;
+					alt: string | null;
+					hotspot: SanityImageHotspot | null;
+					crop: SanityImageCrop | null;
+					asset: {
+						_id: string;
+						url: string;
+						width: number | null;
+						height: number | null;
+					} | null;
+				};
+				imagePosition: 'left' | 'right' | null;
+		  }
+	>;
+} | null;
+
+// Query TypeMap
+declare global {
+	interface SanityQueries {
+		'\n\t*[_id == "siteSettings"][0]{\n\t\tcompanyName,\n\t\ttagline,\n\t\tnip,\n\t\taddress,\n\t\tphone,\n\t\temail,\n\t\topeningHours[]{ _key, days, closed, opens, closes },\n\t\tsocial[]{ _key, platform, url },\n\t\tlogo {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tdefaultOgImage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tanalytics\n\t}\n': SITE_SETTINGS_QUERY_RESULT;
+		'\n\t*[_id == "navigation"][0]{\n\t\tmainMenu[] {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n},\n\t\tfooterMenu[] {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n}\n\t}\n': NAVIGATION_QUERY_RESULT;
+		'\n\t*[_type == "page" && defined(slug.current)]{ "slug": slug.current }\n': PAGE_SLUGS_QUERY_RESULT;
+		'\n\t*[_type == "page" && slug.current == $slug][0]{\n\t\t_id,\n\t\ttitle,\n\t\t"slug": slug.current,\n\t\tseo{\n\t\t\tmetaTitle,\n\t\t\tmetaDescription,\n\t\t\tnoindex,\n\t\t\togImage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n}\n\t\t},\n\t\tsections[]{\n\t_key,\n\t_type,\n\t_type == "hero" => {\n\t\theading,\n\t\tlead,\n\t\timage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tbuttons[] {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n}\n\t},\n\t_type == "textImage" => {\n\t\theading,\n\t\tbody []{\n\t...,\n\tmarkDefs[]{\n\t\t...,\n\t\t_type == "link" => {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n\t}\n},\n\t\timage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\timagePosition\n\t},\n\t_type == "features" => {\n\t\theading,\n\t\tlead,\n\t\titems[]{ _key, title, description }\n\t},\n\t_type == "pricing" => {\n\t\theading,\n\t\tlead,\n\t\tplans[]{\n\t\t\t_key,\n\t\t\tname,\n\t\t\tprice,\n\t\t\tunit,\n\t\t\tdescription,\n\t\t\tincludes,\n\t\t\trecommended,\n\t\t\tbutton {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n}\n\t\t}\n\t},\n\t_type == "testimonials" => {\n\t\theading,\n\t\titems[]{ _key, quote, author, role, avatar {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n} }\n\t},\n\t_type == "faq" => {\n\t\theading,\n\t\titems[]{ _key, question, answer []{\n\t...,\n\tmarkDefs[]{\n\t\t...,\n\t\t_type == "link" => {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n\t}\n} }\n\t},\n\t_type == "gallery" => {\n\t\theading,\n\t\timages[] {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n}\n\t},\n\t_type == "cta" => {\n\t\theading,\n\t\tlead,\n\t\tbutton {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n}\n\t}\n}\n\t}\n': PAGE_BY_SLUG_QUERY_RESULT;
+	}
+}
+// Lets @sanity/client releases that predate the global registry read it too
+declare module '@sanity/client' {
+	interface SanityQueries extends globalThis.SanityQueries {}
+}

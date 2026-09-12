@@ -1,5 +1,5 @@
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig, fontProviders } from 'astro/config';
+import { defineConfig, envField, fontProviders } from 'astro/config';
 import { brand } from './src/config/brand.ts';
 
 // https://astro.build/config
@@ -40,6 +40,25 @@ export default defineConfig({
 		// Obrazy z Sanity pobierane i optymalizowane przy buildzie przez astro:assets.
 		// W wyjściowym HTML nie ma linków do cdn.sanity.io.
 		domains: ['cdn.sanity.io'],
+		// Celowo BEZ globalnego `layout`: `constrained` generuje warianty dla każdego
+		// breakpointu do 2× szerokości (ok. 10 na obraz). Przy 50 obrazach to setki
+		// operacji sharpa i koniec kryterium „build < 60 s". Szerokości podaje
+		// jawnie komponent SanityImage.
+	},
+
+	// Zmienne środowiskowe z walidacją typu na starcie builda.
+	// Brak SANITY_PROJECT_ID w buildzie produkcyjnym przerywa build z czytelnym
+	// komunikatem — chyba że DEMO_CONTENT=true (treści demo z web/src/lib/sanity/fixtures.ts).
+	env: {
+		schema: {
+			SANITY_PROJECT_ID: envField.string({ context: 'server', access: 'secret', optional: true }),
+			SANITY_DATASET: envField.string({
+				context: 'server',
+				access: 'secret',
+				default: 'production',
+			}),
+			DEMO_CONTENT: envField.boolean({ context: 'server', access: 'secret', default: false }),
+		},
 	},
 
 	vite: {

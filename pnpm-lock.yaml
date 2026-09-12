@@ -66,12 +66,24 @@ importers:
 
   web:
     dependencies:
+      '@sanity/client':
+        specifier: 8.6.1
+        version: 8.6.1
+      '@sanity/image-url':
+        specifier: 2.1.1
+        version: 2.1.1
       '@tailwindcss/vite':
         specifier: 4.3.3
         version: 4.3.3(vite@8.3.0(@types/node@24.13.4)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
       astro:
         specifier: 7.3.2
         version: 7.3.2(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@24.13.4)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0)
+      astro-portabletext:
+        specifier: 1.0.0
+        version: 1.0.0(astro@7.3.2(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@24.13.4)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0))
+      groq:
+        specifier: 6.13.2
+        version: 6.13.2
       sharp:
         specifier: 0.35.4
         version: 0.35.4(@types/node@24.13.4)
@@ -2985,6 +2997,12 @@ packages:
   astro-eslint-parser@3.1.0:
     resolution: {integrity: sha512-lS5qlx401Q1ZUhQ44XQnM4uT2qI6hA0H+vstrd841xGVxunFOs0ut3DWJGYHK1l7mxRxQdDi1j53pfE7/AyGlA==}
     engines: {node: ^22.22.3 || ^24.16.0 || >=26.3.0}
+
+  astro-portabletext@1.0.0:
+    resolution: {integrity: sha512-7oj+cvbfq++WfD9lw4NGu6rZnbchDGfRsgCgzys/20QhinCjjwL4XO+iKse0dNofXI/cVyiHXdTg/K6InScryg==}
+    engines: {node: '>=22.12.0'}
+    peerDependencies:
+      astro: '>=4.6.0'
 
   astro@7.3.2:
     resolution: {integrity: sha512-ysTcdpGP61XZpHoMRYC/CK19DQ94qkBvzXMtXEo0gEqPNkmOU/Tv++CtWmzaI4nF2Ck8RXFdiWvdlTWa2oOr9w==}
@@ -9926,6 +9944,12 @@ snapshots:
       - '@emnapi/core'
       - '@emnapi/runtime'
       - supports-color
+
+  astro-portabletext@1.0.0(astro@7.3.2(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@24.13.4)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0)):
+    dependencies:
+      '@portabletext/toolkit': 6.0.0
+      '@portabletext/types': 4.0.2
+      astro: 7.3.2(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@24.13.4)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0)
 
   astro@7.3.2(@emnapi/core@1.11.1)(@emnapi/runtime@1.11.3)(@types/node@24.13.4)(jiti@2.7.0)(tsx@4.23.13)(yaml@2.9.0):
     dependencies:

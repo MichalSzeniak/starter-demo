@@ -10,8 +10,12 @@
     "check": "astro check && tsc --noEmit"
   },
   "dependencies": {
+    "@sanity/client": "8.6.1",
+    "@sanity/image-url": "2.1.1",
     "@tailwindcss/vite": "4.3.3",
     "astro": "7.3.2",
+    "astro-portabletext": "1.0.0",
+    "groq": "6.13.2",
     "sharp": "0.35.4",
     "tailwindcss": "4.3.3"
   },
