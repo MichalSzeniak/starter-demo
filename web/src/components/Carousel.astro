@@ -1,16 +1,23 @@
 ---
 /**
- * Poziomy rząd elementów przewijany w bok — zero JS, `scroll-snap-type: x mandatory`.
- * Współdzielony: dziś galeria, przygotowany dla opinii klientów (pole `layout`).
+ * Poziomy rząd elementów przewijany w bok. Współdzielony: dziś galeria,
+ * przygotowany dla opinii klientów (pole `layout`).
+ *
+ * Działa w dwóch warstwach:
+ * 1. Bez JS — `scroll-snap-type: x mandatory`: dotyk, pasek przewijania,
+ *    Shift+kółko, strzałki po sfocusowaniu rzędu.
+ * 2. Z JS (świadomy wyjątek od „zero JS", uzgodniony dla karuzeli) — przyciski
+ *    poprzedni/następny i Home/End. Przyciski są w HTML ukryte i pokazuje je
+ *    dopiero skrypt, więc bez JS nie ma martwych kontrolek.
  *
  * - Dzieci slotu to <li>. Szerokość elementu i przyciąganie ustawia ten
  *   komponent (`*:`), więc wywołujący renderuje tylko treść.
- * - Następny element wystaje zza krawędzi (85% / 45% / 30%) — to jedyna
- *   wskazówka „przewiń", jaką mamy bez przycisków.
- * - Kontener ma `tabindex="0"` i `role="region"` z etykietą: bez focusowalnej
- *   treści (same zdjęcia) klawiatura nie miałaby jak przewinąć rzędu
- *   (strzałki działają po sfocusowaniu). Lista w środku zachowuje semantykę <ul>.
- * - Pasek przewijania zostaje widoczny (cienki): bez JS to jedyny uchwyt dla myszy.
+ * - Następny element wystaje zza krawędzi (85% / 45% / 30%) — wskazówka „przewiń".
+ * - Rząd ma `tabindex="0"` i `role="region"` z etykietą: bez focusowalnej
+ *   treści (same zdjęcia) klawiatura nie miałaby jak go przewinąć.
+ * - Pasek przewijania zostaje (cienki) — pokazuje pozycję, zastępuje kropki.
+ * - Skrypt to własny element, nie wyspa frameworka: zero runtime'u, a Astro
+ *   dołącza go tylko do stron, które faktycznie renderują karuzelę.
  */
 interface Props {
 	/** Nazwa regionu dla czytników ekranu, np. tytuł sekcji. */
@@ -21,19 +28,167 @@ interface Props {
 const { label, class: className } = Astro.props;
 ---
 
-<div
-	role="region"
-	aria-label={label}
-	tabindex="0"
-	class:list={[
-		'snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:thin]',
-		className,
-	]}
->
-	<ul
-		class="flex gap-4 *:shrink-0 *:basis-[85%] *:snap-start sm:*:basis-[45%] lg:*:basis-[30%]"
-		role="list"
+<site-carousel class:list={['block', className]}>
+	<div
+		role="region"
+		aria-label={label}
+		tabindex="0"
+		data-carousel-track
+		class="snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:thin]"
 	>
-		<slot />
-	</ul>
-</div>
+		<ul
+			class="flex gap-4 *:shrink-0 *:basis-[85%] *:snap-start sm:*:basis-[45%] lg:*:basis-[30%]"
+			role="list"
+		>
+			<slot />
+		</ul>
+	</div>
+
+	<div data-carousel-controls hidden class="mt-2 flex justify-end gap-2">
+		<button
+			type="button"
+			data-carousel-prev
+			aria-label={`${label}: poprzednie`}
+			class="grid size-11 cursor-pointer place-items-center rounded-full border border-border bg-surface text-ink transition-colors hover:bg-surface-alt aria-disabled:cursor-default aria-disabled:opacity-40 aria-disabled:hover:bg-surface"
+		>
+			<svg
+				aria-hidden="true"
+				viewBox="0 0 24 24"
+				class="size-5"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<path d="m15 18-6-6 6-6"></path>
+			</svg>
+		</button>
+		<button
+			type="button"
+			data-carousel-next
+			aria-label={`${label}: następne`}
+			class="grid size-11 cursor-pointer place-items-center rounded-full border border-border bg-surface text-ink transition-colors hover:bg-surface-alt aria-disabled:cursor-default aria-disabled:opacity-40 aria-disabled:hover:bg-surface"
+		>
+			<svg
+				aria-hidden="true"
+				viewBox="0 0 24 24"
+				class="size-5"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<path d="m9 18 6-6-6-6"></path>
+			</svg>
+		</button>
+	</div>
+</site-carousel>
+
+<script>
+	class SiteCarousel extends HTMLElement {
+		#abort = new AbortController();
+		#resize = new ResizeObserver(() => this.#update());
+		#track!: HTMLElement;
+		#controls!: HTMLElement;
+		#prev!: HTMLButtonElement;
+		#next!: HTMLButtonElement;
+
+		connectedCallback() {
+			const track = this.querySelector<HTMLElement>('[data-carousel-track]');
+			const controls = this.querySelector<HTMLElement>('[data-carousel-controls]');
+			const prev = this.querySelector<HTMLButtonElement>('[data-carousel-prev]');
+			const next = this.querySelector<HTMLButtonElement>('[data-carousel-next]');
+			if (!track || !controls || !prev || !next) return;
+			this.#track = track;
+			this.#controls = controls;
+			this.#prev = prev;
+			this.#next = next;
+
+			const { signal } = this.#abort;
+			prev.addEventListener('click', () => this.#page(-1), { signal });
+			next.addEventListener('click', () => this.#page(1), { signal });
+			track.addEventListener('scroll', () => this.#update(), { passive: true, signal });
+			track.addEventListener(
+				'keydown',
+				(event) => {
+					if (event.key !== 'Home' && event.key !== 'End') return;
+					event.preventDefault();
+					this.#scrollTo(event.key === 'Home' ? 0 : track.scrollWidth);
+				},
+				{ signal },
+			);
+			this.#resize.observe(track);
+			this.#update();
+		}
+
+		disconnectedCallback() {
+			this.#abort.abort();
+			this.#resize.disconnect();
+		}
+
+		/** Pozycja scrolla, przy której element stoi przy lewej krawędzi rzędu. */
+		#startOf(item: Element): number {
+			return (
+				this.#track.scrollLeft +
+				item.getBoundingClientRect().left -
+				this.#track.getBoundingClientRect().left
+			);
+		}
+
+		/**
+		 * Przesunięcie o widoczną „stronę", zawsze na początek pełnego elementu.
+		 * Dalej: pierwszy element, który nie mieści się w całości, staje przy lewej
+		 * krawędzi. Wstecz: najdalszy element, od którego poprzednia strona się zaczyna.
+		 */
+		#page(direction: 1 | -1) {
+			const track = this.#track;
+			const items = [...track.querySelectorAll(':scope > ul > li')];
+			const current = track.scrollLeft;
+			const trackRight = track.getBoundingClientRect().right;
+
+			let target: number;
+			if (direction === 1) {
+				const partial = items.find((item) => item.getBoundingClientRect().right > trackRight + 1);
+				target = partial ? this.#startOf(partial) : track.scrollWidth;
+			} else {
+				const desired = current - track.clientWidth;
+				const first = items.find((item) => this.#startOf(item) >= desired - 1);
+				target = first ? this.#startOf(first) : 0;
+				// Poprzednia strona musi faktycznie się cofnąć (np. przy końcu rzędu).
+				if (target >= current - 1) {
+					const before = items.filter((item) => this.#startOf(item) < current - 1).at(-1);
+					target = before ? this.#startOf(before) : 0;
+				}
+			}
+			this.#scrollTo(target);
+		}
+
+		#scrollTo(left: number) {
+			const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+			this.#track.scrollTo({ left, behavior: reduce ? 'auto' : 'smooth' });
+		}
+
+		/** Przyciski tylko, gdy jest co przewijać; na końcach — nieaktywne, ale focusowalne. */
+		#update() {
+			const track = this.#track;
+			const max = track.scrollWidth - track.clientWidth;
+			this.#controls.hidden = max <= 1;
+			setDisabled(this.#prev, track.scrollLeft <= 1);
+			setDisabled(this.#next, track.scrollLeft >= max - 1);
+		}
+	}
+
+	/**
+	 * `aria-disabled`, nie `disabled`: zablokowanie przycisku, który ma fokus,
+	 * wyrzuciłoby fokus klawiatury na <body>. Kliknięcie w nieaktywny i tak nic
+	 * nie robi — przewijanie jest już na końcu.
+	 */
+	function setDisabled(button: HTMLButtonElement, disabled: boolean) {
+		if (disabled) button.setAttribute('aria-disabled', 'true');
+		else button.removeAttribute('aria-disabled');
+	}
+
+	if (!customElements.get('site-carousel')) customElements.define('site-carousel', SiteCarousel);
+</script>

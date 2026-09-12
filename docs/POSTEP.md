@@ -710,6 +710,39 @@ wczytują się po przewinięciu w bok; `<ul role="list">` zachowane. Realny data
 galeria bez pola renderuje się jako siatka 2×2, poprzednie 23 testy wizualne OK.
 0 plików `.js`.
 
-**Ograniczenia bez JS:** brak przycisków poprzedni/następny i kropek. Home/End
-nie działają w rzędzie (w Chrome przewijają w pionie). Mysz bez poziomego kółka:
-pasek przewijania (zostawiony, cienki) albo Shift+kółko.
+## Karuzela: przyciski i Home/End (JS za zgodą) — 2026-09-13
+
+Zgoda właściciela na JS w karuzeli. Wyjątek od „zero JS domyślnie" dotyczy
+wyłącznie `Carousel.astro`.
+
+- **Technika:** zwykły `<script>` z własnym elementem `<site-carousel>`, nie
+  wyspa `client:*` — wyspa wymagałaby frameworka (runtime), a logika to ~50 linii.
+  Skrypt: 1,7 kB, 774 B gzip, wstawiony inline przez Astro.
+- **Tylko tam, gdzie karuzela jest renderowana.** Astro nie dołącza skryptu
+  komponentu, który się nie renderuje, mimo że `Gallery` importuje `Carousel` na
+  każdej stronie. Realny dataset (galeria = siatka): 0 skryptów na wszystkich
+  stronach. Demo z karuzelą: skrypt tylko na `/`.
+- **Progressive enhancement:** kontrolki mają `hidden` w HTML i pokazuje je
+  skrypt. Bez JS zostaje karuzela na samym scroll-snap.
+- **Przyciski poprzedni/następny** przesuwają o widoczną „stronę" i zawsze
+  kończą na początku pełnego elementu (liczone z pozycji elementów, nie
+  `scrollBy` na ślepo). 44×44 px, etykiety „<tytuł sekcji>: poprzednie/następne".
+  Na końcach `aria-disabled`, nie `disabled` — zablokowanie przycisku z fokusem
+  wyrzuciłoby fokus na `<body>`. Gdy wszystko się mieści, kontrolki są ukryte
+  (`ResizeObserver` na rzędzie).
+- **Home/End** na sfocusowanym rzędzie — natywnie w Chrome nie działały.
+- **Reduced motion:** `scrollTo` z `behavior: 'auto'` zamiast `'smooth'`.
+- **Bez kropek** — pasek przewijania pokazuje pozycję; do dodania na życzenie.
+
+**Zweryfikowane w Chrome 152, 15/15:** bez JS przyciski niewidoczne, snap
+działa; start: „poprzednie" nieaktywne; 1280 px, 12 elementów: „następne"
+0 → 1056 → 2112 → 3088 (strony po 3, każda przyciągnięta), na końcu nieaktywne
+z fokusem nadal na przycisku, klik nic nie robi; „poprzednie" 3088 → 2112 →
+1056 → 0; End/Home 3088/0; reduced motion — przesunięcie natychmiastowe;
+390 px: po jednym elemencie 0 → 320 → 641 → 907, strona bez poziomego scrolla;
+3 elementy mieszczące się w rzędzie → kontrolki ukryte. Regresja na realnym
+datasecie: 23/23, 0 skryptów.
+
+**Do rozważenia:** CLAUDE.md nadal mówi „Wyspa `client:visible` tylko dla menu
+mobilnego i accordionu FAQ" — nie edytowałem (plik ma Twoje niezacommitowane
+zmiany).
