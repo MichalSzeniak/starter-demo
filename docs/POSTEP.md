@@ -193,3 +193,106 @@ działać w fazie 2, gdy powstanie schema i `web/` dostanie CLI Sanity.
 
 Szkielet stoi, oba serwery dev działają, build i typechecki przechodzą.
 Następny krok: faza 2 (schema Sanity), po Twoim „dalej".
+
+---
+
+## Faza 2 — Schema Sanity — 2026-09-12
+
+### Co powstało
+
+```
+studio/
+  sanity.config.ts      schemaTypes, structure, blokady singletonów, Vision tylko w dev
+  sanity.cli.ts         konfiguracja TypeGen (sanity-typegen.json jest przestarzały)
+  structure.ts          struktura panelu
+  schemaTypes/
+    index.ts            schemaTypes + singletonTypeNames
+    documents/          siteSettings, navigation, page, redirect
+    objects/            seo, imageWithAlt, richText, link, labeledLink
+    sections/           hero, textImage, features, pricing, testimonials,
+                        faq, gallery, cta  + index.ts z zamkniętą listą
+web/src/lib/sanity/types.gen.ts   30 typów wygenerowanych z schemy
+```
+
+### Decyzje
+
+**`imageWithAlt` jest jedynym typem obrazu w całej schemie.**
+Zamiast powtarzać pole `alt` przy każdym obrazie, istnieje jeden typ i to on
+niesie walidację. Zweryfikowane: `type: 'image'` występuje w źródłach dokładnie
+raz — w definicji `imageWithAlt`. Siedem pól obrazu w schemie używa tego typu.
+
+**Walidacja `alt` jest warunkowa, nie `required()`.**
+`rule.required()` na polu wewnątrz opcjonalnego obrazu ryzykuje blokadę zapisu
+dokumentu, w którym obrazu w ogóle nie wgrano. Zamiast tego `rule.custom()`
+sprawdza `parent.asset` i zwraca błąd tylko wtedy, gdy obraz jest, a opisu nie
+ma. Blokuje publikację dokładnie w tym jednym przypadku.
+
+> Koszt: TypeGen nie widzi walidacji warunkowej, więc w wygenerowanych typach
+> `alt` jest opcjonalne (`alt?: string`). Komponenty z fazy 3 i tak muszą
+> obsłużyć brak wartości. Jeśli wolisz twardsze typy kosztem ryzyka blokowania
+> pustych pól — powiedz, zamienię na `required()`.
+
+**`metaTitle` i `metaDescription` są wymagane już na poziomie schemy.**
+PLAN wymaga failowania buildu przy ich braku (faza 4), ale taniej jest nie
+pozwolić opublikować takiej strony w ogóle. Limity 60 i 155 znaków są błędami,
+nie ostrzeżeniami. Potwierdzone w wygenerowanych typach: `metaTitle: string`
+i `metaDescription: string` bez znaku zapytania.
+
+**`richText` ma celowo wąski zakres.** Akapit, H2, H3, dwie listy, pogrubienie,
+kursywa i odnośnik. Brak H1 (jeden H1 na stronę pilnuje szablon), brak obrazów,
+brak tabel, brak surowego HTML-a.
+
+**„Kod analytics" zamodelowany jako wybór dostawcy, nie pole na kod.**
+PLAN mówi o kodzie analytics w `siteSettings`, ale CLAUDE.md zakazuje pól typu
+„surowy HTML". Zamiast tego: dostawca z listy (wyłączona / Plausible / Umami),
+domena i opcjonalny adres własnej instancji. Faza 5 podłączy to do skryptu.
+
+**Strona główna to podstrona ze slugiem `/`.** Zamiast dokładać pole
+`homePage` do `siteSettings` (co wyszłoby poza listę pól z PLAN-u), walidacja
+slugu dopuszcza pojedynczy ukośnik. Slugify usuwa polskie znaki.
+
+**Singletony zabezpieczone na trzy sposoby:** stały `documentId` w strukturze,
+odfiltrowanie z `schema.templates` (znika z globalnego „+") oraz usunięcie
+akcji `delete`, `duplicate` i `unpublish` przez `document.actions`.
+
+**Vision tylko w trybie deweloperskim.** Konsola GROQ nie jest dla klienta.
+Zweryfikowane na produkcyjnym buildzie: config w bundlu to
+`plugins:[dt({structure:sr})` — samo `structureTool`. Chunk Vision nadal trafia
+do `dist/` jako martwy kod, bo import pozostaje statyczny; wtyczka nie jest
+zarejestrowana.
+
+### TypeGen
+
+`pnpm typegen` działa od zera: `sanity schemas extract --enforce-required-fields
+--force` w `studio/`, potem `sanity typegen generate` z konfiguracją w
+`sanity.cli.ts` (nie w przestarzałym `sanity-typegen.json`). Typy lądują
+w `web/src/lib/sanity/types.gen.ts`, dzięki czemu `web/` nadal nie zależy od
+paczki `sanity`. `studio/schema.json` to artefakt pośredni — w `.gitignore`.
+
+### Weryfikacja
+
+| Sprawdzenie | Wynik |
+|---|---|
+| `sanity schemas validate` | 0 błędów, 0 ostrzeżeń |
+| `pnpm --filter studio check` | czysto |
+| `pnpm check` (web, z wygenerowanymi typami) | 0 errors, 0 warnings, 0 hints |
+| `pnpm lint`, `pnpm format:check` | czysto |
+| `pnpm build` | 2 strony, bez zmian |
+| Dokumenty w schemie | redirect, page, navigation, siteSettings |
+| Typy sekcji | dokładnie 8, wszystkie dozwolone w `page.sections` |
+| `preview` + `icon` w każdej sekcji | 8/8 |
+| Pola obrazu omijające `imageWithAlt` | brak |
+| `sanity dev` | startuje bez ostrzeżeń |
+| `sanity build` | przechodzi |
+
+### Czego nie zweryfikowałem
+
+Schema nie była uruchomiona na realnym projekcie Sanity — `SANITY_STUDIO_PROJECT_ID`
+jest puste, więc Studio startuje, ale nie łączy się z datasetem. Walidacja pól
+przy faktycznej publikacji dokumentu (a więc i twarde blokowanie braku `alt`)
+wymaga podpiętego projektu. To do potwierdzenia przy pierwszym realnym kliencie.
+
+### Stan
+
+Schema zamknięta na 8 typach sekcji, struktura panelu ułożona pod klienta,
+TypeGen działa. Następny krok: faza 3 (komponenty sekcji), po Twoim „dalej".
