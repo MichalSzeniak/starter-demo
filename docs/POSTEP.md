@@ -861,3 +861,42 @@ Demo: `/o-nas` 1 174 B, pozostałe strony 0 B. Realny dataset: 0 skryptów.
 - Lighthouse — faza 6.
 - **CLAUDE.md** nadal mówi „8 typów sekcji" — nie edytowałem (Twoje niezacommitowane
   zmiany). PLAN.md mówi o Pages Function i mapie z podglądem — rozbieżność opisana wyżej.
+
+## Treść demo pokrywa całą bibliotekę sekcji — 2026-09-13
+
+Fixtures przebudowane na trzy podstrony ułożone jak strona prawdziwej firmy
+usługowej, zamiast 7 sekcji na stronie głównej:
+
+| Podstrona | Sekcje |
+| --- | --- |
+| `/` | hero · features · testimonials · **gallery (siatka)** · cta |
+| `/o-nas` | textImage · **gallery (karuzela)** · faq · cta |
+| `/cennik` | pricing · faq · **contact** („Zapytaj o wycenę") |
+
+- Każdy z 9 typów występuje co najmniej raz. Galeria w obu układach na tych samych
+  zdjęciach (`galeria-1…4`; karuzela dodatkowo `hero`, żeby było co przewijać) —
+  da się je porównać. Tylko istniejące pliki z `demo-images`, bez nowych slotów.
+- Zdublowana historia firmy (textImage na głównej i na „O nas") scalona w jedną
+  sekcję na „O nas". FAQ podzielone tematycznie: o firmie (`/o-nas`), o cenach
+  i rozliczeniach (`/cennik`). Formularz wyceny stoi pod cennikiem, gdzie zapada decyzja.
+- **Strażnik pokrycia w seedzie.** `REQUIRED_SECTION_TYPES` jest typowany
+  `Record<typ sekcji z TypeGen, true>` — nowy typ sekcji wywala typecheck, dopóki
+  nie trafi do listy; `preflightCoverage()` przed jakimkolwiek zapisem sprawdza, że
+  fixtures faktycznie zawierają każdy typ i każdy układ galerii. Sprawdzone w obie
+  strony: fixtures bez karuzeli → seed odmawia z listą braków; rekord bez `contact`
+  → TS2741.
+- **Seed uruchomiony** na `mebrv8ha`/`production`: 8 dokumentów, 10 obrazów
+  z demo-images, 0 placeholderów.
+
+**Zweryfikowane na realnym datasecie** (build po seedzie): wszystkie 9 typów
+i oba układy galerii wyrenderowane; po jednym `<h1>` na stronę; SEO 4/4; JS tylko
+tam, gdzie trzeba (karuzela na `/o-nas` — 5 zdjęć, formularz na `/cennik`,
+strona główna 0 B); `FAQPage` w JSON-LD na `/o-nas` i `/cennik`; 0 odwołań do
+`cdn.sanity.io`. Build demo też OK.
+
+**Znalezione przy okazji, niepoprawione:** tło sekcji jest na sztywno w komponencie
+(hero, features, testimonials, gallery → `bg-surface-alt`). Na nowej stronie głównej
+cztery takie sekcje z rzędu zlewają się w jeden szary blok — zmiana kolejności tego
+nie naprawi. Dotyczy każdego klienta, który ułoży te sekcje obok siebie. Propozycja:
+naprzemienne tło liczone w `SectionRenderer` z pozycji sekcji (CTA zostaje w kolorze
+marki) — do decyzji.

@@ -145,9 +145,20 @@ const navigation: Navigation = {
 	],
 };
 
+/*
+ * Trzy podstrony demo ułożone jak prawdziwa strona firmy usługowej.
+ * Razem pokrywają KAŻDY typ sekcji z biblioteki (pilnuje tego seed):
+ *
+ *   /        hero · features · testimonials · gallery (siatka) · cta
+ *   /o-nas   textImage · gallery (karuzela) · faq · cta
+ *   /cennik  pricing · faq · contact
+ *
+ * Galeria występuje w obu układach na tych samych zdjęciach — da się je porównać.
+ */
+
 const home: Page = {
 	_id: 'demo-page-home',
-	_updatedAt: '2026-09-12T08:00:00Z',
+	_updatedAt: '2026-09-13T08:00:00Z',
 	title: 'Strona główna',
 	slug: '/',
 	seo: {
@@ -195,28 +206,6 @@ const home: Page = {
 		},
 		{
 			_key: key(),
-			_type: 'textImage',
-			heading: 'Pracujemy w Przykładowie od 2009 roku',
-			body: [
-				paragraph(
-					'Zaczynaliśmy w jednym garażu z dwiema osobami. Dziś to sześcioosobowy zespół i dwa auta serwisowe, ale zasada została ta sama: robimy porządnie albo wcale.',
-				),
-				paragraph('Co robimy', 'h3'),
-				bullet('Naprawy i konserwacja instalacji'),
-				bullet('Montaż i uruchomienie urządzeń'),
-				bullet('Przeglądy okresowe z protokołem'),
-				paragraphWithLink(
-					'Pełną listę usług i ceny znajdziesz w ',
-					'cenniku',
-					internal('cennik'),
-					'.',
-				),
-			],
-			image: image('o-nas', 'Zespół Firmy Demo przed warsztatem (placeholder)', 1000, 750),
-			imagePosition: 'left',
-		},
-		{
-			_key: key(),
 			_type: 'testimonials',
 			heading: 'Co mówią klienci',
 			items: [
@@ -252,41 +241,6 @@ const home: Page = {
 		},
 		{
 			_key: key(),
-			_type: 'faq',
-			heading: 'Najczęstsze pytania',
-			items: [
-				{
-					_key: key(),
-					question: 'Ile kosztuje dojazd?',
-					answer: [
-						paragraph(
-							'W Przykładowie i promieniu 20 km dojazd jest bezpłatny. Dalej liczymy 2 zł za kilometr w jedną stronę — kwotę podajemy przy wycenie.',
-						),
-					],
-				},
-				{
-					_key: key(),
-					question: 'Czy wystawiacie faktury VAT?',
-					answer: [
-						paragraph('Tak, na każdą usługę. Fakturę wysyłamy mailem w dniu wykonania pracy.'),
-					],
-				},
-				{
-					_key: key(),
-					question: 'Jak umówić wizytę?',
-					answer: [
-						paragraphWithLink(
-							'Najszybciej telefonicznie — numer jest w nagłówku strony. Możesz też napisać na ',
-							'kontakt@example.com',
-							external('mailto:kontakt@example.com', false),
-							', odpowiadamy w dni robocze do 2 godzin.',
-						),
-					],
-				},
-			],
-		},
-		{
-			_key: key(),
 			_type: 'cta',
 			heading: 'Masz awarię albo pytanie?',
 			lead: 'Zadzwoń — wycenę podajemy od ręki.',
@@ -297,7 +251,7 @@ const home: Page = {
 
 const about: Page = {
 	_id: 'demo-page-about',
-	_updatedAt: '2026-09-12T08:00:00Z',
+	_updatedAt: '2026-09-13T08:00:00Z',
 	title: 'O nas',
 	slug: 'o-nas',
 	seo: {
@@ -311,24 +265,40 @@ const about: Page = {
 		{
 			_key: key(),
 			_type: 'textImage',
-			heading: 'Kim jesteśmy',
+			heading: 'Pracujemy w Przykładowie od 2009 roku',
 			body: [
 				paragraph(
-					'Jesteśmy lokalną firmą serwisową. Nie mamy call center ani podwykonawców — do klienta jedzie ta sama osoba, która odbierała telefon.',
+					'Zaczynaliśmy w jednym garażu z dwiema osobami. Dziś to sześcioosobowy zespół i dwa auta serwisowe, ale zasada została ta sama: robimy porządnie albo wcale.',
+				),
+				paragraph(
+					'Nie mamy call center ani podwykonawców — do klienta jedzie ta sama osoba, która odbierała telefon.',
 				),
 				paragraph('Nasze zasady', 'h2'),
 				bullet('Cena ustalona przed rozpoczęciem pracy'),
 				bullet('Termin, który naprawdę trzymamy'),
 				bullet('Po nas nie trzeba sprzątać'),
 				paragraphWithLink(
-					'Zobacz ',
-					'cennik usług',
+					'Pełną listę usług i ceny znajdziesz w ',
+					'cenniku',
 					internal('cennik'),
-					' albo wróć na stronę główną.',
+					'.',
 				),
 			],
 			image: image('o-nas', 'Zespół Firmy Demo przed warsztatem (placeholder)', 1000, 750),
 			imagePosition: 'right',
+		},
+		{
+			_key: key(),
+			_type: 'gallery',
+			heading: 'Zespół i warsztat',
+			layout: 'carousel',
+			images: [
+				galleryImage('galeria-1', 'Z życia firmy 1 (placeholder)'),
+				galleryImage('galeria-2', 'Z życia firmy 2 (placeholder)'),
+				galleryImage('galeria-3', 'Z życia firmy 3 (placeholder)'),
+				galleryImage('galeria-4', 'Z życia firmy 4 (placeholder)'),
+				galleryImage('hero', 'Z życia firmy 5 (placeholder)'),
+			],
 		},
 		{
 			_key: key(),
@@ -353,21 +323,22 @@ const about: Page = {
 						),
 					],
 				},
+				{
+					_key: key(),
+					question: 'Kto przyjeżdża na zlecenie?',
+					answer: [
+						paragraph(
+							'Zawsze ktoś z naszego zespołu — nie zlecamy prac podwykonawcom. Imię technika podajemy przy umawianiu wizyty.',
+						),
+					],
+				},
 			],
-		},
-		{
-			_key: key(),
-			_type: 'contact',
-			heading: 'Napisz do nas',
-			lead: 'Odpowiadamy w ciągu jednego dnia roboczego.',
-			showContactDetails: true,
-			showMap: true,
 		},
 		{
 			_key: key(),
 			_type: 'cta',
 			heading: 'Porozmawiajmy o Twoim zleceniu',
-			lead: null,
+			lead: 'Ceny orientacyjne i formularz wyceny znajdziesz w cenniku.',
 			button: { _key: null, label: 'Zobacz cennik', link: internal('cennik') },
 		},
 	],
@@ -375,7 +346,7 @@ const about: Page = {
 
 const pricing: Page = {
 	_id: 'demo-page-pricing',
-	_updatedAt: '2026-09-12T08:00:00Z',
+	_updatedAt: '2026-09-13T08:00:00Z',
 	title: 'Cennik',
 	slug: 'cennik',
 	seo: {
@@ -431,14 +402,46 @@ const pricing: Page = {
 		},
 		{
 			_key: key(),
-			_type: 'cta',
-			heading: 'Nie ma Twojej usługi na liście?',
-			lead: 'Napisz, co trzeba zrobić — wycenimy indywidualnie.',
-			button: {
-				_key: null,
-				label: 'Napisz do nas',
-				link: external('mailto:kontakt@example.com', false),
-			},
+			_type: 'faq',
+			heading: 'Pytania o ceny i rozliczenia',
+			items: [
+				{
+					_key: key(),
+					question: 'Ile kosztuje dojazd?',
+					answer: [
+						paragraph(
+							'W Przykładowie i promieniu 20 km dojazd jest bezpłatny. Dalej liczymy 2 zł za kilometr w jedną stronę — kwotę podajemy przy wycenie.',
+						),
+					],
+				},
+				{
+					_key: key(),
+					question: 'Czy wystawiacie faktury VAT?',
+					answer: [
+						paragraph('Tak, na każdą usługę. Fakturę wysyłamy mailem w dniu wykonania pracy.'),
+					],
+				},
+				{
+					_key: key(),
+					question: 'Jak umówić wizytę?',
+					answer: [
+						paragraphWithLink(
+							'Najszybciej telefonicznie — numer jest w nagłówku strony. Możesz też wypełnić formularz poniżej albo napisać na ',
+							'kontakt@example.com',
+							external('mailto:kontakt@example.com', false),
+							', odpowiadamy w dni robocze do 2 godzin.',
+						),
+					],
+				},
+			],
+		},
+		{
+			_key: key(),
+			_type: 'contact',
+			heading: 'Zapytaj o wycenę',
+			lead: 'Nie ma Twojej usługi na liście? Opisz, co trzeba zrobić — wycenimy indywidualnie w ciągu jednego dnia roboczego.',
+			showContactDetails: true,
+			showMap: true,
 		},
 	],
 };

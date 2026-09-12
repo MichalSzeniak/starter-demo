@@ -249,6 +249,45 @@ function collectImageUrls(): string[] {
 	return urls.filter((url): url is string => Boolean(url));
 }
 
+/**
+ * Treść demo ma pokazywać CAŁĄ bibliotekę sekcji — to jej jedyny sens.
+ *
+ * Rekord jest typowany kluczami z TypeGen: nowy typ sekcji w schemie wywala
+ * typecheck, dopóki ktoś go tu nie dopisze. Sprawdzenie w czasie działania
+ * pilnuje, żeby fixtures faktycznie go zawierały (i każdy układ galerii).
+ */
+const REQUIRED_SECTION_TYPES: Record<SectionType, true> = {
+	hero: true,
+	textImage: true,
+	features: true,
+	pricing: true,
+	testimonials: true,
+	faq: true,
+	gallery: true,
+	contact: true,
+	cta: true,
+};
+const REQUIRED_GALLERY_LAYOUTS: Record<GalleryLayout, true> = { grid: true, carousel: true };
+
+function preflightCoverage(): void {
+	const sections = Object.values(demoContent.pages).flatMap((page) => page.sections);
+	const types = new Set(sections.map((item) => item._type));
+	const layouts = new Set(
+		sections.flatMap((item) => (item._type === 'gallery' ? [item.layout] : [])),
+	);
+	const missing = [
+		...Object.keys(REQUIRED_SECTION_TYPES).filter((type) => !types.has(type as SectionType)),
+		...Object.keys(REQUIRED_GALLERY_LAYOUTS)
+			.filter((layout) => !layouts.has(layout as GalleryLayout))
+			.map((layout) => `gallery (${layout})`),
+	];
+	if (missing.length > 0) {
+		fail(
+			`Treść demo nie pokazuje wszystkich sekcji. Brakuje: ${missing.join(', ')}. Uzupełnij web/src/lib/sanity/fixtures.ts.`,
+		);
+	}
+}
+
 /** Twardy błąd przy brakujących zdjęciach — zanim cokolwiek trafi do Sanity. */
 async function preflightImages(): Promise<void> {
 	const missing = new Set<string>();
@@ -322,6 +361,8 @@ function richText(blocks: ResultBlock[] | null | undefined) {
 // ---------------------------------------------------------------------------
 
 type Section = (typeof demoContent.pages)[string]['sections'][number];
+type SectionType = Section['_type'];
+type GalleryLayout = Extract<Section, { _type: 'gallery' }>['layout'];
 
 async function section(value: Section) {
 	const base = { _key: value._key, _type: value._type };
@@ -473,7 +514,8 @@ async function buildDocuments(): Promise<Doc[]> {
 // ---------------------------------------------------------------------------
 
 async function seed() {
-	console.log('Sprawdzam zdjęcia…');
+	console.log('Sprawdzam pokrycie sekcji i zdjęcia…');
+	preflightCoverage();
 	await preflightImages();
 	console.log('Buduję dokumenty…');
 	const docs = await buildDocuments();
