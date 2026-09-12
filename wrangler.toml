@@ -1,0 +1,30 @@
+# Cloudflare Workers — serwowanie statycznych assetów (Workers Static Assets).
+#
+# Worker bez `main`: nie ma własnego kodu, wystawia wyłącznie pliki z web/dist.
+# `main` jest opcjonalne dla Workerów assets-only, `compatibility_date` nie jest.
+#
+# Uwaga: NIE używamy [site] — to przestarzałe Workers Sites, wycofane w Wranglerze v4.
+#
+# Składnia zweryfikowana na wranglerze 4.131.1 (config-schema.json w paczce)
+# oraz w dokumentacji Cloudflare (workers/wrangler/configuration/#assets).
+
+name = "starter-wizytowka"
+compatibility_date = "2026-09-12"
+
+[assets]
+# Ścieżka względem tego pliku. Astro nie ma ustawionego `outDir`, więc buduje
+# do ./dist względem katalogu pakietu — czyli do web/dist.
+directory = "./web/dist"
+
+# MUSI być "drop-trailing-slash", żeby zgadzało się z `trailingSlash: 'never'`
+# w astro.config.ts.
+#
+# Domyślne "auto-trailing-slash" serwuje pliki indeksowe katalogów
+# (o-nas/index.html) Z ukośnikiem na końcu, a my budujemy w `format: 'directory'`
+# i wystawiamy canonical BEZ ukośnika. Zostawienie domyślnej wartości dałoby
+# rozjazd: canonical /o-nas, a realnie serwowane /o-nas/.
+html_handling = "drop-trailing-slash"
+
+# Serwuje najbliższy 404.html ze statusem 404. Astro generuje dist/404.html.
+# Nie "single-page-application" — to jest strona statyczna, nie SPA.
+not_found_handling = "404-page"
