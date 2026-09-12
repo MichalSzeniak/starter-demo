@@ -13,9 +13,13 @@
  * więc skrypt przekłada je z powrotem na dokumenty: obraz → referencja do
  * wgranego assetu, odnośnik wewnętrzny → referencja do dokumentu strony.
  *
- * Obrazy: wgrywane z web/public/demo przez client.assets.upload. Sanity nadaje
- * assetom id z hasza treści, więc ponowne wgranie tego samego pliku nie tworzy
- * duplikatu. Assety dostają source.name = SEED_SOURCE — po tym `--clean` je znajduje.
+ * Obrazy: czytane z dysku i wgrywane przez client.assets.upload — nigdy z URL-i.
+ * Źródłem jest studio/scripts/demo-images (pliki dodawane ręcznie, poza repo),
+ * dopasowane po nazwie do slotu z fixtures: /demo/hero.svg → demo-images/hero.*
+ * (jpg, jpeg, png, webp, avif, gif, svg). Gdy pliku brak, wchodzi placeholder SVG
+ * z web/public/demo — z ostrzeżeniem. Sanity nadaje assetom id z hasza treści,
+ * więc ponowne wgranie tego samego pliku nie tworzy duplikatu. Assety dostają
+ * source.name = SEED_SOURCE — po tym `--clean` je znajduje.
  *
  * Token: SANITY_WRITE_TOKEN ze studio/.env (Node ładuje go przez --env-file-if-exists).
  * Nigdy w kodzie.
@@ -24,7 +28,7 @@
  * świeży projekt klienta nie dostaje treści demo.
  */
 
-import { readFile } from 'node:fs/promises';
+import { readdir, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createClient } from '@sanity/client';
@@ -42,10 +46,13 @@ const VERBOSE = args.has('--verbose');
 
 const SEED_SOURCE = 'starter-demo-seed';
 const DOC_TYPES = ['page', 'siteSettings', 'navigation', 'redirect'];
-const DEMO_DIR = path.resolve(
-	fileURLToPath(new URL('.', import.meta.url)),
-	'../../web/public/demo',
-);
+
+const SCRIPT_DIR = fileURLToPath(new URL('.', import.meta.url));
+/** Zdjęcia do seeda — dodawane ręcznie, poza repo. Nazwa pliku = slot z fixtures. */
+const DEMO_IMAGES_DIR = path.join(SCRIPT_DIR, 'demo-images');
+/** Placeholdery SVG strony demo — zapas, gdy w demo-images brakuje pliku. */
+const PLACEHOLDER_DIR = path.resolve(SCRIPT_DIR, '../../web/public/demo');
+const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp', 'avif', 'gif', 'svg'];
 
 function fail(message: string): never {
 	console.error(`\n✖ ${message}\n`);
@@ -127,26 +134,77 @@ const ref = (id: string) => ({ _type: 'reference' as const, _ref: id });
 // Obrazy
 // ---------------------------------------------------------------------------
 
+/** Slot = nazwa pliku bez rozszerzenia, małymi literami: /demo/hero.svg → hero. */
+function slotOf(file: string): string {
+	return path.basename(file, path.extname(file)).toLowerCase();
+}
+
+/** Pliki z demo-images zindeksowane po slocie. Czytane raz. */
+let demoImageIndex: Promise<Map<string, string>> | undefined;
+
+function indexDemoImages(): Promise<Map<string, string>> {
+	demoImageIndex ??= (async () => {
+		const map = new Map<string, string>();
+		let entries: string[];
+		try {
+			entries = await readdir(DEMO_IMAGES_DIR);
+		} catch {
+			return map;
+		}
+		for (const entry of entries.sort()) {
+			const ext = path.extname(entry).slice(1).toLowerCase();
+			if (!IMAGE_EXTENSIONS.includes(ext)) continue;
+			const slot = slotOf(entry);
+			const existing = map.get(slot);
+			if (existing) {
+				console.warn(
+					`  ! ${slot}: kilka plików w demo-images — biorę ${existing}, pomijam ${entry}`,
+				);
+				continue;
+			}
+			map.set(slot, entry);
+		}
+		return map;
+	})();
+	return demoImageIndex;
+}
+
+interface ResolvedFile {
+	slot: string;
+	file: string;
+	placeholder: boolean;
+}
+
+/** Slot z fixtures → plik z demo-images albo placeholder SVG. */
+async function resolveImageFile(url: string): Promise<ResolvedFile> {
+	const slot = slotOf(url);
+	const own = (await indexDemoImages()).get(slot);
+	if (own) return { slot, file: path.join(DEMO_IMAGES_DIR, own), placeholder: false };
+	return { slot, file: path.join(PLACEHOLDER_DIR, `${slot}.svg`), placeholder: true };
+}
+
 const uploads = new Map<string, Promise<string>>();
-let uploadCount = 0;
+const resolvedFiles: ResolvedFile[] = [];
 
 function uploadDemoImage(url: string): Promise<string> {
-	const filename = path.basename(url);
-	let pending = uploads.get(filename);
+	const slot = slotOf(url);
+	let pending = uploads.get(slot);
 	if (!pending) {
 		pending = (async () => {
-			const body = await readFile(path.join(DEMO_DIR, filename));
-			uploadCount += 1;
-			if (DRY_RUN) return `image-dry-run-${filename.replace(/\W+/g, '-')}`;
+			const resolved = await resolveImageFile(url);
+			resolvedFiles.push(resolved);
+			const body = await readFile(resolved.file);
+			const filename = path.basename(resolved.file);
+			if (DRY_RUN) return `image-dry-run-${slot}`;
 			const asset = await client.assets.upload('image', body, {
 				filename,
 				label: 'demo',
-				source: { name: SEED_SOURCE, id: filename },
+				source: { name: SEED_SOURCE, id: slot },
 			});
 			console.log(`  ↑ ${filename} → ${asset._id}`);
 			return asset._id;
 		})();
-		uploads.set(filename, pending);
+		uploads.set(slot, pending);
 	}
 	return pending;
 }
@@ -159,6 +217,18 @@ async function image(img: ResultImage | null | undefined) {
 		alt: img.alt ?? undefined,
 		asset: ref(await uploadDemoImage(img.asset.url)),
 	};
+}
+
+function printImageSummary(): void {
+	const placeholders = resolvedFiles.filter((file) => file.placeholder).length;
+	console.log(
+		`\n${resolvedFiles.length} obrazów (${resolvedFiles.length - placeholders} z demo-images, ${placeholders} placeholderów):`,
+	);
+	for (const file of resolvedFiles) {
+		const source = path.relative(SCRIPT_DIR, file.file).replace(/\\/g, '/');
+		const note = file.placeholder ? `   (brak ${file.slot}.* w demo-images)` : '';
+		console.log(`  ${file.slot.padEnd(11)} ← ${source}${note}`);
+	}
 }
 
 // ---------------------------------------------------------------------------
@@ -342,8 +412,9 @@ async function seed() {
 	console.log('Buduję dokumenty…');
 	const docs = await buildDocuments();
 
-	console.log(`\n${docs.length} dokumentów, ${uploadCount} obrazów:`);
+	console.log(`\n${docs.length} dokumentów:`);
 	for (const doc of docs) console.log(`  ${doc._type.padEnd(13)} ${doc._id}`);
+	printImageSummary();
 
 	if (DRY_RUN) {
 		if (VERBOSE) console.log(JSON.stringify(docs, null, 2));

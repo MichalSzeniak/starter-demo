@@ -20,3 +20,7 @@ Thumbs.db
 
 # Sanity TypeGen — artefakt pośredni, typy wynikowe commitujemy
 studio/schema.json
+
+# Zdjęcia do seeda — lokalne, nie w repo (kilkanaście MB). README zostaje.
+studio/scripts/demo-images/*
+!studio/scripts/demo-images/README.md

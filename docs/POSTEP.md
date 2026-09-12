@@ -583,7 +583,9 @@ lub og:image. Następny krok: faza 5 (formularz i analityka), po Twoim „dalej"
 
 `pnpm --filter studio seed` zasila dataset treściami demo z `web/src/lib/sanity/fixtures.ts`
 (jedyne źródło; skrypt przekłada kształt wyników zapytań na dokumenty,
-wgrywa obrazy z `web/public/demo`, `createOrReplace` z deterministycznymi `_id`).
+wgrywa obrazy z dysku — `studio/scripts/demo-images/` dopasowane po nazwie do slotu,
+z zapasem SVG z `web/public/demo` i ostrzeżeniem, gdy pliku brak — `createOrReplace`
+z deterministycznymi `_id`). Zdjęcia w `demo-images/` są poza repo (`.gitignore`), README zostaje.
 `--dry-run [--verbose]` bez sieci, `seed:clean [--yes]` sprząta dokumenty i assety
 oznaczone `source.name = starter-demo-seed`. Token z `SANITY_WRITE_TOKEN` w `studio/.env`.
 
