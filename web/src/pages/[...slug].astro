@@ -1,0 +1,36 @@
+---
+import type { GetStaticPaths } from 'astro';
+import SectionRenderer from '~/components/SectionRenderer.astro';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { getPage, getPageSlugs } from '~/lib/content';
+
+/**
+ * Jedna trasa dla wszystkich podstron z Sanity. Slug `/` to strona główna
+ * (parametr `undefined` = korzeń). Astro hoistuje getStaticPaths do osobnego
+ * modułu, więc korzysta ono wyłącznie z importów, nie ze stałych frontmattera.
+ */
+export const getStaticPaths = (async () => {
+	const slugs = await getPageSlugs();
+	return slugs.map((slug) => ({
+		params: { slug: slug === '/' ? undefined : slug },
+		props: { slug },
+	}));
+}) satisfies GetStaticPaths;
+
+const { slug } = Astro.props;
+const page = await getPage(slug);
+
+if (!page) {
+	throw new Error(
+		`Brak strony dla sluga "${slug}" — getStaticPaths zwróciło ścieżkę bez dokumentu.`,
+	);
+}
+---
+
+<BaseLayout
+	title={page.seo?.metaTitle ?? page.title}
+	description={page.seo?.metaDescription ?? undefined}
+	noindex={page.seo?.noindex ?? false}
+>
+	<SectionRenderer sections={page.sections} />
+</BaseLayout>

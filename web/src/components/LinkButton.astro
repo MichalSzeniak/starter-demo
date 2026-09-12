@@ -1,0 +1,27 @@
+---
+import { anchorAttributes, resolveLink, type LinkLike } from '~/lib/links';
+
+/** Przycisk z obiektu `labeledLink`. Nie renderuje się, gdy odnośnik jest niekompletny. */
+interface Props {
+	item: { label: string | null; link: LinkLike | null } | null | undefined;
+	variant?: 'primary' | 'secondary' | 'inverse';
+	class?: string;
+}
+
+const { item, variant = 'primary', class: className } = Astro.props;
+const resolved = resolveLink(item?.link);
+
+const base =
+	'inline-flex items-center justify-center rounded-md px-5 py-3 text-sm font-medium transition-colors';
+const variants = {
+	primary: 'bg-brand text-white hover:bg-brand-dark',
+	secondary: 'border border-border bg-surface text-ink hover:bg-surface-alt',
+	inverse: 'bg-white text-brand hover:bg-surface-alt',
+};
+---
+
+{item?.label && resolved && (
+	<a {...anchorAttributes(resolved)} class:list={[base, variants[variant], className]}>
+		{item.label}
+	</a>
+)}

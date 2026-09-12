@@ -1,0 +1,73 @@
+---
+import { Image } from 'astro:assets';
+import { resolveImage, type ImageLike } from '~/lib/sanity/image';
+
+/**
+ * Jedyny sposób renderowania obrazów z Sanity.
+ *
+ * - Zawsze width/height w HTML — zero CLS.
+ * - Obraz z CDN Sanity przechodzi przez astro:assets: pobierany przy buildzie,
+ *   optymalizowany, serwowany lokalnie. W wyjściowym HTML nie ma cdn.sanity.io.
+ * - `priority` = pierwszy obraz na stronie: eager + fetchpriority=high + decoding=sync.
+ * - `eager` = ładuj od razu, ale bez podbijania priorytetu (logo w nagłówku).
+ *   Wszystko inne jest lazy.
+ * - Warianty srcset podajemy jawnie (domyślnie połowa i całość), a nie przez
+ *   globalny `layout`, który mnożyłby operacje sharpa na każdym obrazie.
+ * - Treści demo (pliki z web/public/demo) renderują się jako zwykły <img>.
+ */
+interface Props {
+	image: ImageLike | null | undefined;
+	/** Największa szerokość, jakiej potrzebuje ten slot (px). */
+	width: number;
+	/** Szerokości do srcset. Domyślnie [width/2, width]. */
+	widths?: number[];
+	/** Atrybut sizes. Domyślnie: pełna szerokość ekranu do `width`, potem stała. */
+	sizes?: string;
+	priority?: boolean;
+	eager?: boolean;
+	class?: string;
+}
+
+const {
+	image,
+	width,
+	widths,
+	sizes,
+	priority = false,
+	eager = false,
+	class: className,
+} = Astro.props;
+const resolved = resolveImage(image, width);
+
+const srcsetWidths = (widths ?? [Math.round(width / 2), width]).filter(
+	(w) => resolved !== null && w <= resolved.width,
+);
+const sizesAttr = sizes ?? `(min-width: ${width}px) ${width}px, 100vw`;
+const loading = priority || eager ? 'eager' : 'lazy';
+---
+
+{resolved &&
+	(resolved.remote ? (
+		<Image
+			src={resolved.src}
+			width={resolved.width}
+			height={resolved.height}
+			alt={resolved.alt}
+			widths={srcsetWidths}
+			sizes={sizesAttr}
+			priority={priority}
+			loading={loading}
+			class={className}
+		/>
+	) : (
+		<img
+			src={resolved.src}
+			width={resolved.width}
+			height={resolved.height}
+			alt={resolved.alt}
+			loading={loading}
+			decoding={priority ? 'sync' : 'async'}
+			fetchpriority={priority ? 'high' : undefined}
+			class={className}
+		/>
+	))}

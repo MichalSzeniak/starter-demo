@@ -1,0 +1,19 @@
+---
+/**
+ * Nagłówek o poziomie ustalanym przez kontekst, nie przez treść.
+ * Poziom NIE jest polem w Sanity — o hierarchii decyduje szablon:
+ * pierwsza sekcja dostaje h1, kolejne h2, elementy wewnątrz sekcji h3.
+ */
+interface Props {
+	level: 1 | 2 | 3;
+	class?: string;
+	id?: string;
+}
+
+const { level, class: className, id } = Astro.props;
+const Tag = `h${level}` as 'h1' | 'h2' | 'h3';
+---
+
+<Tag class={className} id={id}>
+	<slot />
+</Tag>

@@ -1,0 +1,24 @@
+---
+import type { MarkProps } from 'astro-portabletext/types';
+import { anchorAttributes, resolveLink, type LinkLike } from '~/lib/links';
+
+/**
+ * Adnotacja `link` w tekście formatowanym. Wewnętrzna → ścieżka do podstrony,
+ * zewnętrzna → pełny adres z rel="noopener". Niekompletna → sam tekst, bez <a>.
+ */
+type Props = MarkProps<LinkLike>;
+
+const { node } = Astro.props;
+const resolved = resolveLink(node.markDef);
+---
+
+{resolved ? (
+	<a
+		{...anchorAttributes(resolved)}
+		class="font-medium text-brand underline decoration-brand/40 underline-offset-2 hover:text-brand-dark hover:decoration-brand-dark"
+	>
+		<slot />
+	</a>
+) : (
+	<slot />
+)}

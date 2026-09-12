@@ -1,0 +1,40 @@
+---
+import Heading from '~/components/Heading.astro';
+import SanityImage from '~/components/SanityImage.astro';
+import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
+
+interface Props {
+	section: SectionOf<'gallery'>;
+	ctx: SectionContext;
+}
+
+const { section, ctx } = Astro.props;
+const images = section.images ?? [];
+---
+
+<section class="bg-surface-alt">
+	<div class="content-container py-section">
+		{section.heading && (
+			<Heading
+				level={ctx.headingLevel}
+				class="text-3xl font-bold tracking-tight text-ink sm:text-4xl"
+			>
+				{section.heading}
+			</Heading>
+		)}
+		<ul class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="list">
+			{images.map((image, i) => (
+				<li>
+					<SanityImage
+						image={image}
+						width={800}
+						widths={[400, 800]}
+						sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+						priority={ctx.priorityImage && i === 0}
+						class="aspect-[4/3] h-auto w-full rounded-md object-cover"
+					/>
+				</li>
+			))}
+		</ul>
+	</div>
+</section>

@@ -1,0 +1,24 @@
+---
+import Heading from '~/components/Heading.astro';
+import LinkButton from '~/components/LinkButton.astro';
+import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
+
+interface Props {
+	section: SectionOf<'cta'>;
+	ctx: SectionContext;
+}
+
+const { section, ctx } = Astro.props;
+---
+
+<section class="bg-brand text-white">
+	<div class="content-container flex flex-col items-start gap-6 py-section md:flex-row md:items-center md:justify-between">
+		<div>
+			<Heading level={ctx.headingLevel} class="text-3xl font-bold tracking-tight sm:text-4xl">
+				{section.heading}
+			</Heading>
+			{section.lead && <p class="mt-3 max-w-2xl text-lg text-white/85">{section.lead}</p>}
+		</div>
+		<LinkButton item={section.button} variant="inverse" class="shrink-0" />
+	</div>
+</section>

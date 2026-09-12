@@ -1,0 +1,18 @@
+---
+import type { ListProps } from 'astro-portabletext/types';
+
+type Props = ListProps;
+
+const { node } = Astro.props;
+const ordered = node.listItem === 'number';
+---
+
+{ordered ? (
+	<ol class="mb-4 list-decimal space-y-1 pl-6 text-muted marker:text-brand">
+		<slot />
+	</ol>
+) : (
+	<ul class="mb-4 list-disc space-y-1 pl-6 text-muted marker:text-brand">
+		<slot />
+	</ul>
+)}

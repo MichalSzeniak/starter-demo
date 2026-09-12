@@ -1,23 +1,102 @@
 ---
-import { brand, phoneHref } from '~/config/brand';
+import SanityImage from '~/components/SanityImage.astro';
+import type { Navigation, SiteSettings } from '~/lib/content';
+import { telHref } from '~/lib/format';
+import { anchorAttributes, resolveLink, type ResolvedLink } from '~/lib/links';
 
-// FAZA 2: pozycje menu przyjdą z dokumentu `navigation` w Sanity.
-// Do tego czasu nagłówek pokazuje tylko nazwę firmy i telefon —
-// wolę pusty nagłówek niż linki prowadzące donikąd.
+/**
+ * Nagłówek z menu z dokumentu `navigation`. Na telefonie menu rozwija
+ * natywny <details> — zero JS. Klik poza menu go nie zamyka; przy ≤6 pozycjach
+ * to akceptowalny kompromis, a podmiana na wyspę to zmiana w jednym pliku.
+ */
+interface Props {
+	settings: SiteSettings;
+	navigation: Navigation;
+}
+
+const { settings, navigation } = Astro.props;
+
+const items = (navigation.mainMenu ?? [])
+	.map((item) => ({ label: item.label, link: resolveLink(item.link) }))
+	.filter((item): item is { label: string; link: ResolvedLink } =>
+		Boolean(item.label && item.link),
+	);
+
+const hasLogo = Boolean(settings.logo?.asset?.url);
+const phone = telHref(settings.phone);
 ---
 
 <header class="border-b border-border bg-surface">
-	<div class="content-container flex items-center justify-between gap-4 py-4">
-		<a href="/" class="text-lg font-semibold text-ink">
-			{' '}
-			{brand.company.name}{' '}
+	<div class="content-container flex items-center justify-between gap-4 py-3">
+		<a
+			href="/"
+			class="flex items-center gap-2 text-lg font-semibold text-ink"
+			aria-label={`${settings.companyName} — strona główna`}
+		>
+			{hasLogo ? (
+				<SanityImage
+					image={settings.logo}
+					width={240}
+					widths={[120, 240]}
+					sizes="120px"
+					eager
+					class="h-10 w-auto"
+				/>
+			) : (
+				settings.companyName
+			)}
 		</a>
 
-		<a
-			href={phoneHref}
-			class="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
-		>
-			{brand.company.phone}
-		</a>
+		{items.length > 0 && (
+			<nav aria-label="Menu główne" class="hidden sm:block">
+				<ul class="flex items-center gap-6" role="list">
+					{items.map((item) => (
+						<li>
+							<a
+								{...anchorAttributes(item.link)}
+								class="text-sm font-medium text-muted hover:text-ink"
+							>
+								{item.label}
+							</a>
+						</li>
+					))}
+				</ul>
+			</nav>
+		)}
+
+		<div class="flex items-center gap-3">
+			{phone && (
+				<a
+					href={phone}
+					class="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+				>
+					{settings.phone}
+				</a>
+			)}
+			{items.length > 0 && (
+				<details class="relative sm:hidden">
+					<summary class="cursor-pointer list-none rounded-md border border-border px-3 py-2 text-sm font-medium text-ink [&::-webkit-details-marker]:hidden">
+						Menu
+					</summary>
+					<nav
+						aria-label="Menu mobilne"
+						class="absolute right-0 z-40 mt-2 w-56 rounded-md border border-border bg-surface p-2 shadow-lg"
+					>
+						<ul role="list">
+							{items.map((item) => (
+								<li>
+									<a
+										{...anchorAttributes(item.link)}
+										class="block rounded-sm px-3 py-2 text-sm font-medium text-ink hover:bg-surface-alt"
+									>
+										{item.label}
+									</a>
+								</li>
+							))}
+						</ul>
+					</nav>
+				</details>
+			)}
+		</div>
 	</div>
 </header>

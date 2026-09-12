@@ -1,0 +1,48 @@
+---
+import Heading from '~/components/Heading.astro';
+import SanityImage from '~/components/SanityImage.astro';
+import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
+
+interface Props {
+	section: SectionOf<'testimonials'>;
+	ctx: SectionContext;
+}
+
+const { section, ctx } = Astro.props;
+const items = section.items ?? [];
+---
+
+<section class="bg-surface-alt">
+	<div class="content-container py-section">
+		{section.heading && (
+			<Heading
+				level={ctx.headingLevel}
+				class="text-3xl font-bold tracking-tight text-ink sm:text-4xl"
+			>
+				{section.heading}
+			</Heading>
+		)}
+		<ul class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3" role="list">
+			{items.map((item) => (
+				<li>
+					<figure class="flex h-full flex-col rounded-lg border border-border bg-surface p-6">
+						<blockquote class="flex-1 text-muted">„{item.quote}”</blockquote>
+						<figcaption class="mt-6 flex items-center gap-3">
+							<SanityImage
+								image={item.avatar}
+								width={96}
+								widths={[48, 96]}
+								sizes="48px"
+								class="size-12 rounded-full object-cover"
+							/>
+							<div>
+								<p class="font-semibold text-ink">{item.author}</p>
+								{item.role && <p class="text-sm text-muted">{item.role}</p>}
+							</div>
+						</figcaption>
+					</figure>
+				</li>
+			))}
+		</ul>
+	</div>
+</section>

@@ -1,0 +1,36 @@
+---
+import Heading from '~/components/Heading.astro';
+import RichText from '~/components/portable/RichText.astro';
+import SanityImage from '~/components/SanityImage.astro';
+import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
+
+interface Props {
+	section: SectionOf<'textImage'>;
+	ctx: SectionContext;
+}
+
+const { section, ctx } = Astro.props;
+const imageLeft = section.imagePosition === 'left';
+---
+
+<section>
+	<div class="content-container grid gap-10 py-section lg:grid-cols-2 lg:items-center">
+		<div class:list={[imageLeft && 'lg:order-2']}>
+			<Heading
+				level={ctx.headingLevel}
+				class="text-3xl font-bold tracking-tight text-ink sm:text-4xl"
+			>
+				{section.heading}
+			</Heading>
+			<RichText value={section.body} class="mt-6" />
+		</div>
+		<SanityImage
+			image={section.image}
+			width={900}
+			widths={[480, 900]}
+			sizes="(min-width: 1024px) 50vw, 100vw"
+			priority={ctx.priorityImage}
+			class={imageLeft ? 'h-auto w-full rounded-lg lg:order-1' : 'h-auto w-full rounded-lg'}
+		/>
+	</div>
+</section>

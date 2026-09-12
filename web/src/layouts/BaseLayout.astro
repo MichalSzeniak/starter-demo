@@ -1,8 +1,9 @@
 ---
 import { Font } from 'astro:assets';
-import { brand, themeCss } from '~/config/brand';
 import Footer from '~/components/layout/Footer.astro';
 import Header from '~/components/layout/Header.astro';
+import { brand, themeCss } from '~/config/brand';
+import { getNavigation, getSiteSettings } from '~/lib/content';
 import '~/styles/global.css';
 
 interface Props {
@@ -12,7 +13,20 @@ interface Props {
 	noindex?: boolean;
 }
 
-const { title, description = brand.company.tagline, noindex = false } = Astro.props;
+// Ustawienia i nawigacja są memoizowane w content.ts — jedno pobranie na build,
+// nie jedno na każdą podstronę.
+const [settings, navigation] = await Promise.all([getSiteSettings(), getNavigation()]);
+
+const {
+	title,
+	description = settings.tagline ?? brand.company.tagline,
+	noindex = false,
+} = Astro.props;
+
+// Canonical spójny z `trailingSlash: 'never'` — jedyny wyjątek to strona główna,
+// gdzie kanoniczną formą jest sam ukośnik.
+const canonicalPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const canonical = new URL(canonicalPath, Astro.site).href;
 
 // Uwaga na kolejność w <head>:
 // 1. `themeCss` — zmienne z brand.ts, muszą poprzedzać arkusz Tailwinda.
@@ -21,11 +35,6 @@ const { title, description = brand.company.tagline, noindex = false } = Astro.pr
 //    więc w wyjściowym HTML nie ma ani jednego requestu do Google.
 //    Preload obejmuje oba podzbiory, bo polski tekst sięga po latin-ext
 //    już w pierwszym nagłówku.
-
-// Canonical spójny z `trailingSlash: 'never'` — jedyny wyjątek to strona główna,
-// gdzie kanoniczną formą jest sam ukośnik.
-const canonicalPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
-const canonical = new URL(canonicalPath, Astro.site).href;
 ---
 
 <!doctype html>
@@ -52,12 +61,12 @@ const canonical = new URL(canonicalPath, Astro.site).href;
 			Przejdź do treści
 		</a>
 
-		<Header />
+		<Header settings={settings} navigation={navigation} />
 
 		<main id="tresc" class="flex-1">
 			<slot />
 		</main>
 
-		<Footer />
+		<Footer settings={settings} navigation={navigation} />
 	</body>
 </html>

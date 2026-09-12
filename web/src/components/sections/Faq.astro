@@ -1,0 +1,52 @@
+---
+import Heading from '~/components/Heading.astro';
+import RichText from '~/components/portable/RichText.astro';
+import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
+
+/**
+ * Accordion na natywnym <details>/<summary> — zero JS, klawiatura i czytniki
+ * ekranu działają z pudełka. CLAUDE.md dopuszcza wyspę dla FAQ, ale nie jest
+ * tu potrzebna.
+ */
+interface Props {
+	section: SectionOf<'faq'>;
+	ctx: SectionContext;
+}
+
+const { section, ctx } = Astro.props;
+const items = section.items ?? [];
+const questionLevel = ctx.headingLevel === 1 ? 2 : 3;
+---
+
+<section>
+	<div class="content-container py-section">
+		<div class="mx-auto max-w-3xl">
+			{section.heading && (
+				<Heading
+					level={ctx.headingLevel}
+					class="text-3xl font-bold tracking-tight text-ink sm:text-4xl"
+				>
+					{section.heading}
+				</Heading>
+			)}
+			<div class="mt-8 divide-y divide-border border-y border-border">
+				{items.map((item) => (
+					<details class="group py-4">
+						<summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-left [&::-webkit-details-marker]:hidden">
+							<Heading level={questionLevel} class="text-lg font-medium text-ink">
+								{item.question}
+							</Heading>
+							<span
+								aria-hidden="true"
+								class="shrink-0 text-2xl leading-none text-brand transition-transform group-open:rotate-45"
+							>
+								+
+							</span>
+						</summary>
+						<RichText value={item.answer} class="pt-3 pr-10" />
+					</details>
+				))}
+			</div>
+		</div>
+	</div>
+</section>

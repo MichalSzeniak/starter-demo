@@ -1,0 +1,51 @@
+---
+import Heading from '~/components/Heading.astro';
+import LinkButton from '~/components/LinkButton.astro';
+import SanityImage from '~/components/SanityImage.astro';
+import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
+
+interface Props {
+	section: SectionOf<'hero'>;
+	ctx: SectionContext;
+}
+
+const { section, ctx } = Astro.props;
+const buttons = section.buttons ?? [];
+const hasImage = Boolean(section.image?.asset?.url);
+---
+
+<section class="bg-surface-alt">
+	<div
+		class:list={[
+			'content-container grid gap-10 py-section lg:py-section-lg',
+			hasImage && 'lg:grid-cols-2 lg:items-center',
+		]}
+	>
+		<div>
+			<Heading
+				level={ctx.headingLevel}
+				class="text-4xl font-bold tracking-tight text-ink sm:text-5xl"
+			>
+				{section.heading}
+			</Heading>
+			{section.lead && <p class="mt-5 max-w-2xl text-lg text-muted">{section.lead}</p>}
+			{buttons.length > 0 && (
+				<div class="mt-8 flex flex-wrap gap-3">
+					{buttons.map((button, i) => (
+						<LinkButton item={button} variant={i === 0 ? 'primary' : 'secondary'} />
+					))}
+				</div>
+			)}
+		</div>
+		{hasImage && (
+			<SanityImage
+				image={section.image}
+				width={1200}
+				widths={[640, 960, 1200]}
+				sizes="(min-width: 1024px) 50vw, 100vw"
+				priority={ctx.priorityImage}
+				class="h-auto w-full rounded-lg"
+			/>
+		)}
+	</div>
+</section>

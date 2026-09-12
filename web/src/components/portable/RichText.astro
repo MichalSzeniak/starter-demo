@@ -1,0 +1,33 @@
+---
+import { PortableText } from 'astro-portabletext';
+import type { TypedObject } from 'astro-portabletext/types';
+import Block from './Block.astro';
+import Link from './Link.astro';
+import List from './List.astro';
+import ListItem from './ListItem.astro';
+
+/**
+ * Renderuje pole `richText` z Sanity własnymi komponentami.
+ * Klucze `block`/`mark`/`list`/`listItem` są w liczbie pojedynczej —
+ * tak nazywa je astro-portabletext (inaczej niż @portabletext/react).
+ */
+interface Props {
+	value: TypedObject[] | null | undefined;
+	class?: string;
+}
+
+const { value, class: className } = Astro.props;
+
+const components = {
+	block: Block,
+	mark: { link: Link },
+	list: List,
+	listItem: ListItem,
+};
+---
+
+{value && value.length > 0 && (
+	<div class={className}>
+		<PortableText value={value} components={components} />
+	</div>
+)}
