@@ -1,0 +1,18 @@
+---
+import type { JsonLdNode } from '~/lib/seo/jsonld';
+
+/**
+ * Jeden <script type="application/ld+json"> na stronę z grafem węzłów.
+ * `is:inline`, żeby Astro nie próbował go bundlować — to dane, nie kod;
+ * nie liczy się jako JS kliencki (przeglądarka go nie wykonuje).
+ * `<` zamieniane na <, żeby treść z CMS nie mogła zamknąć znacznika.
+ */
+interface Props {
+	data: JsonLdNode;
+}
+
+const { data } = Astro.props;
+const json = JSON.stringify(data).replace(/</g, '\\u003c');
+---
+
+<script is:inline type="application/ld+json" set:html={json}></script>

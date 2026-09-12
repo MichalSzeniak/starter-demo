@@ -2,7 +2,9 @@
 import type { GetStaticPaths } from 'astro';
 import SectionRenderer from '~/components/SectionRenderer.astro';
 import BaseLayout from '~/layouts/BaseLayout.astro';
-import { getPage, getPageSlugs } from '~/lib/content';
+import { getPage, getPageIndex, getSiteSettings } from '~/lib/content';
+import { breadcrumbNode, faqPageNode } from '~/lib/seo/jsonld';
+import { generatedOgImage, ogIdForSlug, ogImageFromSanity, requireSite } from '~/lib/seo/og-image';
 
 /**
  * Jedna trasa dla wszystkich podstron z Sanity. Slug `/` to strona główna
@@ -10,27 +12,36 @@ import { getPage, getPageSlugs } from '~/lib/content';
  * modułu, więc korzysta ono wyłącznie z importów, nie ze stałych frontmattera.
  */
 export const getStaticPaths = (async () => {
-	const slugs = await getPageSlugs();
-	return slugs.map((slug) => ({
+	const pages = await getPageIndex();
+	return pages.map(({ slug }) => ({
 		params: { slug: slug === '/' ? undefined : slug },
 		props: { slug },
 	}));
 }) satisfies GetStaticPaths;
 
 const { slug } = Astro.props;
-const page = await getPage(slug);
+const site = requireSite(Astro.site);
+const [page, settings] = await Promise.all([getPage(slug), getSiteSettings()]);
 
 if (!page) {
 	throw new Error(
 		`Brak strony dla sluga "${slug}" — getStaticPaths zwróciło ścieżkę bez dokumentu.`,
 	);
 }
+
+// Własny obraz podstrony → domyślny z ustawień → wygenerowany z tytułu i logo.
+const ogImage =
+	(await ogImageFromSanity(page.seo.ogImage, site)) ??
+	(await ogImageFromSanity(settings.defaultOgImage, site)) ??
+	generatedOgImage(ogIdForSlug(page.slug), site, page.seo.metaTitle);
 ---
 
 <BaseLayout
-	title={page.seo?.metaTitle ?? page.title}
-	description={page.seo?.metaDescription ?? undefined}
-	noindex={page.seo?.noindex ?? false}
+	title={page.seo.metaTitle}
+	description={page.seo.metaDescription}
+	noindex={page.seo.noindex ?? false}
+	ogImage={ogImage}
+	jsonLd={[breadcrumbNode(page, site), faqPageNode(page)]}
 >
 	<SectionRenderer sections={page.sections} />
 </BaseLayout>

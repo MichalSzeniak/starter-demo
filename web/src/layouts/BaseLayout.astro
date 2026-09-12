@@ -2,8 +2,13 @@
 import { Font } from 'astro:assets';
 import Footer from '~/components/layout/Footer.astro';
 import Header from '~/components/layout/Header.astro';
+import JsonLd from '~/components/seo/JsonLd.astro';
+import Seo from '~/components/seo/Seo.astro';
 import { brand, themeCss } from '~/config/brand';
 import { getNavigation, getSiteSettings } from '~/lib/content';
+import { jsonLdGraph, type JsonLdNode } from '~/lib/seo/jsonld';
+import { generatedOgImage, ogImageFromSanity, requireSite, type OgImage } from '~/lib/seo/og-image';
+import { getSiteGraph } from '~/lib/seo/site-graph';
 import '~/styles/global.css';
 
 interface Props {
@@ -11,22 +16,37 @@ interface Props {
 	description?: string;
 	/** Ustaw na true tam, gdzie strona nie ma trafić do indeksu (np. 404). */
 	noindex?: boolean;
+	/** Obraz OG strony. Bez niego: domyślny z ustawień albo wygenerowany dla strony głównej. */
+	ogImage?: OgImage | null;
+	/** Dodatkowe węzły JSON-LD strony (okruszki, FAQ). Organization i WebSite dokładane zawsze. */
+	jsonLd?: (JsonLdNode | null | undefined)[];
 }
 
-// Ustawienia i nawigacja są memoizowane w content.ts — jedno pobranie na build,
-// nie jedno na każdą podstronę.
-const [settings, navigation] = await Promise.all([getSiteSettings(), getNavigation()]);
+const site = requireSite(Astro.site);
+
+// Ustawienia i nawigacja są memoizowane w content.ts — jedno pobranie na build.
+const [settings, navigation, siteGraph] = await Promise.all([
+	getSiteSettings(),
+	getNavigation(),
+	getSiteGraph(site),
+]);
 
 const {
 	title,
 	description = settings.tagline ?? brand.company.tagline,
 	noindex = false,
+	jsonLd = [],
 } = Astro.props;
+
+const ogImage =
+	Astro.props.ogImage ??
+	(await ogImageFromSanity(settings.defaultOgImage, site)) ??
+	generatedOgImage('strona-glowna', site, settings.companyName);
 
 // Canonical spójny z `trailingSlash: 'never'` — jedyny wyjątek to strona główna,
 // gdzie kanoniczną formą jest sam ukośnik.
 const canonicalPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
-const canonical = new URL(canonicalPath, Astro.site).href;
+const canonical = new URL(canonicalPath, site).href;
 
 // Uwaga na kolejność w <head>:
 // 1. `themeCss` — zmienne z brand.ts, muszą poprzedzać arkusz Tailwinda.
@@ -42,15 +62,21 @@ const canonical = new URL(canonicalPath, Astro.site).href;
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title>{title}</title>
-		<meta name="description" content={description} />
-		<link rel="canonical" href={canonical} />
-		{noindex && <meta name="robots" content="noindex, follow" />}
+		<Seo
+			title={title}
+			description={description}
+			canonical={canonical}
+			siteName={settings.companyName}
+			locale={brand.locale}
+			noindex={noindex}
+			ogImage={ogImage}
+		/>
 
 		<style is:inline set:html={themeCss}></style>
 		<Font cssVariable="--font-brand-sans" preload />
 
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<JsonLd data={jsonLdGraph([...siteGraph, ...jsonLd])} />
 		<slot name="head" />
 	</head>
 	<body class="flex min-h-screen flex-col">

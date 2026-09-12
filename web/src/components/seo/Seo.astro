@@ -1,0 +1,52 @@
+---
+import type { OgImage } from '~/lib/seo/og-image';
+
+/**
+ * Wszystkie metadane strony w jednym miejscu. Renderowany wyłącznie w <head>
+ * przez BaseLayout — komponenty stron nie dotykają <title> ani <meta>.
+ *
+ * `robots` tylko dla noindex: brak znacznika = indeksuj, tak jak domyślnie.
+ */
+interface Props {
+	title: string;
+	description: string;
+	/** Absolutny adres kanoniczny — bez ukośnika na końcu, poza stroną główną. */
+	canonical: string;
+	siteName: string;
+	locale: string;
+	noindex?: boolean;
+	ogImage?: OgImage | null;
+}
+
+const { title, description, canonical, siteName, locale, noindex = false, ogImage } = Astro.props;
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex, follow" />}
+
+<meta property="og:type" content="website" />
+<meta property="og:locale" content={locale} />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+{ogImage && (
+	<>
+		<meta property="og:image" content={ogImage.url} />
+		<meta property="og:image:width" content={String(ogImage.width)} />
+		<meta property="og:image:height" content={String(ogImage.height)} />
+		<meta property="og:image:alt" content={ogImage.alt} />
+	</>
+)}
+
+<meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+{ogImage && (
+	<>
+		<meta name="twitter:image" content={ogImage.url} />
+		<meta name="twitter:image:alt" content={ogImage.alt} />
+	</>
+)}
