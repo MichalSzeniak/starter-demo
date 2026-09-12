@@ -41,6 +41,13 @@ Przed rozpoczęciem pracy przeczytaj `docs/PLAN.md` oraz `docs/POSTEP.md`.
 Wykonuj wyłącznie fazę, którą wskażę. Po jej zakończeniu dopisz wpis
 do `docs/POSTEP.md` i zatrzymaj się.
 
+## Wiedza o Sanity
+
+W repo zainstalowane są skille `sanity-io/agent-toolkit`. Przy każdej pracy
+dotyczącej schemy, GROQ, TypeGen, obrazów, Portable Text lub page buildera
+korzystaj z `sanity-best-practices`, a przy metadanych i danych
+strukturalnych z `seo-aeo-best-practices`.
+
 ## Weryfikacja API
 
 Nie zgaduj sygnatur. Przed użyciem API z `astro`, `@sanity/astro`,
