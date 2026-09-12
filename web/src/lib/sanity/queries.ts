@@ -16,6 +16,7 @@ const IMAGE = /* groq */ `{
 	asset->{
 		_id,
 		url,
+		mimeType,
 		"width": metadata.dimensions.width,
 		"height": metadata.dimensions.height
 	}

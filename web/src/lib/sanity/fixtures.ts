@@ -36,7 +36,13 @@ function image(name: string, alt: string, width: number, height: number): Image 
 		alt,
 		hotspot: null,
 		crop: null,
-		asset: { _id: `image-demo-${name}`, url: `/demo/${name}.svg`, width, height },
+		asset: {
+			_id: `image-demo-${name}`,
+			url: `/demo/${name}.svg`,
+			mimeType: 'image/svg+xml',
+			width,
+			height,
+		},
 	};
 }
 

@@ -592,3 +592,41 @@ oznaczone `source.name = starter-demo-seed`. Token z `SANITY_WRITE_TOKEN` w `stu
 **Dla fazy 7:** `nowy-klient` NIE uruchamia seeda — świeży projekt klienta startuje
 z pustym datasetem. Nie zweryfikowano na realnym projekcie (brak `SANITY_STUDIO_PROJECT_ID`);
 sprawdzony wyłącznie dry-run i transformacja struktur.
+
+---
+
+## Poprawka — logo jako SVG z Sanity (2026-09-12)
+
+Build na realnym datasecie padał: `astro:assets` odmawia rasteryzacji SVG bez
+`dangerouslyProcessSVG`. **Winowajcą nie był `SanityImage.astro`** — ten
+przepuszczał logo poprawnie (w `dist/` lądowały dwa pliki `.svg`, zanim build
+padł). Wywracał go `site-graph.ts`, który dla `logo` w danych strukturalnych
+wołał `getImage({ format: 'png' })` na wektorze.
+
+**Rozwiązanie rozdziela dwa zastosowania obrazu:**
+
+- **Wyświetlany wektor zostaje wektorem.** `resolveImage` wykrywa SVG po
+  `mimeType` z metadanych assetu (zapasowo po rozszerzeniu adresu) i zwraca
+  czysty adres oraz wymiary własne assetu — bez parametrów transformacji, bo CDN
+  Sanity i tak ich dla SVG nie stosuje (sprawdzone: `?w=`/`?fit=` zwracają ten
+  sam plik). `SanityImage` renderuje wtedy `<Image format="svg">`: plik trafia do
+  `dist/` nietknięty, jednym plikiem zamiast dwóch identycznych wariantów srcset.
+- **Gdzie raster jest wymagany, robi go CDN.** Google nie przyjmuje SVG w polu
+  `logo` danych strukturalnych, a podgląd linku na Facebooku i LinkedIn nie
+  renderuje SVG. Nowe `cdnRasterUrl` dokłada dla wektorów `fm=png`/`fm=jpg` —
+  Sanity konwertuje po swojej stronie (sprawdzone: `?w=1200&h=630&fm=jpg` →
+  `image/jpeg`), więc `astro:assets` dostaje gotowego rastra i nie dotyka SVG.
+
+`dangerouslyProcessSVG` pozostaje wyłączone.
+
+**Zasięg.** Każde pole obrazu w schemie jest pokryte: `logo` (nagłówek, JSON-LD,
+karta OG), `defaultOgImage` i `seo.ogImage` (podgląd linku), `hero.image`,
+`textImage.image`, `gallery.images[]`, `testimonials.avatar` (`SanityImage`).
+Pozostałe sloty demo to WebP — nietknięte.
+
+**Zweryfikowane na projekcie `mebrv8ha`:** build przechodzi (4 strony, 4 s);
+logo w HTML to `/_astro/…svg`, 973 B, bajt w bajt jak źródło; JSON-LD dostaje
+PNG 4 kB; `og:image` to JPG 1200×630; jeden plik `.svg` zamiast dwóch;
+0 odwołań do `cdn.sanity.io` w HTML; 0 plików `.js`. Karta OG z fazy 4 poprawnie
+rasteryzuje wektorowe logo przez sharpa (podgląd sprawdzony). Symulacja „klient
+wgrywa SVG jako obraz OG" zwraca z CDN `image/jpeg`. Tryb demo bez regresji.

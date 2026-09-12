@@ -1,5 +1,5 @@
 import { getImage } from 'astro:assets';
-import { cdnCropUrl, type ImageLike } from '~/lib/sanity/image';
+import { cdnRasterUrl, type ImageLike } from '~/lib/sanity/image';
 
 /**
  * Obraz Open Graph strony. Kolejność:
@@ -36,7 +36,14 @@ export async function ogImageFromSanity(
 	image: ImageLike | null | undefined,
 	site: URL,
 ): Promise<OgImage | null> {
-	const src = cdnCropUrl(image, OG_WIDTH, OG_HEIGHT);
+	// Raster już z CDN: gdyby klient wgrał tu SVG, podgląd linku i tak by go nie
+	// wyrenderował, a astro:assets odmówiłby rasteryzacji.
+	const src = cdnRasterUrl(image, {
+		width: OG_WIDTH,
+		height: OG_HEIGHT,
+		format: 'jpg',
+		fit: 'crop',
+	});
 	if (!src) return null;
 
 	// JPG, nie WebP: część serwisów społecznościowych nadal nie renderuje WebP w podglądzie linku.

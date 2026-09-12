@@ -13,11 +13,15 @@ import { resolveImage, type ImageLike } from '~/lib/sanity/image';
  *   Wszystko inne jest lazy.
  * - Warianty srcset podajemy jawnie (domyślnie połowa i całość), a nie przez
  *   globalny `layout`, który mnożyłby operacje sharpa na każdym obrazie.
+ * - WEKTORY (klient wgrywa logo jako SVG): `format="svg"` mówi astro:assets,
+ *   żeby przepuścił plik bez zmian. Plik i tak ląduje w dist/, więc w HTML
+ *   nadal nie ma odwołania do CDN, ale zostaje wektorem. Bez srcset — warianty
+ *   byłyby kopiami tego samego pliku.
  * - Treści demo (pliki z web/public/demo) renderują się jako zwykły <img>.
  */
 interface Props {
 	image: ImageLike | null | undefined;
-	/** Największa szerokość, jakiej potrzebuje ten slot (px). */
+	/** Największa szerokość, jakiej potrzebuje ten slot (px). Wektory ignorują. */
 	width: number;
 	/** Szerokości do srcset. Domyślnie [width/2, width]. */
 	widths?: number[];
@@ -47,7 +51,29 @@ const loading = priority || eager ? 'eager' : 'lazy';
 ---
 
 {resolved &&
-	(resolved.remote ? (
+	(!resolved.remote ? (
+		<img
+			src={resolved.src}
+			width={resolved.width}
+			height={resolved.height}
+			alt={resolved.alt}
+			loading={loading}
+			decoding={priority ? 'sync' : 'async'}
+			fetchpriority={priority ? 'high' : undefined}
+			class={className}
+		/>
+	) : resolved.vector ? (
+		<Image
+			src={resolved.src}
+			width={resolved.width}
+			height={resolved.height}
+			alt={resolved.alt}
+			format="svg"
+			priority={priority}
+			loading={loading}
+			class={className}
+		/>
+	) : (
 		<Image
 			src={resolved.src}
 			width={resolved.width}
@@ -57,17 +83,6 @@ const loading = priority || eager ? 'eager' : 'lazy';
 			sizes={sizesAttr}
 			priority={priority}
 			loading={loading}
-			class={className}
-		/>
-	) : (
-		<img
-			src={resolved.src}
-			width={resolved.width}
-			height={resolved.height}
-			alt={resolved.alt}
-			loading={loading}
-			decoding={priority ? 'sync' : 'async'}
-			fetchpriority={priority ? 'high' : undefined}
 			class={className}
 		/>
 	))}
