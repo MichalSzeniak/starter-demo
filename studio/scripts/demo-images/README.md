@@ -17,3 +17,9 @@ wchodzą wyłącznie pod flagą `--allow-placeholders` (do testów).
 | `avatar-1.*`, `avatar-2.*`    | opinie klientów                   | kwadrat, twarz na środku          |
 | `logo.*`                      | nagłówek, JSON-LD, obraz OG       | SVG lub PNG z przezroczystym tłem |
 | `og.*`                        | domyślny obraz przy udostępnianiu | dokładnie 1200×630                |
+
+`logo.*` i `og.*` można wygenerować: `pnpm --filter studio images:generate`
+(monogram z inicjałów nazwy firmy na kolorze akcentu; karta 1200×630 z nazwą firmy
+fontem marki — wszystko z `web/src/config/brand.ts`). Wynik jest deterministyczny:
+ten sam `brand.ts` daje bajt w bajt te same pliki. Generator mieszka w `web/scripts/`,
+bo tam jest satori.

@@ -585,7 +585,7 @@ lub og:image. Następny krok: faza 5 (formularz i analityka), po Twoim „dalej"
 (jedyne źródło; skrypt przekłada kształt wyników zapytań na dokumenty,
 wgrywa obrazy z dysku — `studio/scripts/demo-images/` dopasowane po nazwie do slotu,
 z zapasem SVG z `web/public/demo` i ostrzeżeniem, gdy pliku brak — `createOrReplace`
-z deterministycznymi `_id`). Zdjęcia w `demo-images/` są wersjonowane — przed commitem `pnpm --filter studio images:optimize` (dłuższy bok ≤ 1600 px, WebP q80). Brak pliku dla slotu zatrzymuje seed przed pierwszym uploadem; placeholdery SVG tylko pod `--allow-placeholders`.
+z deterministycznymi `_id`). Zdjęcia w `demo-images/` są wersjonowane — przed commitem `pnpm --filter studio images:optimize` (dłuższy bok ≤ 1600 px, WebP q80). Brak pliku dla slotu zatrzymuje seed przed pierwszym uploadem; placeholdery SVG tylko pod `--allow-placeholders`. `logo.svg` i `og.webp` generuje deterministycznie `pnpm --filter studio images:generate` (kod w `web/scripts/demo-images.ts`, bo tam jest satori — `studio/` nie dostało nowej zależności).
 `--dry-run [--verbose]` bez sieci, `seed:clean [--yes]` sprząta dokumenty i assety
 oznaczone `source.name = starter-demo-seed`. Token z `SANITY_WRITE_TOKEN` w `studio/.env`.
 
