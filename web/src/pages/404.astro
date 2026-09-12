@@ -1,4 +1,5 @@
 ---
+import Heading from '~/components/Heading.astro';
 import BaseLayout from '~/layouts/BaseLayout.astro';
 ---
 
@@ -9,9 +10,9 @@ import BaseLayout from '~/layouts/BaseLayout.astro';
 >
 	<section class="content-container py-section-lg">
 		<p class="text-sm font-medium text-brand">Błąd 404</p>
-		<h1 class="mt-2 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+		<Heading level={1} variant="section" class="mt-2 text-ink">
 			Nie znaleźliśmy tej strony
-		</h1>
+		</Heading>
 		<p class="mt-4 max-w-xl text-muted">
 			Adres jest nieprawidłowy albo strona została przeniesiona.
 		</p>

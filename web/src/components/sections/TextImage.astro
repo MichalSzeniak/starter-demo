@@ -16,10 +16,7 @@ const imageLeft = section.imagePosition === 'left';
 <section>
 	<div class="content-container grid gap-10 py-section lg:grid-cols-2 lg:items-center">
 		<div class:list={[imageLeft && 'lg:order-2']}>
-			<Heading
-				level={ctx.headingLevel}
-				class="text-3xl font-bold tracking-tight text-ink sm:text-4xl"
-			>
+			<Heading level={ctx.headingLevel} variant="section" class="text-ink">
 				{section.heading}
 			</Heading>
 			<RichText value={section.body} class="mt-6" />

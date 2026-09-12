@@ -3,17 +3,30 @@
  * Nagłówek o poziomie ustalanym przez kontekst, nie przez treść.
  * Poziom NIE jest polem w Sanity — o hierarchii decyduje szablon:
  * pierwsza sekcja dostaje h1, kolejne h2, elementy wewnątrz sekcji h3.
+ *
+ * `variant="section"` = tytuł sekcji. Rozmiar wynika wtedy z POZIOMU, nie
+ * z typu sekcji: h1 jest dominujący niezależnie od tego, którą sekcję klient
+ * postawi na górze strony. Skala żyje tylko tutaj.
+ * Bez wariantu (tytuły kart, pytania FAQ) rozmiar podaje wywołujący w `class`.
  */
 interface Props {
 	level: 1 | 2 | 3;
+	variant?: 'section';
 	class?: string;
 	id?: string;
 }
 
-const { level, class: className, id } = Astro.props;
+const { level, variant, class: className, id } = Astro.props;
 const Tag = `h${level}` as 'h1' | 'h2' | 'h3';
+
+// Desktop: 60 px vs 30 px (2:1). Telefon: 36 px vs 24 px (1,5:1) — więcej się
+// nie zmieści bez łamania polskich słów w wąskiej kolumnie.
+const scale = {
+	1: 'text-4xl leading-[1.1] font-extrabold tracking-tight sm:text-5xl lg:text-6xl',
+	2: 'text-2xl leading-tight font-bold tracking-tight sm:text-3xl',
+} as const;
 ---
 
-<Tag class={className} id={id}>
+<Tag class:list={[variant === 'section' && level !== 3 && scale[level], className]} id={id}>
 	<slot />
 </Tag>

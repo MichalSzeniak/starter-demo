@@ -29,6 +29,9 @@
 @layer base {
 	html {
 		scroll-behavior: smooth;
+		/* Nagłówek jest sticky: kotwice, „Przejdź do treści” i fokus z klawiatury
+		   nie mogą lądować pod nim. Zapas ponad jego wysokość (~65 px). */
+		scroll-padding-top: 5rem;
 		-webkit-text-size-adjust: 100%;
 	}
 
@@ -64,4 +67,37 @@
 	width: 100%;
 	max-width: var(--brand-content-max);
 	padding-inline: 1rem;
+}
+
+/**
+ * Łagodne wejście sekcji przy scrollu — czysty CSS, wątek kompozytora.
+ *
+ * - Pierwsza sekcja jest pominięta: to h1 i obraz LCP, animacja opacity
+ *   opóźniłaby LCP.
+ * - Animujemy zawartość, nie <section> — pasy tła zostają na miejscu.
+ * - Zakres w rem, nie w %: przy procentach wysoka sekcja (długie FAQ) byłaby
+ *   półprzezroczysta w trakcie czytania.
+ * - Bez `animation-timeline` albo przy „ogranicz animacje" reguła nie istnieje,
+ *   więc treść jest po prostu widoczna.
+ */
+@media (prefers-reduced-motion: no-preference) {
+	@supports (animation-timeline: view()) {
+		main > section:not(:first-child) > * {
+			/* Longhandy, nie skrót `animation`: minifikator skleja skrót z
+			   `animation-timeline` w `animation: … view()`, którego Chrome nie przyjmuje,
+			   i animacja po cichu znika (sprawdzone: Chrome 152, lightningcss 1.33). */
+			animation-name: section-reveal;
+			animation-timing-function: linear;
+			animation-fill-mode: both;
+			animation-timeline: view();
+			animation-range: entry 0% entry 12rem;
+		}
+	}
+}
+
+@keyframes section-reveal {
+	from {
+		opacity: 0;
+		translate: 0 2rem;
+	}
 }

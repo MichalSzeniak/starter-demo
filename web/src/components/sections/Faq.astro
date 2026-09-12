@@ -7,6 +7,14 @@ import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
  * Accordion na natywnym <details>/<summary> — zero JS, klawiatura i czytniki
  * ekranu działają z pudełka. CLAUDE.md dopuszcza wyspę dla FAQ, ale nie jest
  * tu potrzebna.
+ *
+ * Animacja wysokości: wrapper `.faq-panel` to grid z jednym wierszem
+ * 0fr → 1fr, a dziecko z `min-h-0` + `overflow-hidden` zwija się do zera.
+ * Zamknięty <details> nie renderuje treści, więc otwarcie nie miałoby stanu
+ * startowego — podaje go `@starting-style`. Zamykanie animuje się tylko tam,
+ * gdzie jest `::details-content`; gdzie indziej panel znika od razu.
+ * Odstęp nad odpowiedzią siedzi WEWNĄTRZ zwijanego dziecka, inaczej zostałby
+ * widoczny przy 0fr.
  */
 interface Props {
 	section: SectionOf<'faq'>;
@@ -22,31 +30,72 @@ const questionLevel = ctx.headingLevel === 1 ? 2 : 3;
 	<div class="content-container py-section">
 		<div class="mx-auto max-w-3xl">
 			{section.heading && (
-				<Heading
-					level={ctx.headingLevel}
-					class="text-3xl font-bold tracking-tight text-ink sm:text-4xl"
-				>
+				<Heading level={ctx.headingLevel} variant="section" class="text-ink">
 					{section.heading}
 				</Heading>
 			)}
 			<div class="mt-8 divide-y divide-border border-y border-border">
 				{items.map((item) => (
-					<details class="group py-4">
+					<details class="faq-item group py-4">
 						<summary class="flex cursor-pointer list-none items-center justify-between gap-4 text-left [&::-webkit-details-marker]:hidden">
 							<Heading level={questionLevel} class="text-lg font-medium text-ink">
 								{item.question}
 							</Heading>
 							<span
 								aria-hidden="true"
-								class="shrink-0 text-2xl leading-none text-brand transition-transform group-open:rotate-45"
+								class="faq-icon shrink-0 text-2xl leading-none text-brand group-open:rotate-45"
 							>
 								+
 							</span>
 						</summary>
-						<RichText value={item.answer} class="pt-3 pr-10" />
+						<div class="faq-panel">
+							<div class="min-h-0 overflow-hidden">
+								<RichText value={item.answer} class="pt-3 pr-10" />
+							</div>
+						</div>
 					</details>
 				))}
 			</div>
 		</div>
 	</div>
 </section>
+
+<style>
+	.faq-panel {
+		display: grid;
+		grid-template-rows: 0fr;
+	}
+
+	.faq-item[open] > .faq-panel {
+		grid-template-rows: 1fr;
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.faq-panel {
+			transition-property: grid-template-rows;
+			transition-duration: 250ms;
+			transition-timing-function: ease;
+		}
+
+		.faq-icon {
+			transition-property: rotate;
+			transition-duration: 250ms;
+			transition-timing-function: ease;
+		}
+
+		@starting-style {
+			.faq-item[open] > .faq-panel {
+				grid-template-rows: 0fr;
+			}
+		}
+
+		/* Zamykanie: treść zostaje wyrenderowana do końca przejścia. */
+		@supports selector(::details-content) {
+			.faq-item::details-content {
+				transition-property: content-visibility;
+				transition-duration: 250ms;
+				transition-behavior: allow-discrete;
+			}
+		}
+	}
+</style>

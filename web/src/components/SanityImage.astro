@@ -43,9 +43,15 @@ const {
 } = Astro.props;
 const resolved = resolveImage(image, width);
 
-const srcsetWidths = (widths ?? [Math.round(width / 2), width]).filter(
-	(w) => resolved !== null && w <= resolved.width,
-);
+// Wariant szerszy niż źródło przycinamy do źródła, zamiast go wyrzucać — inaczej
+// pionowe zdjęcie (np. 1068 px przy widths [600, 1200]) zostałoby z samym 600w.
+const srcsetWidths = [
+	...new Set(
+		(widths ?? [Math.round(width / 2), width]).map((w) =>
+			resolved ? Math.min(w, resolved.width) : w,
+		),
+	),
+];
 const sizesAttr = sizes ?? `(min-width: ${width}px) ${width}px, 100vw`;
 const loading = priority || eager ? 'eager' : 'lazy';
 ---

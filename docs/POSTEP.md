@@ -630,3 +630,53 @@ PNG 4 kB; `og:image` to JPG 1200×630; jeden plik `.svg` zamiast dwóch;
 0 odwołań do `cdn.sanity.io` w HTML; 0 plików `.js`. Karta OG z fazy 4 poprawnie
 rasteryzuje wektorowe logo przez sharpa (podgląd sprawdzony). Symulacja „klient
 wgrywa SVG jako obraz OG" zwraca z CDN `image/jpeg`. Tryb demo bez regresji.
+
+## Poprawki wizualne przed fazą 5 — 2026-09-13
+
+Wszystko bez JS-u (0 plików `.js` w `dist/`, oba tryby: realny dataset i demo).
+
+- **Sticky header** — `sticky top-0`, tło `bg-surface/80` + `backdrop-blur-md`
+  tylko tam, gdzie przeglądarka obsługuje rozmycie (inaczej pełne tło).
+  `scroll-padding-top: 5rem` na `html`: kotwice, „Przejdź do treści" i fokus
+  z klawiatury nie lądują pod nagłówkiem.
+- **FAQ** — nadal `<details>`. Wrapper `.faq-panel` z `grid-template-rows`
+  0fr → 1fr. Sam trik nie wystarcza (zamknięty `<details>` nie renderuje treści,
+  więc otwarcie nie ma stanu startowego) — stan podaje `@starting-style`.
+  Zamykanie animuje się tylko przy `::details-content` (za `@supports`);
+  gdzie indziej panel znika od razu. Całość za `prefers-reduced-motion`.
+- **Fade-in sekcji** — `animation-timeline: view()` za `@supports` i
+  `prefers-reduced-motion`. Pierwsza sekcja pominięta (h1 + obraz LCP). Zakres
+  `entry 0% entry 12rem`, nie w %, żeby wysoka sekcja nie była półprzezroczysta
+  w trakcie czytania. **Longhandy zamiast skrótu `animation`** — pipeline CSS
+  (Tailwind + minifikacja Vite) sklejał skrót z `animation-timeline` w
+  `animation: … view()`, którego Chrome nie przyjmuje: animacja znikała po cichu,
+  bez błędu builda.
+- **Galeria** — 3 kolumny, chyba że zostawiłyby w ostatnim rzędzie jedną sierotę,
+  a 2 dzielą równo (4, 10, 16, 22 zdjęcia); 2 zdjęcia też w dwóch kolumnach.
+  Przy 2 kolumnach srcset do 1200 px.
+- **Karty features/testimonials** — bez ramki i tła (cieni nie było), akcent
+  `border-l-2 border-brand`, większe odstępy między kartami.
+- **Skala typograficzna** — rozmiar tytułu sekcji wynika teraz z poziomu, nie
+  z typu sekcji: `<Heading variant="section">`, skala tylko w `Heading.astro`.
+  h1 36/48/60 px extrabold, h2 24/30 px (desktop 2:1, było 48:36). Wcześniej h1
+  był duży tylko w Hero — FAQ na górze strony miało h1 wielkości h2.
+
+**Poprawka przy okazji (regresja ujawniona przez galerię).** `SanityImage`
+wyrzucał z srcset warianty szersze od źródła zamiast je przycinać — pionowe
+zdjęcie 1068 px przy `widths [600, 1200]` dostawało samo `600w`. Teraz wariant
+jest przycinany do szerokości źródła (`600w, 1068w`).
+
+**Zweryfikowane w Chrome 152 (DevTools Protocol, bez nowych zależności), 23/23:**
+h1 60 px vs h2 30 px; header `top: 0` po scrollu, `blur(12px)`, tło z alfą 0,8;
+pierwsza sekcja bez animacji, pozostałe z `ViewTimeline`, każda w pełni widoczna
+po przewinięciu; galeria 2 kolumny × 4 zdjęcia; 5 kart: tylko lewa krawędź.
+Klawiatura w FAQ: summary osiągalne Tabem, widoczny fokus, nie pod headerem;
+Enter otwiera (wysokość 9 → 52 → 64 px), Spacja zamyka (52 → 12 → 0 px); fokus
+zostaje na pytaniu; w zamkniętym pytaniu Tab omija link z odpowiedzi, w otwartym
+wchodzi w niego, Shift+Tab wraca. `prefers-reduced-motion: reduce` → zero
+animacji sekcji i `transition-duration: 0s` w FAQ. 390 px: bez poziomego scrolla.
+
+**Niezweryfikowane:** Safari i Firefox (brak na maszynie). Tam oczekiwane:
+otwieranie FAQ animowane (`@starting-style`), zamykanie natychmiastowe;
+fade-in w Firefoksie nie działa (brak `view()` bez flagi) — treść jest wtedy
+po prostu widoczna. Lighthouse nadal odłożony do fazy 6.

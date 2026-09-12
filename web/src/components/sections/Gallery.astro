@@ -10,26 +10,36 @@ interface Props {
 
 const { section, ctx } = Astro.props;
 const images = section.images ?? [];
+
+// Trzy kolumny, chyba że zostawiłyby w ostatnim rzędzie jedno zdjęcie, a dwie
+// kolumny dzielą liczbę równo (4, 10, 16, 22) — wtedy 2×N. Dwa zdjęcia też
+// w dwóch kolumnach, zamiast pustego trzeciego slotu.
+const count = images.length;
+const twoColumns = count === 2 || (count % 3 === 1 && count % 2 === 0);
 ---
 
 <section class="bg-surface-alt">
 	<div class="content-container py-section">
 		{section.heading && (
-			<Heading
-				level={ctx.headingLevel}
-				class="text-3xl font-bold tracking-tight text-ink sm:text-4xl"
-			>
+			<Heading level={ctx.headingLevel} variant="section" class="text-ink">
 				{section.heading}
 			</Heading>
 		)}
-		<ul class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="list">
+		<ul
+			class:list={['mt-8 grid gap-4 sm:grid-cols-2', !twoColumns && 'lg:grid-cols-3']}
+			role="list"
+		>
 			{images.map((image, i) => (
 				<li>
 					<SanityImage
 						image={image}
-						width={800}
-						widths={[400, 800]}
-						sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+						width={twoColumns ? 1200 : 800}
+						widths={twoColumns ? [600, 1200] : [400, 800]}
+						sizes={
+							twoColumns
+								? '(min-width: 640px) 50vw, 100vw'
+								: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw'
+						}
 						priority={ctx.priorityImage && i === 0}
 						class="aspect-[4/3] h-auto w-full rounded-md object-cover"
 					/>

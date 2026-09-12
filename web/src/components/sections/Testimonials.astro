@@ -15,17 +15,14 @@ const items = section.items ?? [];
 <section class="bg-surface-alt">
 	<div class="content-container py-section">
 		{section.heading && (
-			<Heading
-				level={ctx.headingLevel}
-				class="text-3xl font-bold tracking-tight text-ink sm:text-4xl"
-			>
+			<Heading level={ctx.headingLevel} variant="section" class="text-ink">
 				{section.heading}
 			</Heading>
 		)}
-		<ul class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3" role="list">
+		<ul class="mt-10 grid gap-x-8 gap-y-10 md:grid-cols-2 lg:grid-cols-3" role="list">
 			{items.map((item) => (
 				<li>
-					<figure class="flex h-full flex-col rounded-lg border border-border bg-surface p-6">
+					<figure class="flex h-full flex-col border-l-2 border-brand py-1 pl-5">
 						<blockquote class="flex-1 text-muted">„{item.quote}”</blockquote>
 						<figcaption class="mt-6 flex items-center gap-3">
 							<SanityImage

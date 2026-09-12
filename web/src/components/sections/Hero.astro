@@ -22,10 +22,7 @@ const hasImage = Boolean(section.image?.asset?.url);
 		]}
 	>
 		<div>
-			<Heading
-				level={ctx.headingLevel}
-				class="text-4xl font-bold tracking-tight text-ink sm:text-5xl"
-			>
+			<Heading level={ctx.headingLevel} variant="section" class="text-ink">
 				{section.heading}
 			</Heading>
 			{section.lead && <p class="mt-5 max-w-2xl text-lg text-muted">{section.lead}</p>}

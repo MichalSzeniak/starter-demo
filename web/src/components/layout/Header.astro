@@ -5,9 +5,13 @@ import { telHref } from '~/lib/format';
 import { anchorAttributes, resolveLink, type ResolvedLink } from '~/lib/links';
 
 /**
- * Nagłówek z menu z dokumentu `navigation`. Na telefonie menu rozwija
- * natywny <details> — zero JS. Klik poza menu go nie zamyka; przy ≤6 pozycjach
- * to akceptowalny kompromis, a podmiana na wyspę to zmiana w jednym pliku.
+ * Nagłówek z menu z dokumentu `navigation`. Przyklejony do góry (sticky) z rozmytym,
+ * półprzezroczystym tłem; gdzie rozmycie nie działa, tło jest pełne, żeby tekst
+ * pod spodem nie zlewał się z menu.
+ *
+ * Na telefonie menu rozwija natywny <details> — zero JS. Klik poza menu go nie
+ * zamyka; przy ≤6 pozycjach to akceptowalny kompromis, a podmiana na wyspę
+ * to zmiana w jednym pliku.
  */
 interface Props {
 	settings: SiteSettings;
@@ -26,7 +30,7 @@ const hasLogo = Boolean(settings.logo?.asset?.url);
 const phone = telHref(settings.phone);
 ---
 
-<header class="border-b border-border bg-surface">
+<header class="sticky top-0 z-40 border-b border-border bg-surface supports-[backdrop-filter]:bg-surface/80 supports-[backdrop-filter]:backdrop-blur-md">
 	<div class="content-container flex items-center justify-between gap-4 py-3">
 		<a
 			href="/"
