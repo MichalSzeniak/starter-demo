@@ -75,6 +75,9 @@
  * - Pierwsza sekcja jest pominięta: to h1 i obraz LCP, animacja opacity
  *   opóźniłaby LCP.
  * - Animujemy zawartość, nie <section> — pasy tła zostają na miejscu.
+ * - Tylko opacity, bez przesunięcia: `translate` zmieniał pozycję elementów
+ *   w chwili liczenia celu przewijania do kotwicy, więc po animacji cel
+ *   podjeżdżał pod sticky header (sprawdzone: komunikat formularza o 32 px).
  * - Zakres w rem, nie w %: przy procentach wysoka sekcja (długie FAQ) byłaby
  *   półprzezroczysta w trakcie czytania.
  * - Bez `animation-timeline` albo przy „ogranicz animacje" reguła nie istnieje,
@@ -98,6 +101,5 @@
 @keyframes section-reveal {
 	from {
 		opacity: 0;
-		translate: 0 2rem;
 	}
 }

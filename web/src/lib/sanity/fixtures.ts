@@ -122,6 +122,13 @@ const siteSettings: SiteSettings = {
 	],
 	logo: image('logo', 'Firma Demo — logo', 240, 80),
 	defaultOgImage: image('og', 'Firma Demo', 1200, 630),
+	// Puste pola = wartości domyślne komponentu (zgoda i klauzula składane z danych firmy).
+	contactForm: {
+		consentLabel: null,
+		privacyNotice: null,
+		successMessage: null,
+		privacyPolicySlug: null,
+	},
 	analytics: { provider: 'none' },
 	geo: { _type: 'geopoint', lat: 52.2297, lng: 21.0122 },
 };
@@ -347,6 +354,14 @@ const about: Page = {
 					],
 				},
 			],
+		},
+		{
+			_key: key(),
+			_type: 'contact',
+			heading: 'Napisz do nas',
+			lead: 'Odpowiadamy w ciągu jednego dnia roboczego.',
+			showContactDetails: true,
+			showMap: true,
 		},
 		{
 			_key: key(),

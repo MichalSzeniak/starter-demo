@@ -92,6 +92,12 @@ const SECTIONS = /* groq */ `sections[]{
 		"layout": coalesce(layout, "grid"),
 		images[] ${IMAGE}
 	},
+	_type == "contact" => {
+		heading,
+		lead,
+		"showContactDetails": coalesce(showContactDetails, true),
+		"showMap": coalesce(showMap, true)
+	},
 	_type == "cta" => {
 		heading,
 		lead,
@@ -112,6 +118,12 @@ export const SITE_SETTINGS_QUERY = defineQuery(/* groq */ `
 		social[]{ _key, platform, url },
 		logo ${IMAGE},
 		defaultOgImage ${IMAGE},
+		contactForm{
+			consentLabel,
+			privacyNotice,
+			successMessage,
+			"privacyPolicySlug": privacyPolicyPage->slug.current
+		},
 		analytics
 	}
 `);

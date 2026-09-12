@@ -22,6 +22,7 @@ export const siteSettings = defineType({
 		{ name: 'company', title: 'Firma', default: true },
 		{ name: 'contact', title: 'Kontakt i godziny' },
 		{ name: 'media', title: 'Logo i udostępnianie' },
+		{ name: 'form', title: 'Formularz kontaktowy' },
 		{ name: 'analytics', title: 'Analityka' },
 	],
 	fields: [
@@ -249,6 +250,48 @@ export const siteSettings = defineType({
 			group: 'media',
 			description:
 				'Używany, gdy podstrona nie ma własnego. Zalecane 1200×630 px — tak wygląda link do strony wklejony na Facebooku czy LinkedIn.',
+		}),
+		defineField({
+			name: 'contactForm',
+			title: 'Formularz kontaktowy',
+			type: 'object',
+			group: 'form',
+			description:
+				'Wspólne dla każdej sekcji „Kontakt" na stronie. Adres, na który przychodzą wiadomości, ustawia wykonawca strony — nie ma go tutaj.',
+			fields: [
+				defineField({
+					name: 'consentLabel',
+					title: 'Treść zgody przy polu wyboru',
+					type: 'text',
+					rows: 3,
+					description:
+						'Zdanie, które osoba zaznacza przed wysłaniem. Puste = zdanie domyślne. Treść zgody trafia też do każdej wiadomości jako dowód, na co się zgodzono.',
+					validation: (rule) => rule.max(400),
+				}),
+				defineField({
+					name: 'privacyNotice',
+					title: 'Klauzula informacyjna (RODO)',
+					type: 'text',
+					rows: 12,
+					description:
+						'Kto przetwarza dane, w jakim celu, jak długo i jakie prawa przysługują. Akapity oddzielaj pustą linią. Puste = wzór złożony automatycznie z danych firmy — do sprawdzenia przez prawnika.',
+					validation: (rule) => rule.max(4000),
+				}),
+				defineField({
+					name: 'privacyPolicyPage',
+					title: 'Polityka prywatności',
+					type: 'reference',
+					to: [{ type: 'page' }],
+					description: 'Podstrona z pełną polityką prywatności — pod klauzulą pojawi się link.',
+				}),
+				defineField({
+					name: 'successMessage',
+					title: 'Komunikat po wysłaniu',
+					type: 'string',
+					description: 'Puste = „Dziękujemy! Odpowiemy najszybciej, jak to możliwe."',
+					validation: (rule) => rule.max(200),
+				}),
+			],
 		}),
 		defineField({
 			name: 'analytics',

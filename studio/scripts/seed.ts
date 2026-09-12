@@ -378,6 +378,14 @@ async function section(value: Section) {
 				layout: value.layout,
 				images: await Promise.all(value.images.map(image)),
 			};
+		case 'contact':
+			return {
+				...base,
+				heading: value.heading,
+				lead: value.lead,
+				showContactDetails: value.showContactDetails,
+				showMap: value.showMap,
+			};
 		case 'cta':
 			return {
 				...base,
@@ -412,6 +420,12 @@ async function buildDocuments(): Promise<Doc[]> {
 		social: (siteSettings.social ?? []).map((profile) => ({ _type: 'socialProfile', ...profile })),
 		logo: await image(siteSettings.logo),
 		defaultOgImage: await image(siteSettings.defaultOgImage),
+		// `privacyPolicySlug` to projekcja referencji, nie pole dokumentu — nie zapisujemy.
+		contactForm: {
+			consentLabel: siteSettings.contactForm?.consentLabel,
+			privacyNotice: siteSettings.contactForm?.privacyNotice,
+			successMessage: siteSettings.contactForm?.successMessage,
+		},
 		analytics: siteSettings.analytics,
 	};
 

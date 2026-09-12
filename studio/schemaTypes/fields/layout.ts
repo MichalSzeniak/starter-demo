@@ -4,7 +4,7 @@ import { defineField } from 'sanity';
  * Pole „Układ" dla sekcji z listą elementów: siatka albo karuzela.
  *
  * Fabryka pola, nie osobny typ schemy — wartość to zwykły string, więc lista
- * ośmiu typów sekcji się nie zmienia, a TypeGen daje `'grid' | 'carousel'`.
+ * typów sekcji się nie zmienia, a TypeGen daje `'grid' | 'carousel'`.
  *
  * Używa: galeria. Przygotowane dla opinii klientów — włączenie to dopisanie
  * `layoutField()` do `fields` w testimonials.ts, pola `layout` w zapytaniu

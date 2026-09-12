@@ -24,6 +24,6 @@ export const schemaTypes = [
 	richText,
 	link,
 	labeledLink,
-	// Osiem typów sekcji
+	// Dziewięć typów sekcji (zamknięta lista)
 	...sectionTypes,
 ];

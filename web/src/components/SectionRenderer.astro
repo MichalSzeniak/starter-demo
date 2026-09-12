@@ -1,5 +1,6 @@
 ---
 import { firstImageSectionIndex, type Section, type SectionContext } from '~/lib/sanity/sections';
+import Contact from './sections/Contact.astro';
 import Cta from './sections/Cta.astro';
 import Faq from './sections/Faq.astro';
 import Features from './sections/Features.astro';
@@ -23,6 +24,8 @@ interface Props {
 const { sections } = Astro.props;
 const list = sections ?? [];
 const firstImage = firstImageSectionIndex(list);
+// `#kontakt` wskazuje pierwszą sekcję kontaktową; kolejne (rzadkie) dostają unikalne id.
+const firstContact = list.findIndex((section) => section._type === 'contact');
 
 function contextFor(index: number): SectionContext {
 	return {
@@ -50,6 +53,14 @@ function contextFor(index: number): SectionContext {
 			return <Faq section={section} ctx={ctx} />;
 		case 'gallery':
 			return <Gallery section={section} ctx={ctx} />;
+		case 'contact':
+			return (
+				<Contact
+					section={section}
+					ctx={ctx}
+					anchor={index === firstContact ? 'kontakt' : `kontakt-${index}`}
+				/>
+			);
 		case 'cta':
 			return <Cta section={section} ctx={ctx} />;
 		default: {

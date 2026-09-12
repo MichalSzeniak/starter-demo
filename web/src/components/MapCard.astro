@@ -1,0 +1,83 @@
+---
+import type { SiteSettings } from '~/lib/content';
+import { formatAddress } from '~/lib/format';
+
+/**
+ * Karta „jak dojechać" zamiast osadzonej mapy.
+ *
+ * Świadomie bez iframe'a i bez obrazka mapy (decyzja z fazy 5):
+ * - podgląd z kafelków OSM przy buildzie jest w szarej strefie zasad OSMF,
+ *   a statyczne mapy Google zabraniają zapisywania obrazu;
+ * - iframe Google wymagałby klucza API i ładowałby się od Google.
+ *
+ * Linki to oficjalne Google Maps URLs (`api=1`, bez klucza). Na stronie nie
+ * ładuje się nic od Google — dane trafiają tam dopiero, gdy ktoś kliknie,
+ * i to w nowej karcie. Zero JS.
+ */
+interface Props {
+	settings: SiteSettings;
+	/** false, gdy obok są już dane kontaktowe z adresem — bez dublowania. */
+	showAddress?: boolean;
+}
+
+const { settings, showAddress = true } = Astro.props;
+const address = formatAddress(settings.address);
+const coordinates =
+	settings.geo?.lat !== undefined && settings.geo?.lng !== undefined
+		? `${settings.geo.lat},${settings.geo.lng}`
+		: null;
+
+// Adres trafia w wizytówkę firmy lepiej niż same współrzędne; współrzędne to zapas.
+const query = address ? `${settings.companyName}, ${address}` : coordinates;
+const searchUrl = query
+	? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`
+	: null;
+const directionsUrl = query
+	? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(query)}`
+	: null;
+
+const link =
+	'inline-flex items-center justify-center rounded-md px-4 py-2.5 text-sm font-medium transition-colors';
+---
+
+{searchUrl && directionsUrl && (
+	<div class="rounded-lg bg-surface-alt p-6">
+		<div class="flex items-start gap-3">
+			<svg
+				aria-hidden="true"
+				viewBox="0 0 24 24"
+				class="mt-0.5 size-6 shrink-0 text-brand"
+				fill="none"
+				stroke="currentColor"
+				stroke-width="2"
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			>
+				<path d="M20 10c0 5-8 12-8 12s-8-7-8-12a8 8 0 0 1 16 0Z" />
+				<circle cx="12" cy="10" r="3" />
+			</svg>
+			<div>
+				<p class="font-semibold text-ink">Jak do nas trafić</p>
+				{showAddress && address && <p class="mt-1 text-muted">{address}</p>}
+			</div>
+		</div>
+		<div class="mt-5 flex flex-wrap gap-3">
+			<a
+				href={searchUrl}
+				target="_blank"
+				rel="noopener"
+				class:list={[link, 'bg-brand text-white hover:bg-brand-dark']}
+			>
+				Pokaż na mapie<span class="sr-only"> (Google Maps, nowa karta)</span>
+			</a>
+			<a
+				href={directionsUrl}
+				target="_blank"
+				rel="noopener"
+				class:list={[link, 'border border-border bg-surface text-ink hover:bg-surface-alt']}
+			>
+				Wyznacz trasę<span class="sr-only"> (Google Maps, nowa karta)</span>
+			</a>
+		</div>
+	</div>
+)}

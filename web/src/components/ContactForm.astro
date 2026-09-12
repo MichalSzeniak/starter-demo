@@ -1,0 +1,268 @@
+---
+import type { SiteSettings } from '~/lib/content';
+import { CONTACT_ENDPOINT, FIELD, LIMIT, type ContactStatus } from '~/lib/contact-form';
+import { telHref } from '~/lib/format';
+import { consentLabel, privacyNoticeParagraphs, successMessage } from '~/lib/privacy';
+
+/**
+ * Formularz kontaktowy → Worker `/api/kontakt` → e-mail przez Resend.
+ *
+ * Dwie warstwy:
+ * 1. Bez JS — natywna walidacja przeglądarki (required, type=email, maxlength),
+ *    zwykły POST, Worker odpowiada 303 na `<strona>#<kotwica>-<status>`,
+ *    a komunikat pokazuje `:target`. Nic nie wymaga skryptu.
+ * 2. Z JS (uzasadnienie budżetu: CSS nie wyśle formularza bez przeładowania
+ *    i nie zachowa wpisanej treści przy błędzie serwera) — fetch, komunikat
+ *    w regionie `role="status"`, błędy przy polach, fokus na wyniku.
+ *
+ * Honeypot: pole schowane poza ekranem (nie `display:none` — część botów je
+ * pomija), bez fokusu z klawiatury i ukryte przed czytnikami ekranu.
+ */
+interface Props {
+	settings: SiteSettings;
+	/** Kotwica sekcji; komunikaty mają id `<anchor>-<status>`. */
+	anchor: string;
+}
+
+const { settings, anchor } = Astro.props;
+const consent = consentLabel(settings);
+const notice = privacyNoticeParagraphs(settings);
+const policySlug = settings.contactForm?.privacyPolicySlug;
+const id = (suffix: string) => `${anchor}-${suffix}`;
+const phone = telHref(settings.phone);
+
+// Zapasowy kanał kontaktu w komunikatach o błędzie — klient nie może zostać z niczym.
+const fallback = [
+	settings.phone && phone ? `zadzwoń: ${settings.phone}` : null,
+	settings.email ? `napisz: ${settings.email}` : null,
+]
+	.filter(Boolean)
+	.join(' albo ');
+
+const statuses: { status: ContactStatus; text: string; tone: 'ok' | 'error' }[] = [
+	{ status: 'wyslano', text: successMessage(settings), tone: 'ok' },
+	{
+		status: 'blad',
+		text: `Nie udało się wysłać wiadomości.${fallback ? ` Spróbuj ponownie albo ${fallback}.` : ' Spróbuj ponownie za chwilę.'}`,
+		tone: 'error',
+	},
+	{
+		status: 'limit',
+		text: `Za dużo prób w krótkim czasie. Spróbuj ponownie za minutę${fallback ? ` albo ${fallback}` : ''}.`,
+		tone: 'error',
+	},
+	{
+		status: 'niepoprawne',
+		text: 'Sprawdź zaznaczone pola i wyślij ponownie.',
+		tone: 'error',
+	},
+];
+
+// Ramka pola w kolorze `muted`, nie `border`: granica pola musi mieć kontrast ≥ 3:1
+// (WCAG 1.4.11), a `border` z brand.ts ma 1,26:1. `muted` jako kolor tekstu i tak
+// musi mieć ≥ 4,5:1, więc warunek trzyma się przy każdej poprawnej palecie klienta.
+const input =
+	'mt-1.5 block w-full rounded-md border border-muted bg-surface px-3 py-2.5 text-ink aria-invalid:border-2 aria-invalid:border-red-700';
+const label = 'block text-sm font-medium text-ink';
+const fieldError = 'mt-1 text-sm text-red-700 empty:hidden';
+---
+
+<form
+	method="post"
+	action={CONTACT_ENDPOINT}
+	class="grid gap-5"
+	data-contact-form
+	aria-label="Formularz kontaktowy"
+>
+	{statuses.map(({ status, text, tone }) => (
+		<p
+			id={id(status)}
+			data-status={status}
+			tabindex="-1"
+			class:list={[
+				'hidden rounded-md px-4 py-3 text-sm font-medium target:block data-shown:block',
+				tone === 'ok' ? 'bg-green-50 text-green-900' : 'bg-red-50 text-red-900',
+			]}
+		>
+			{text}
+		</p>
+	))}
+	<p role="status" class="sr-only" data-live></p>
+
+	<div class="grid gap-5 sm:grid-cols-2">
+		<div>
+			<label for={id('name')} class={label}>
+				Imię
+			</label>
+			<input
+				id={id('name')}
+				name={FIELD.name}
+				type="text"
+				autocomplete="name"
+				required
+				maxlength={LIMIT.name}
+				aria-describedby={id('name-error')}
+				class={input}
+			/>
+			<p id={id('name-error')} data-error-for={FIELD.name} class={fieldError}></p>
+		</div>
+		<div>
+			<label for={id('email')} class={label}>
+				E-mail
+			</label>
+			<input
+				id={id('email')}
+				name={FIELD.email}
+				type="email"
+				autocomplete="email"
+				required
+				maxlength={LIMIT.email}
+				aria-describedby={id('email-error')}
+				class={input}
+			/>
+			<p id={id('email-error')} data-error-for={FIELD.email} class={fieldError}></p>
+		</div>
+	</div>
+
+	<div>
+		<label for={id('phone')} class={label}>
+			Telefon <span class="font-normal text-muted">(opcjonalnie)</span>
+		</label>
+		<input
+			id={id('phone')}
+			name={FIELD.phone}
+			type="tel"
+			autocomplete="tel"
+			maxlength={LIMIT.phone}
+			aria-describedby={id('phone-error')}
+			class={input}
+		/>
+		<p id={id('phone-error')} data-error-for={FIELD.phone} class={fieldError}></p>
+	</div>
+
+	<div>
+		<label for={id('message')} class={label}>
+			Wiadomość
+		</label>
+		<textarea
+			id={id('message')}
+			name={FIELD.message}
+			rows="5"
+			required
+			minlength={LIMIT.messageMin}
+			maxlength={LIMIT.message}
+			aria-describedby={id('message-error')}
+			class={input}
+		></textarea>
+		<p id={id('message-error')} data-error-for={FIELD.message} class={fieldError}></p>
+	</div>
+
+	<div>
+		<div class="flex items-start gap-3">
+			<input
+				id={id('consent')}
+				name={FIELD.consent}
+				type="checkbox"
+				value="tak"
+				required
+				aria-describedby={id('consent-error')}
+				class="mt-1 size-5 shrink-0 accent-brand"
+			/>
+			<label for={id('consent')} class="text-sm text-ink">
+				{consent}
+			</label>
+		</div>
+		<p id={id('consent-error')} data-error-for={FIELD.consent} class={fieldError}></p>
+		<input type="hidden" name={FIELD.consentText} value={consent} />
+		<input type="hidden" name={FIELD.page} value={Astro.url.pathname} />
+		<input type="hidden" name={FIELD.anchor} value={anchor} />
+
+		<details class="mt-3 text-sm text-muted">
+			<summary class="cursor-pointer font-medium text-ink underline underline-offset-2">
+				Klauzula informacyjna — kto i jak przetwarza Twoje dane
+			</summary>
+			<div class="mt-2 space-y-2">
+				{notice.map((paragraph) => (
+					<p>{paragraph}</p>
+				))}
+				{policySlug && (
+					<p>
+						<a href={`/${policySlug}`} class="text-brand underline underline-offset-2">
+							Pełna polityka prywatności
+						</a>
+					</p>
+				)}
+			</div>
+		</details>
+	</div>
+
+	<div class="absolute -left-[9999px] h-px w-px overflow-hidden" aria-hidden="true">
+		<label for={id('trap')}>Zostaw to pole puste</label>
+		<input id={id('trap')} name={FIELD.trap} type="text" tabindex="-1" autocomplete="off" />
+	</div>
+
+	<div>
+		<button
+			type="submit"
+			data-submit
+			class="inline-flex cursor-pointer items-center justify-center rounded-md bg-brand px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-brand-dark aria-disabled:cursor-progress aria-disabled:opacity-70"
+		>
+			Wyślij wiadomość
+		</button>
+	</div>
+</form>
+
+<script>
+	type Result = { status?: string; errors?: Record<string, string> };
+
+	for (const form of document.querySelectorAll<HTMLFormElement>('form[data-contact-form]')) {
+		const button = form.querySelector<HTMLButtonElement>('[data-submit]')!;
+		const live = form.querySelector<HTMLElement>('[data-live]')!;
+		const idleLabel = button.textContent;
+		let busy = false;
+
+		form.addEventListener('submit', async (event) => {
+			event.preventDefault();
+			if (busy) return;
+			busy = true;
+			// aria-disabled, nie disabled: zablokowany przycisk z fokusem gubi fokus.
+			button.setAttribute('aria-disabled', 'true');
+			button.textContent = 'Wysyłanie…';
+			for (const el of form.querySelectorAll('[data-status]')) el.removeAttribute('data-shown');
+			for (const el of form.querySelectorAll('[data-error-for]')) el.textContent = '';
+			for (const el of form.querySelectorAll('[aria-invalid]')) el.removeAttribute('aria-invalid');
+
+			let result: Result = { status: 'blad' };
+			try {
+				const response = await fetch(form.action, {
+					method: 'POST',
+					body: new FormData(form),
+					headers: { Accept: 'application/json' },
+				});
+				result = await response.json();
+			} catch {
+				// Brak sieci albo nie-JSON: zostaje „blad" z zapasowym kontaktem.
+			}
+
+			const errors = Object.entries(result.errors ?? {});
+			for (const [name, message] of errors) {
+				const field = form.elements.namedItem(name);
+				if (field instanceof Element) field.setAttribute('aria-invalid', 'true');
+				const slot = form.querySelector(`[data-error-for="${name}"]`);
+				if (slot) slot.textContent = message;
+			}
+
+			const status = form.querySelector<HTMLElement>(`[data-status="${result.status ?? 'blad'}"]`);
+			status?.setAttribute('data-shown', '');
+			live.textContent = status?.textContent?.trim() ?? '';
+			if (result.status === 'wyslano') form.reset();
+
+			const firstInvalid = form.querySelector<HTMLElement>('[aria-invalid="true"]');
+			(firstInvalid ?? status)?.focus();
+
+			button.removeAttribute('aria-disabled');
+			button.textContent = idleLabel;
+			busy = false;
+		});
+	}
+</script>

@@ -1,0 +1,95 @@
+---
+import ContactForm from '~/components/ContactForm.astro';
+import Heading from '~/components/Heading.astro';
+import MapCard from '~/components/MapCard.astro';
+import { getSiteSettings } from '~/lib/content';
+import { formatAddress, formatOpeningHours, telHref } from '~/lib/format';
+import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
+
+/**
+ * Sekcja „Kontakt": formularz + dane kontaktowe z Ustawień strony + karta dojazdu.
+ * Dane firmy nie są kopiowane do sekcji — klient zmienia telefon w jednym miejscu.
+ */
+interface Props {
+	section: SectionOf<'contact'>;
+	ctx: SectionContext;
+	/** `kontakt` dla pierwszej takiej sekcji na stronie (cel linków „#kontakt"). */
+	anchor: string;
+}
+
+const { section, ctx, anchor } = Astro.props;
+const settings = await getSiteSettings();
+
+const address = formatAddress(settings.address);
+const phone = telHref(settings.phone);
+const hours = formatOpeningHours(settings.openingHours);
+const hasDetails = section.showContactDetails && Boolean(address || phone || settings.email);
+const hasLocation = Boolean(address || settings.geo);
+const showMap = section.showMap && hasLocation;
+const showAside = hasDetails || showMap;
+---
+
+<section id={anchor} class="scroll-mt-4">
+	<div class="content-container py-section">
+		<div class="max-w-2xl">
+			<Heading level={ctx.headingLevel} variant="section" class="text-ink">
+				{section.heading}
+			</Heading>
+			{section.lead && <p class="mt-4 text-lg text-muted">{section.lead}</p>}
+		</div>
+
+		<div class:list={['mt-10 grid gap-12', showAside && 'lg:grid-cols-[3fr_2fr]']}>
+			<ContactForm settings={settings} anchor={anchor} />
+
+			{showAside && (
+				<div class="space-y-8">
+					{hasDetails && (
+						<address class="space-y-4 not-italic">
+							{address && (
+								<div>
+									<p class="text-sm font-semibold text-ink">Adres</p>
+									<p class="mt-1 text-muted">{address}</p>
+								</div>
+							)}
+							{phone && (
+								<div>
+									<p class="text-sm font-semibold text-ink">Telefon</p>
+									<a href={phone} class="mt-1 inline-block text-lg font-medium text-brand">
+										{settings.phone}
+									</a>
+								</div>
+							)}
+							{settings.email && (
+								<div>
+									<p class="text-sm font-semibold text-ink">E-mail</p>
+									<a
+										href={`mailto:${settings.email}`}
+										class="mt-1 inline-block text-brand underline-offset-2 hover:underline"
+									>
+										{settings.email}
+									</a>
+								</div>
+							)}
+						</address>
+					)}
+
+					{hasDetails && hours.length > 0 && (
+						<div>
+							<p class="text-sm font-semibold text-ink">Godziny otwarcia</p>
+							<dl class="mt-2 grid grid-cols-[auto_1fr] gap-x-6 gap-y-1 text-muted">
+								{hours.map((row) => (
+									<>
+										<dt>{row.days}</dt>
+										<dd>{row.hours}</dd>
+									</>
+								))}
+							</dl>
+						</div>
+					)}
+
+					{showMap && <MapCard settings={settings} showAddress={!hasDetails} />}
+				</div>
+			)}
+		</div>
+	</div>
+</section>

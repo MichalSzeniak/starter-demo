@@ -1,3 +1,4 @@
+import { contact } from './contact';
 import { cta } from './cta';
 import { faq } from './faq';
 import { features } from './features';
@@ -8,12 +9,22 @@ import { testimonials } from './testimonials';
 import { textImage } from './textImage';
 
 /**
- * ZAMKNIĘTA LISTA OŚMIU TYPÓW SEKCJI.
+ * ZAMKNIĘTA LISTA DZIEWIĘCIU TYPÓW SEKCJI.
  *
- * Dziewiąty typ wymaga osobnej zgody — patrz CLAUDE.md. Klient układa każdą
- * podstronę wyłącznie z tych ośmiu klocków.
+ * Kolejny typ wymaga osobnej zgody — patrz CLAUDE.md. Dziewiąty (`contact`)
+ * dodany za zgodą w fazie 5. Klient układa każdą podstronę wyłącznie z tych klocków.
  */
-export const sectionTypes = [hero, textImage, features, pricing, testimonials, faq, gallery, cta];
+export const sectionTypes = [
+	hero,
+	textImage,
+	features,
+	pricing,
+	testimonials,
+	faq,
+	gallery,
+	contact,
+	cta,
+];
 
 /** Nazwy typów w kolejności, w jakiej pojawiają się w menu dodawania sekcji. */
 export const sectionTypeNames = sectionTypes.map((section) => section.name);

@@ -1,6 +1,6 @@
 import type { PAGE_BY_SLUG_QUERY_RESULT } from './types.gen';
 
-/** Jedna sekcja strony — unia ośmiu typów, rozróżniana po `_type`. */
+/** Jedna sekcja strony — unia dziewięciu typów, rozróżniana po `_type`. */
 export type Section = NonNullable<NonNullable<PAGE_BY_SLUG_QUERY_RESULT>['sections']>[number];
 
 /** Zawężenie do konkretnego typu sekcji, np. `SectionOf<'hero'>`. */

@@ -69,6 +69,7 @@ function settingsFromBrand(): SiteSettings {
 		social: null,
 		logo: null,
 		defaultOgImage: null,
+		contactForm: null,
 		analytics: null,
 	};
 }
