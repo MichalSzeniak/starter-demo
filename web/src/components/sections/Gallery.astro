@@ -1,4 +1,5 @@
 ---
+import Carousel from '~/components/Carousel.astro';
 import Heading from '~/components/Heading.astro';
 import SanityImage from '~/components/SanityImage.astro';
 import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
@@ -10,12 +11,29 @@ interface Props {
 
 const { section, ctx } = Astro.props;
 const images = section.images ?? [];
+const carousel = section.layout === 'carousel';
 
-// Trzy kolumny, chyba że zostawiłyby w ostatnim rzędzie jedno zdjęcie, a dwie
-// kolumny dzielą liczbę równo (4, 10, 16, 22) — wtedy 2×N. Dwa zdjęcia też
-// w dwóch kolumnach, zamiast pustego trzeciego slotu.
+// Siatka: trzy kolumny, chyba że zostawiłyby w ostatnim rzędzie jedno zdjęcie,
+// a dwie kolumny dzielą liczbę równo (4, 10, 16, 22) — wtedy 2×N. Dwa zdjęcia
+// też w dwóch kolumnach, zamiast pustego trzeciego slotu.
 const count = images.length;
-const twoColumns = count === 2 || (count % 3 === 1 && count % 2 === 0);
+const twoColumns = !carousel && (count === 2 || (count % 3 === 1 && count % 2 === 0));
+
+// Rozmiary zgodne z szerokością kafelka w danym układzie (Carousel: 85/45/30%).
+const imageProps = carousel
+	? {
+			width: 800,
+			widths: [400, 800],
+			sizes: '(min-width: 1024px) 30vw, (min-width: 640px) 45vw, 85vw',
+		}
+	: twoColumns
+		? { width: 1200, widths: [600, 1200], sizes: '(min-width: 640px) 50vw, 100vw' }
+		: {
+				width: 800,
+				widths: [400, 800],
+				sizes: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw',
+			};
+const imageClass = 'aspect-[4/3] h-auto w-full rounded-md object-cover';
 ---
 
 <section class="bg-surface-alt">
@@ -25,26 +43,35 @@ const twoColumns = count === 2 || (count % 3 === 1 && count % 2 === 0);
 				{section.heading}
 			</Heading>
 		)}
-		<ul
-			class:list={['mt-8 grid gap-4 sm:grid-cols-2', !twoColumns && 'lg:grid-cols-3']}
-			role="list"
-		>
-			{images.map((image, i) => (
-				<li>
-					<SanityImage
-						image={image}
-						width={twoColumns ? 1200 : 800}
-						widths={twoColumns ? [600, 1200] : [400, 800]}
-						sizes={
-							twoColumns
-								? '(min-width: 640px) 50vw, 100vw'
-								: '(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw'
-						}
-						priority={ctx.priorityImage && i === 0}
-						class="aspect-[4/3] h-auto w-full rounded-md object-cover"
-					/>
-				</li>
-			))}
-		</ul>
+		{carousel ? (
+			<Carousel label={section.heading || 'Galeria zdjęć'} class="mt-8">
+				{images.map((image, i) => (
+					<li>
+						<SanityImage
+							image={image}
+							{...imageProps}
+							priority={ctx.priorityImage && i === 0}
+							class={imageClass}
+						/>
+					</li>
+				))}
+			</Carousel>
+		) : (
+			<ul
+				class:list={['mt-8 grid gap-4 sm:grid-cols-2', !twoColumns && 'lg:grid-cols-3']}
+				role="list"
+			>
+				{images.map((image, i) => (
+					<li>
+						<SanityImage
+							image={image}
+							{...imageProps}
+							priority={ctx.priorityImage && i === 0}
+							class={imageClass}
+						/>
+					</li>
+				))}
+			</ul>
+		)}
 	</div>
 </section>

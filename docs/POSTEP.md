@@ -680,3 +680,36 @@ animacji sekcji i `transition-duration: 0s` w FAQ. 390 px: bez poziomego scrolla
 otwieranie FAQ animowane (`@starting-style`), zamykanie natychmiastowe;
 fade-in w Firefoksie nie działa (brak `view()` bez flagi) — treść jest wtedy
 po prostu widoczna. Lighthouse nadal odłożony do fazy 6.
+
+## Galeria: pole „Układ" (siatka / karuzela) — 2026-09-13
+
+- **Schema.** Fabryka `layoutField()` w `studio/schemaTypes/fields/layout.ts`
+  (radio, poziomo, `initialValue: 'grid'`). Fabryka pola, nie nowy typ schemy —
+  lista ośmiu typów sekcji bez zmian, TypeGen daje `'grid' | 'carousel'`.
+  Podgląd sekcji w Studio pokazuje układ („Galeria — 4 zdj. · karuzela").
+- **Pole nie jest wymagane.** Galerie zapisane wcześniej nie mają wartości; wymóg
+  zablokowałby publikację całej strony. Zapytanie zwraca
+  `coalesce(layout, "grid")`, więc typ jest bez `null`, a stare sekcje to siatka.
+- **Przygotowane dla opinii klientów, niewłączone.** Włączenie: `layoutField()`
+  w `testimonials.ts`, `"layout": coalesce(layout, "grid")` w zapytaniu,
+  gałąź z `<Carousel>` w `Testimonials.astro`, `layout` w seedzie.
+- **`Carousel.astro`** (współdzielony) — `snap-x snap-mandatory`,
+  `overflow-x-auto`, `overscroll-x-contain`. Elementy 85% / 45% / 30% szerokości,
+  żeby następny wystawał (jedyna wskazówka „przewiń" bez przycisków). Kontener
+  `role="region"` + `aria-label` (tytuł sekcji) + `tabindex="0"`: bez tego rzędu
+  samych zdjęć nie da się przewinąć klawiaturą (axe: scrollable-region-focusable).
+  W ESLint dopuszczony `tabindex` wyłącznie na `role="region"` — z komentarzem.
+- **Seed i fixtures** przenoszą `layout` (demo: siatka).
+
+**Zweryfikowane w Chrome 152** (demo z fixture tymczasowo przełączonym na
+karuzelę, potem cofniętym), 1280 i 390 px: `scroll-snap-type: x mandatory`,
+`scroll-snap-align: start`; rząd przewija się w bok, strona nie; region
+osiągalny Tabem z widocznym fokusem; strzałki przechodzą przez wszystkie elementy
+i każdy krok jest przyciągnięty (390 px: 320 → 641 → 907); leniwe obrazy
+wczytują się po przewinięciu w bok; `<ul role="list">` zachowane. Realny dataset:
+galeria bez pola renderuje się jako siatka 2×2, poprzednie 23 testy wizualne OK.
+0 plików `.js`.
+
+**Ograniczenia bez JS:** brak przycisków poprzedni/następny i kropek. Home/End
+nie działają w rzędzie (w Chrome przewijają w pionie). Mysz bez poziomego kółka:
+pasek przewijania (zostawiony, cienki) albo Shift+kółko.

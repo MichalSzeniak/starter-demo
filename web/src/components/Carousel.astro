@@ -1,0 +1,39 @@
+---
+/**
+ * Poziomy rząd elementów przewijany w bok — zero JS, `scroll-snap-type: x mandatory`.
+ * Współdzielony: dziś galeria, przygotowany dla opinii klientów (pole `layout`).
+ *
+ * - Dzieci slotu to <li>. Szerokość elementu i przyciąganie ustawia ten
+ *   komponent (`*:`), więc wywołujący renderuje tylko treść.
+ * - Następny element wystaje zza krawędzi (85% / 45% / 30%) — to jedyna
+ *   wskazówka „przewiń", jaką mamy bez przycisków.
+ * - Kontener ma `tabindex="0"` i `role="region"` z etykietą: bez focusowalnej
+ *   treści (same zdjęcia) klawiatura nie miałaby jak przewinąć rzędu
+ *   (strzałki działają po sfocusowaniu). Lista w środku zachowuje semantykę <ul>.
+ * - Pasek przewijania zostaje widoczny (cienki): bez JS to jedyny uchwyt dla myszy.
+ */
+interface Props {
+	/** Nazwa regionu dla czytników ekranu, np. tytuł sekcji. */
+	label: string;
+	class?: string;
+}
+
+const { label, class: className } = Astro.props;
+---
+
+<div
+	role="region"
+	aria-label={label}
+	tabindex="0"
+	class:list={[
+		'snap-x snap-mandatory overflow-x-auto overscroll-x-contain pb-4 [scrollbar-width:thin]',
+		className,
+	]}
+>
+	<ul
+		class="flex gap-4 *:shrink-0 *:basis-[85%] *:snap-start sm:*:basis-[45%] lg:*:basis-[30%]"
+		role="list"
+	>
+		<slot />
+	</ul>
+</div>

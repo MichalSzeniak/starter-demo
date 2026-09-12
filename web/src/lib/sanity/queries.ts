@@ -89,6 +89,7 @@ const SECTIONS = /* groq */ `sections[]{
 	},
 	_type == "gallery" => {
 		heading,
+		"layout": coalesce(layout, "grid"),
 		images[] ${IMAGE}
 	},
 	_type == "cta" => {

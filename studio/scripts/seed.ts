@@ -375,6 +375,7 @@ async function section(value: Section) {
 			return {
 				...base,
 				heading: value.heading,
+				layout: value.layout,
 				images: await Promise.all(value.images.map(image)),
 			};
 		case 'cta':

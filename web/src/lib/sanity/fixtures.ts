@@ -235,6 +235,7 @@ const home: Page = {
 			_key: key(),
 			_type: 'gallery',
 			heading: 'Nasze realizacje',
+			layout: 'grid',
 			images: [
 				galleryImage('galeria-1', 'Realizacja 1 (placeholder)'),
 				galleryImage('galeria-2', 'Realizacja 2 (placeholder)'),
