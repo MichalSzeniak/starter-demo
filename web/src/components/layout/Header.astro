@@ -1,0 +1,23 @@
+---
+import { brand, phoneHref } from '~/config/brand';
+
+// FAZA 2: pozycje menu przyjdą z dokumentu `navigation` w Sanity.
+// Do tego czasu nagłówek pokazuje tylko nazwę firmy i telefon —
+// wolę pusty nagłówek niż linki prowadzące donikąd.
+---
+
+<header class="border-b border-border bg-surface">
+	<div class="content-container flex items-center justify-between gap-4 py-4">
+		<a href="/" class="text-lg font-semibold text-ink">
+			{' '}
+			{brand.company.name}{' '}
+		</a>
+
+		<a
+			href={phoneHref}
+			class="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+		>
+			{brand.company.phone}
+		</a>
+	</div>
+</header>

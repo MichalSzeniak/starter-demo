@@ -1,0 +1,67 @@
+@import 'tailwindcss';
+
+/**
+ * Most między `src/config/brand.ts` a Tailwindem.
+ *
+ * `@theme inline` sprawia, że narzędzia Tailwinda (bg-brand, text-ink, rounded-md…)
+ * odwołują się do zmiennych CSS, a nie do skopiowanych wartości. Dzięki temu
+ * zmiana koloru w brand.ts nie wymaga dotykania tego pliku.
+ */
+@theme inline {
+	--color-brand: var(--brand-color-brand);
+	--color-brand-dark: var(--brand-color-brand-dark);
+	--color-ink: var(--brand-color-ink);
+	--color-muted: var(--brand-color-muted);
+	--color-surface: var(--brand-color-surface);
+	--color-surface-alt: var(--brand-color-surface-alt);
+	--color-border: var(--brand-color-border);
+
+	--radius-sm: var(--brand-radius-sm);
+	--radius-md: var(--brand-radius-md);
+	--radius-lg: var(--brand-radius-lg);
+
+	--spacing-section: var(--brand-section-y);
+	--spacing-section-lg: var(--brand-section-y-lg);
+
+	--font-sans: var(--font-brand-sans), var(--brand-font-fallback);
+}
+
+@layer base {
+	html {
+		scroll-behavior: smooth;
+		-webkit-text-size-adjust: 100%;
+	}
+
+	/* Szanujemy ustawienie systemowe „ogranicz animacje". */
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+	}
+
+	body {
+		background-color: var(--color-surface);
+		color: var(--color-ink);
+		font-family: var(--font-sans);
+		text-wrap: pretty;
+	}
+
+	h1,
+	h2,
+	h3 {
+		text-wrap: balance;
+	}
+
+	/* Widoczny focus dla nawigacji klawiaturą — warunek 100 w Accessibility. */
+	:focus-visible {
+		outline: 2px solid var(--color-brand);
+		outline-offset: 2px;
+	}
+}
+
+@utility content-container {
+	margin-inline: auto;
+	width: 100%;
+	max-width: var(--brand-content-max);
+	padding-inline: 1rem;
+}

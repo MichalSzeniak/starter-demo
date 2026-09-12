@@ -1,0 +1,63 @@
+---
+import { Font } from 'astro:assets';
+import { brand, themeCss } from '~/config/brand';
+import Footer from '~/components/layout/Footer.astro';
+import Header from '~/components/layout/Header.astro';
+import '~/styles/global.css';
+
+interface Props {
+	title: string;
+	description?: string;
+	/** Ustaw na true tam, gdzie strona nie ma trafić do indeksu (np. 404). */
+	noindex?: boolean;
+}
+
+const { title, description = brand.company.tagline, noindex = false } = Astro.props;
+
+// Uwaga na kolejność w <head>:
+// 1. `themeCss` — zmienne z brand.ts, muszą poprzedzać arkusz Tailwinda.
+// 2. `<Font>` — generuje @font-face i <link rel="preload"> dla obu podzbiorów
+//    (latin i latin-ext). Pliki są hostowane lokalnie, pobrane przy buildzie,
+//    więc w wyjściowym HTML nie ma ani jednego requestu do Google.
+//    Preload obejmuje oba podzbiory, bo polski tekst sięga po latin-ext
+//    już w pierwszym nagłówku.
+
+// Canonical spójny z `trailingSlash: 'never'` — jedyny wyjątek to strona główna,
+// gdzie kanoniczną formą jest sam ukośnik.
+const canonicalPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const canonical = new URL(canonicalPath, Astro.site).href;
+---
+
+<!doctype html>
+<html lang={brand.lang}>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<link rel="canonical" href={canonical} />
+		{noindex && <meta name="robots" content="noindex, follow" />}
+
+		<style is:inline set:html={themeCss}></style>
+		<Font cssVariable="--font-brand-sans" preload />
+
+		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+		<slot name="head" />
+	</head>
+	<body class="flex min-h-screen flex-col">
+		<a
+			href="#tresc"
+			class="sr-only rounded-sm bg-brand px-4 py-2 text-white focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50"
+		>
+			Przejdź do treści
+		</a>
+
+		<Header />
+
+		<main id="tresc" class="flex-1">
+			<slot />
+		</main>
+
+		<Footer />
+	</body>
+</html>

@@ -1,0 +1,25 @@
+---
+import BaseLayout from '~/layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+	title="Nie znaleziono strony (404)"
+	description="Strona pod tym adresem nie istnieje."
+	noindex
+>
+	<section class="content-container py-section-lg">
+		<p class="text-sm font-medium text-brand">Błąd 404</p>
+		<h1 class="mt-2 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+			Nie znaleźliśmy tej strony
+		</h1>
+		<p class="mt-4 max-w-xl text-muted">
+			Adres jest nieprawidłowy albo strona została przeniesiona.
+		</p>
+		<a
+			href="/"
+			class="mt-8 inline-block rounded-md bg-brand px-5 py-3 font-medium text-white transition-colors hover:bg-brand-dark"
+		>
+			Wróć na stronę główną
+		</a>
+	</section>
+</BaseLayout>

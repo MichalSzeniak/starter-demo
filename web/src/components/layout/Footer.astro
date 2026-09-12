@@ -1,0 +1,32 @@
+---
+import { brand, fullAddress, phoneHref } from '~/config/brand';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-section border-t border-border bg-surface-alt">
+	<div class="content-container grid gap-8 py-10 sm:grid-cols-2">
+		<div>
+			<p class="font-semibold text-ink">{brand.company.name}</p>
+			<p class="mt-1 text-sm text-muted">{brand.company.tagline}</p>
+		</div>
+
+		<address class="text-sm text-muted not-italic">
+			<p>{fullAddress}</p>
+			<p class="mt-2">
+				<a class="text-brand hover:text-brand-dark" href={phoneHref}>
+					{brand.company.phone}
+				</a>
+			</p>
+			<p>
+				<a class="text-brand hover:text-brand-dark" href={`mailto:${brand.company.email}`}>
+					{brand.company.email}
+				</a>
+			</p>
+		</address>
+	</div>
+
+	<div class="content-container border-t border-border py-4 text-xs text-muted">
+		&copy; {year} {brand.company.name}
+	</div>
+</footer>
