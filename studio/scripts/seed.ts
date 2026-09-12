@@ -4,6 +4,7 @@
  *   pnpm seed                 zapisuje treści demo (createOrReplace — można puszczać wielokrotnie)
  *   pnpm seed --dry-run       buduje dokumenty i wypisuje, co by zapisał; bez sieci i bez tokena
  *   pnpm seed --dry-run --verbose   jak wyżej, plus pełny JSON dokumentów
+ *   pnpm seed --allow-placeholders  brakujące zdjęcia zastępuje placeholderami SVG (tylko do testów)
  *   pnpm seed:clean           wypisuje, co zostałoby usunięte
  *   pnpm seed:clean --yes     usuwa dokumenty demo (page, siteSettings, navigation, redirect,
  *                             wraz z wersjami roboczymi) i assety wgrane przez ten skrypt
@@ -16,8 +17,9 @@
  * Obrazy: czytane z dysku i wgrywane przez client.assets.upload — nigdy z URL-i.
  * Źródłem jest studio/scripts/demo-images (pliki dodawane ręcznie, poza repo),
  * dopasowane po nazwie do slotu z fixtures: /demo/hero.svg → demo-images/hero.*
- * (jpg, jpeg, png, webp, avif, gif, svg). Gdy pliku brak, wchodzi placeholder SVG
- * z web/public/demo — z ostrzeżeniem. Sanity nadaje assetom id z hasza treści,
+ * (jpg, jpeg, png, webp, avif, gif, svg). Brak pliku dla slotu = BŁĄD z listą braków,
+ * sprawdzany przed pierwszym uploadem; placeholdery SVG z web/public/demo wchodzą
+ * wyłącznie pod jawną flagą --allow-placeholders. Sanity nadaje assetom id z hasza treści,
  * więc ponowne wgranie tego samego pliku nie tworzy duplikatu. Assety dostają
  * source.name = SEED_SOURCE — po tym `--clean` je znajduje.
  *
@@ -43,6 +45,7 @@ const CLEAN = args.has('--clean');
 const YES = args.has('--yes');
 const DRY_RUN = args.has('--dry-run');
 const VERBOSE = args.has('--verbose');
+const ALLOW_PLACEHOLDERS = args.has('--allow-placeholders');
 
 const SEED_SOURCE = 'starter-demo-seed';
 const DOC_TYPES = ['page', 'siteSettings', 'navigation', 'redirect'];
@@ -217,6 +220,52 @@ async function image(img: ResultImage | null | undefined) {
 		alt: img.alt ?? undefined,
 		asset: ref(await uploadDemoImage(img.asset.url)),
 	};
+}
+
+/** Wszystkie adresy obrazów z fixtures — do sprawdzenia plików PRZED uploadem. */
+function collectImageUrls(): string[] {
+	const { siteSettings, pages } = demoContent;
+	const urls: (string | null | undefined)[] = [
+		siteSettings.logo?.asset?.url,
+		siteSettings.defaultOgImage?.asset?.url,
+	];
+	for (const page of Object.values(pages)) {
+		urls.push(page.seo.ogImage?.asset?.url);
+		for (const item of page.sections) {
+			switch (item._type) {
+				case 'hero':
+				case 'textImage':
+					urls.push(item.image?.asset?.url);
+					break;
+				case 'testimonials':
+					for (const entry of item.items) urls.push(entry.avatar?.asset?.url);
+					break;
+				case 'gallery':
+					for (const entry of item.images) urls.push(entry.asset?.url);
+					break;
+			}
+		}
+	}
+	return urls.filter((url): url is string => Boolean(url));
+}
+
+/** Twardy błąd przy brakujących zdjęciach — zanim cokolwiek trafi do Sanity. */
+async function preflightImages(): Promise<void> {
+	const missing = new Set<string>();
+	for (const url of collectImageUrls()) {
+		const resolved = await resolveImageFile(url);
+		if (resolved.placeholder) missing.add(resolved.slot);
+	}
+	if (missing.size === 0) return;
+	const slots = [...missing].sort().join(', ');
+	if (!ALLOW_PLACEHOLDERS) {
+		fail(
+			`Brak zdjęć w scripts/demo-images dla slotów: ${slots}. Dodaj pliki (nazwy w scripts/demo-images/README.md) albo uruchom z --allow-placeholders, żeby użyć placeholderów SVG.`,
+		);
+	}
+	console.warn(
+		`  ! --allow-placeholders: sloty ${slots} dostaną placeholdery SVG z web/public/demo.`,
+	);
 }
 
 function printImageSummary(): void {
@@ -409,6 +458,8 @@ async function buildDocuments(): Promise<Doc[]> {
 // ---------------------------------------------------------------------------
 
 async function seed() {
+	console.log('Sprawdzam zdjęcia…');
+	await preflightImages();
 	console.log('Buduję dokumenty…');
 	const docs = await buildDocuments();
 

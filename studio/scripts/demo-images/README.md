@@ -1,11 +1,13 @@
 # Zdjęcia do seeda
 
-Pliki z tego katalogu wgrywa `pnpm --filter studio seed` (przez `client.assets.upload`).
-Dodawane ręcznie, **nie trafiają do repozytorium** (`.gitignore`) — poza tym README.
+Pliki z tego katalogu wgrywa `pnpm --filter studio seed` (przez `client.assets.upload`, z dysku).
+Są wersjonowane w repo — dlatego **przed commitem** przepuść je przez
+`pnpm --filter studio images:optimize` (dłuższy bok ≤ 1600 px, WebP q80, ok. 200–300 kB na plik).
 
 Dopasowanie jest po nazwie pliku (bez rozszerzenia; `jpg`, `jpeg`, `png`, `webp`,
 `avif`, `gif`, `svg`). Nazwa musi odpowiadać slotowi z `web/src/lib/sanity/fixtures.ts`.
-Brakujący plik → seed bierze placeholder SVG z `web/public/demo` i ostrzega.
+**Brakujący plik zatrzymuje seed** z listą braków; placeholdery SVG z `web/public/demo`
+wchodzą wyłącznie pod flagą `--allow-placeholders` (do testów).
 
 | Plik                          | Gdzie                             | Proporcje / uwagi                 |
 | ----------------------------- | --------------------------------- | --------------------------------- |
@@ -15,6 +17,3 @@ Brakujący plik → seed bierze placeholder SVG z `web/public/demo` i ostrzega.
 | `avatar-1.*`, `avatar-2.*`    | opinie klientów                   | kwadrat, twarz na środku          |
 | `logo.*`                      | nagłówek, JSON-LD, obraz OG       | SVG lub PNG z przezroczystym tłem |
 | `og.*`                        | domyślny obraz przy udostępnianiu | dokładnie 1200×630                |
-
-Oryginały z aparatu są OK — Sanity skaluje je na CDN na żądanie, a strona
-i tak pobiera przy buildzie tylko wersję o docelowej szerokości.
