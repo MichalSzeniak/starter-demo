@@ -19,4 +19,11 @@ export default tseslint.config(
 	tseslint.configs.recommended,
 	astro.configs.recommended,
 	astro.configs['jsx-a11y-recommended'],
+	{
+		rules: {
+			// Preflight Tailwinda ustawia list-style: none, a Safari/VoiceOver gubi wtedy
+			// semantykę listy. Jawne role="list" na ul/ol to znany, celowy fix — nie redundancja.
+			'astro/jsx-a11y/no-redundant-roles': ['error', { ul: ['list'], ol: ['list'] }],
+		},
+	},
 );
