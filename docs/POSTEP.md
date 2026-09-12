@@ -296,3 +296,149 @@ wymaga podpiętego projektu. To do potwierdzenia przy pierwszym realnym kliencie
 
 Schema zamknięta na 8 typach sekcji, struktura panelu ułożona pod klienta,
 TypeGen działa. Następny krok: faza 3 (komponenty sekcji), po Twoim „dalej".
+
+---
+
+## Faza 3 — Komponenty sekcji — 2026-09-12
+
+### Co powstało
+
+```
+web/src/lib/
+  content.ts              jedyne wejście do treści: Sanity albo demo, memoizacja na build
+  links.ts                resolveLink / hrefForSlug / anchorAttributes
+  format.ts               tel:, adres, godziny („pon.–pt.”), etykiety social
+  sanity/client.ts        createClient (published, useCdn: false) + bezpiecznik DEMO_CONTENT
+  sanity/queries.ts       4 zapytania defineQuery z fragmentami IMAGE / LINK / RICH_TEXT / SECTIONS
+  sanity/image.ts         resolveImage: URL z CDN + wymiary policzone z metadanych i kadru
+  sanity/sections.ts      typy Section / SectionOf<T> / SectionContext, firstImageSectionIndex
+  sanity/fixtures.ts      treści demo 1:1 z typami wyników (3 strony, wszystkie 8 sekcji)
+  sanity/types.gen.ts     +4 typy wyników zapytań (pnpm typegen)
+web/src/components/
+  SectionRenderer.astro   switch po _type → komponent; dokłada headingLevel i priorityImage
+  sections/               Hero, TextImage, Features, Pricing, Testimonials, Faq, Gallery, Cta
+  portable/               RichText (wrapper), Block, Link, List, ListItem
+  SanityImage.astro       jedyny sposób renderowania obrazów; Heading.astro; LinkButton.astro
+  layout/Header.astro     menu z `navigation`, mobilne na <details> (zero JS)
+  layout/Footer.astro     NAP, godziny, social, menu stopki z `siteSettings`/`navigation`
+web/src/pages/[...slug].astro   jedna trasa; slug `/` → korzeń (index.astro usunięty)
+web/public/demo/*.svg           10 placeholderów do treści demo
+web/astro.config.ts             env.schema (SANITY_PROJECT_ID, SANITY_DATASET, DEMO_CONTENT)
+```
+
+Nowe zależności `web/`: `@sanity/client` 8.6.1, `@sanity/image-url` 2.1.1,
+`astro-portabletext` 1.0.0 (wszystkie z listy fazy 0) oraz `groq` 6.13.2 —
+to z niego pochodzi `defineQuery` (nie z `@sanity/client`), a TypeGen po nim
+rozpoznaje zapytania. Był już w drzewie jako zależność przechodnia.
+
+### Decyzje
+
+**Treści demo i bezpiecznik.** Projektu Sanity nadal nie ma, a komponentów nie
+da się zweryfikować bez danych. `fixtures.ts` ma kształt 1:1 z wynikami
+zapytań (pilnują typy z TypeGen), więc komponenty nie widzą różnicy. Zasady:
+`astro dev` bez `SANITY_PROJECT_ID` używa demo z ostrzeżeniem; `astro build`
+bez projektu **przerywa się** z czytelnym komunikatem, chyba że jawnie
+`DEMO_CONTENT=true` — żeby treści demo nie wyjechały przez pomyłkę na
+produkcję klienta. Zweryfikowane: build bez zmiennych kończy się exit 1 z tym
+komunikatem i zerem wygenerowanego HTML.
+
+> **Konsekwencja dla deploymentu tego repo na Cloudflare:** do build variables
+> trzeba dodać `DEMO_CONTENT=true`, inaczej build będzie się wywalał — celowo.
+
+**Obrazy.** `SanityImage` jest jedynym sposobem renderowania obrazów:
+
+- Z CDN prosimy o wersję już przeskalowaną do docelowej szerokości slotu
+  (`fit('max')`), więc astro:assets pobiera kilkadziesiąt kB zamiast oryginału
+  z aparatu — to mitygacja ryzyka nr 1 z fazy 0.
+- Wymiary liczymy sami z metadanych **i kadru (`crop`)** ustawionego w Studio,
+  żeby `width`/`height` w HTML zgadzały się z tym, co realnie zwróci CDN.
+  Hotspot nie zmienia proporcji przy `fit('max')`, więc nie wchodzi w rachunek.
+- Warianty `srcset` podajemy jawnie per slot (zwykle połowa i całość), a nie
+  przez globalny `image.layout: 'constrained'` — sprawdzone w `layout.js`
+  Astro: `constrained` generuje warianty dla każdego breakpointu do 2×
+  szerokości, ok. 10 na obraz. Przy 50 obrazach to setki operacji sharpa.
+- `priority` na `<Image>` daje dokładnie `loading="eager"`, `decoding="sync"`,
+  `fetchpriority="high"` (zweryfikowane w `internal.js:106-110` i na buildzie).
+  Dostaje go wyłącznie pierwszy obraz sekcji na stronie (`firstImageSectionIndex`);
+  logo w nagłówku ma tylko `eager`, bez podbijania priorytetu.
+
+**Poziomy nagłówków są sprawą szablonu, nie treści.** Pierwsza sekcja dostaje
+h1, każda kolejna h2, elementy wewnątrz sekcji (punkty, pakiety, pytania) h3
+lub h2. Zweryfikowane: dokładnie jeden h1 na każdej z 3 stron demo. Uwaga:
+sekcja bez nagłówka na pierwszej pozycji zostawia stronę bez h1 — walidacja
+buildu z fazy 4 to wyłapie; warto rozważyć regułę w schemie (poza zakresem tej fazy).
+
+**FAQ i menu mobilne na `<details>`, bez wysp.** CLAUDE.md dopuszcza wyspy dla
+obu, ale natywny `<details>/<summary>` daje accordion i rozwijane menu z zerem
+JS, obsługą klawiatury i czytników ekranu. Kompromis: kliknięcie poza menu go
+nie zamyka. Podmiana na wyspę to zmiana w jednym pliku. W `dist/` nadal 0 plików JS.
+
+**Portable Text.** `astro-portabletext` 1.0.0 nazywa klucze komponentów
+w liczbie pojedynczej (`block`, `mark`, `list`, `listItem`) — inaczej niż
+`@portabletext/react`. Adnotacja `link` jest rozwiązywana tą samą funkcją co
+menu i przyciski (`resolveLink`): wewnętrzna → ścieżka, zewnętrzna →
+`rel="noopener"`, niekompletna → sam tekst bez `<a>`.
+
+**Warstwa danych.** `content.ts` memoizuje wyniki na czas builda — ustawienia
+i nawigacja są pobierane raz, nie raz na podstronę. Gdy projekt Sanity istnieje,
+ale klient nie wypełnił `siteSettings`, wchodzi fallback z `brand.ts`. TypeGen
+dokłada do `SITE_SETTINGS_QUERY_RESULT` wariant „wszystko null" — typ
+`SiteSettings` jest zawężony do wariantu z `companyName: string`.
+
+**`role="list"` na `ul`/`ol` zostaje.** ESLint zgłaszał redundancję, ale preflight
+Tailwinda ustawia `list-style: none`, a Safari/VoiceOver gubi wtedy semantykę
+listy. Reguła `no-redundant-roles` dostała wyjątek dla tej pary z komentarzem.
+
+**Nazwy typów z TypeGen** to `SITE_SETTINGS_QUERY_RESULT` itd. (podkreślenie,
+wielkie litery), nie `…QueryResult` jak w dokumentacji skilla.
+
+### Weryfikacja
+
+| Sprawdzenie | Wynik |
+|---|---|
+| `pnpm check` (web) / `pnpm --filter studio check` | 0 errors, 0 warnings, 0 hints / czysto |
+| `pnpm lint`, `pnpm format:check` | czysto |
+| `DEMO_CONTENT=true pnpm build` | 4 strony (`/`, `/o-nas`, `/cennik`, `/404`) w 0,6 s; `[...slug]` z `slug: undefined` daje `/index.html` |
+| h1 na stronę | dokładnie 1 na każdej z 3 stron |
+| `<img>` bez width/height | 0 (z 12 na 3 stronach) |
+| `fetchpriority="high"` | 1 na stronę z obrazem sekcji (hero na `/`, textImage na `/o-nas`), 0 na `/cennik` |
+| `<script>` / pliki `.js` w dist | 0 / 0 |
+| `cdn.sanity.io` w HTML | 0 |
+| Linki | `/`, `/o-nas`, `/cennik`, `tel:`, `mailto:`, social z `rel="me noopener"` |
+| Godziny w stopce | `pon.–pt. 08:00–17:00 \| sob. 09:00–13:00 \| niedz. nieczynne` |
+| Build bez `SANITY_PROJECT_ID` i bez `DEMO_CONTENT` | exit 1, komunikat „Brak SANITY_PROJECT_ID…”, zero HTML |
+| `astro dev` bez `DEMO_CONTENT` | `/`, `/o-nas`, `/cennik` → 200, nieznany → 404 |
+| Zdalny obraz przez astro:assets (host testowy, tymczasowo w `image.domains`) | pobrany przy buildzie, 3 pliki `.webp` lokalnie, `width/height` z `inferSize`, `srcset` 400w/800w, host źródłowy nieobecny w HTML, cały build 3 s |
+
+### Czego nie zweryfikowałem
+
+- **Realny dataset Sanity.** Wszystko chodzi na treściach demo. Zapytania GROQ
+  przeszły przez TypeGen (składnia i typy), ale nie zostały wykonane przeciw
+  Content Lake. Specyfika `cdn.sanity.io` (parametry `rect`, `w`, `fit`) też
+  jest sprawdzona tylko przez typy `@sanity/image-url`.
+- Pierwsze dwie próby testu zdalnego obrazu padły z przyczyn po stronie hosta
+  (Wikimedia odrzuca requesty bez User-Agenta — HTTP 400; zgadnięta ścieżka na
+  GitHubie nie istniała). Trzecia, z sondą HTTP przed buildem, przeszła.
+- Tekst ostrzeżenia `[sanity] …` w `astro dev` nie został przechwycony — serwer
+  dev w Astro 7 jest odłączony i loguje przez `astro dev logs`, nie na stdout
+  launchera. Samo zachowanie (tryb demo) potwierdzają odpowiedzi 200.
+- Lighthouse — nadal faza 6.
+
+### Do fazy 4
+
+- `<head>` w `BaseLayout` to nadal prowizorka; komponent `<Seo>` ma go zastąpić.
+  `seo.ogImage` i `siteSettings.defaultOgImage` są już w zapytaniach, ale
+  nieużywane.
+- FAQ do `FAQPage` JSON-LD wymaga spłaszczenia `answer` (Portable Text) do
+  tekstu — `@portabletext/toolkit` jest już w drzewie jako zależność
+  `astro-portabletext`.
+- `brand.ts` wciąż eksportuje `fullAddress` i `phoneHref` — od tej fazy
+  nieużywane (NAP idzie z Sanity/demo z fallbackiem `settingsFromBrand`).
+  Do usunięcia przy skrypcie `nowy-klient` w fazie 7 albo wcześniej na życzenie.
+
+### Stan
+
+Osiem sekcji renderuje się z jednego `SectionRenderer`, Portable Text ma własne
+komponenty, obrazy idą przez `astro:assets` z wymiarami i priorytetem, strona
+buduje się z demo bez projektu Sanity i odmawia builda produkcyjnego bez niego.
+Następny krok: faza 4 (warstwa SEO), po Twoim „dalej".
