@@ -94,6 +94,14 @@ export const siteSettings = defineType({
 			],
 		}),
 		defineField({
+			name: 'geo',
+			title: 'Współrzędne siedziby',
+			type: 'geopoint',
+			group: 'company',
+			description:
+				'Szerokość i długość geograficzna — trafiają do wizytówki firmy w Google (dane strukturalne). W Google Maps kliknij prawym przyciskiem na pinezkę, pierwsza pozycja menu to gotowe współrzędne.',
+		}),
+		defineField({
 			name: 'phone',
 			title: 'Telefon',
 			type: 'string',
