@@ -8,7 +8,9 @@
     "build": "sanity build",
     "deploy": "sanity deploy",
     "schema:extract": "sanity schemas extract --enforce-required-fields --force",
-    "check": "tsc --noEmit"
+    "check": "tsc --noEmit",
+    "seed": "node --no-warnings --env-file-if-exists=.env scripts/seed.ts",
+    "seed:clean": "node --no-warnings --env-file-if-exists=.env scripts/seed.ts --clean"
   },
   "dependencies": {
     "@sanity/icons": "5.2.2",
@@ -19,6 +21,7 @@
     "styled-components": "6.1.19"
   },
   "devDependencies": {
+    "@sanity/client": "8.6.1",
     "@types/node": "24.13.4",
     "@types/react": "19.3.0",
     "typescript": "6.0.3"
