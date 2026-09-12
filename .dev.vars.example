@@ -1,0 +1,5 @@
+# Sekrety Workera do lokalnego `wrangler dev`. Skopiuj do .dev.vars (gitignore).
+# Na produkcji ustaw je w panelu Cloudflare jako „Secret" — patrz wrangler.toml.
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxx
+CONTACT_TO=kontakt@example.com
+CONTACT_FROM=Strona <formularz@example.com>

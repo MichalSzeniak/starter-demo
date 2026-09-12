@@ -1,7 +1,16 @@
-# Cloudflare Workers — serwowanie statycznych assetów (Workers Static Assets).
+# Cloudflare Workers — statyczne assety z web/dist + Worker formularza kontaktowego.
 #
-# Worker bez `main`: nie ma własnego kodu, wystawia wyłącznie pliki z web/dist.
-# `main` jest opcjonalne dla Workerów assets-only, `compatibility_date` nie jest.
+# Statyczne pliki serwuje Cloudflare bez udziału naszego kodu. Worker (`main`)
+# dostaje wyłącznie ścieżki z `run_worker_first` — dziś tylko /api/kontakt.
+#
+# Sekrety (panel Cloudflare → Worker → Settings → Variables and Secrets, typ
+# „Secret", albo `wrangler secret put`):
+#   RESEND_API_KEY   klucz API Resend
+#   CONTACT_TO       adresat wiadomości (kilka po przecinku)
+#   CONTACT_FROM     nadawca z domeny zweryfikowanej w Resend, np. Strona <formularz@firma.pl>
+# Celowo sekrety, nie [vars]: zmienne zwykłe ustawione w panelu wrangler kasuje
+# przy każdym deployu (chyba że keep_vars = true), a sekrety zostają.
+# Lokalnie: skopiuj .dev.vars.example do .dev.vars.
 #
 # Uwaga: NIE używamy [site] — to przestarzałe Workers Sites, wycofane w Wranglerze v4.
 #
@@ -10,6 +19,7 @@
 
 name = "starter-wizytowka"
 compatibility_date = "2026-09-12"
+main = "./web/worker/index.ts"
 
 [assets]
 # Ścieżka względem tego pliku. Astro nie ma ustawionego `outDir`, więc buduje
@@ -28,3 +38,29 @@ html_handling = "drop-trailing-slash"
 # Serwuje najbliższy 404.html ze statusem 404. Astro generuje dist/404.html.
 # Nie "single-page-application" — to jest strona statyczna, nie SPA.
 not_found_handling = "404-page"
+
+# Nazwa bindingu, przez którą Worker może oddać żądanie assetom (fallback).
+binding = "ASSETS"
+
+# Worker uruchamia się tylko dla API. Wszystko inne idzie prosto do assetów —
+# strona nie płaci za wywołania Workera i działa dalej, gdyby Worker padł.
+run_worker_first = ["/api/*"]
+
+# Rate limiting formularza (natywny binding Cloudflare, bez KV).
+# Limity są lokalne dla lokalizacji Cloudflare i „ostatecznie spójne" — to
+# hamulec na spam, nie precyzyjny licznik. Klucz zawiera host strony, więc
+# kilka stron klientów na jednym koncie nie dzieli limitów mimo tego samego
+# namespace_id. Okres: 10 albo 60 s (tylko te wartości są dozwolone).
+[[ratelimits]]
+name = "CONTACT_RATE_LIMIT_IP"
+namespace_id = "1001"
+simple = { limit = 5, period = 60 }
+
+[[ratelimits]]
+name = "CONTACT_RATE_LIMIT_SITE"
+namespace_id = "1002"
+simple = { limit = 20, period = 60 }
+
+# Logi Workera w panelu — błędy wysyłki (bez danych osobowych) mają być widoczne.
+[observability]
+enabled = true
