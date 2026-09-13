@@ -17,7 +17,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typegen": "pnpm --filter studio run schema:extract && pnpm --filter studio exec sanity typegen generate",
-    "lh": "node --no-warnings scripts/lighthouse.ts"
+    "lh": "node --no-warnings scripts/lighthouse.ts",
+    "nowy-klient": "node --no-warnings scripts/nowy-klient.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

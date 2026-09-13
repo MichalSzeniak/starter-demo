@@ -12,9 +12,10 @@ import type {
  * komponenty nie widzą różnicy. Obrazy to placeholdery SVG z web/public/demo.
  * Wszystkie dane są celowo fikcyjne.
  *
- * Nie jest to drugie źródło prawdy dla klienta: skrypt `pnpm nowy-klient`
- * (faza 7) czyści te treści. W międzyczasie pilnują ich typy — zmiana schemy
- * bez aktualizacji fixtures nie przejdzie `pnpm check`.
+ * Nie jest to drugie źródło prawdy dla klienta: w buildzie z SANITY_PROJECT_ID
+ * nic z tego pliku nie trafia do dist/. `pnpm nowy-klient` usuwa placeholdery
+ * z web/public/demo, sam plik zostaje — to fallback `astro dev` bez projektu
+ * i strażnik typów: zmiana schemy bez aktualizacji fixtures nie przejdzie `pnpm check`.
  */
 
 type SiteSettings = Extract<NonNullable<SITE_SETTINGS_QUERY_RESULT>, { companyName: string }>;

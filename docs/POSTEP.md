@@ -1166,6 +1166,139 @@ CI pilnuje typów, lintu, SEO, linków i progów Lighthouse; backup co noc; publ
 przebudowuje stronę raz na serię zmian. Następny krok: faza 7 (proces nowego klienta),
 po Twoim „dalej".
 
+## Faza 7 — Proces nowego klienta — 2026-09-13
+
+### Co powstało
+
+```
+scripts/nowy-klient.ts         `pnpm nowy-klient` — interaktywny, zero zależności
+docs/BRIEF.md                  formularz dla klienta, z listą „bez tego nie startuję"
+docs/CHECKLIST-WDROZENIE.md    12 etapów, chronologicznie; pozycje z czasem oczekiwania oznaczone ⏳
+docs/DLA-KLIENTA.md            jedna strona, 5 kroków, miejsca na 5 zrzutów
+web/src/lib/sanity/fixtures.ts poprawiony komentarz (obiecywał, że nowy-klient czyści fixtures)
+```
+
+### Skrypt `pnpm nowy-klient`
+
+Pyta: nazwa firmy → domena → kolor marki → wariant hover (Enter = wyliczony) → Sanity
+project ID → nazwa projektu (Enter = z domeny). Pokazuje podsumowanie, **zapisuje dopiero
+po „t"** (domyślnie „nie"). Ostrzega, gdy repo ma niezacommitowane zmiany albo `brand.ts`
+wygląda na skonfigurowany.
+
+| Plik | Zmiana |
+| --- | --- |
+| `web/src/config/brand.ts` | `siteUrl`, `company.name`, `colors.brand`, `colors.brandDark`; usuwa komentarz o placeholderze |
+| `web/.env`, `studio/.env` | tworzy z `.env.example` albo aktualizuje klucze w istniejącym pliku — token i inne linie zostają, CRLF zachowany |
+| `package.json` | `name` |
+| `wrangler.toml` | `name` (tylko klucz najwyższego poziomu, nie te w `[[ratelimits]]`) |
+| `web/public/demo/`, `studio/scripts/demo-images/` | usuwa |
+
+### Decyzje
+
+**„Czyści treści demo" = usuwa to, co wycieka do klienta, nie `fixtures.ts`.** Fixtures są
+fallbackiem `astro dev` bez projektu, źródłem seeda i strażnikiem typów przy zmianie schemy —
+ich usunięcie psuje `content.ts` i `pnpm check`, a każdy cherry-pick zmiany schemy ze startera
+kończyłby się konfliktem. W buildzie z `SANITY_PROJECT_ID` nie trafia z nich do `dist/` ani bajt.
+Realny wyciek to `web/public/demo/` — Astro kopiuje `public/` w całości, więc placeholdery
+wisiałyby pod `/demo/*.svg` na domenie klienta. `demo-images/` (800 kB) nie trafia do `dist/`,
+ale klientowi jest zbędne. Dataset klienta jest pusty — seed nie jest uruchamiany.
+Skutek uboczny w repo klienta: `seed` bez zdjęć odmówi pracy, a dev bez projektu pokaże
+teksty demo bez obrazów. Oba tryby są tam nieużywane.
+
+**Kontrast koloru marki sprawdzany przed zapisem.** Kryterium Lighthouse accessibility 100
+zależy od palety klienta, więc skrypt liczy kontrast WCAG we wszystkich miejscach, gdzie kolor
+marki styka się z tekstem (sprawdzone w `web/src`): biały napis na `bg-brand`, `text-brand` na
+`surface` i `surfaceAlt`, `text-white/85` na CTA. Najsłabsza para musi mieć ≥ 4,5:1. Przy
+niższym kontraście skrypt proponuje ten sam odcień o obniżonej jasności (HSL), zamiast odmawiać.
+Przykłady: `#f59e0b` (1,92:1) → `#915d06` (4,52:1); `#0f766e` (Tailwind teal-700, 5,47:1 na
+białym, ale 4,43:1 na CTA) → `#0f746c` (4,54:1). Hover: jasność × 0,7, ręczny nie może być
+jaśniejszy od koloru marki.
+
+**Nazwa Workera w `wrangler.toml` zmieniana obowiązkowo.** Wszyscy klienci na jednym koncie
+Cloudflare z nazwą `starter-wizytowka` = deploy drugiego nadpisuje pierwszego. Domyślna nazwa
+z domeny (`www.kowalski-serwis.pl` → `kowalski-serwis-pl`), walidowana pod reguły nazw Workerów.
+
+**Skrypt nie pyta o NAP ani o dataset.** Dane firmy wpisuje się w Studio (kryterium „telefon
+w < 60 s"); placeholdery w `brand.ts` zostają celowo fikcyjne. Dataset: `production`, chyba że
+istniejący `.env` ma inny.
+
+**Wszystkie edycje liczone w pamięci przed zapisem.** Każda podmiana w `brand.ts` musi trafić
+dokładnie raz — inny kształt pliku przerywa skrypt, zanim cokolwiek zapisze. Tak wyszedł
+pierwszy błąd: fraza „NIE EDYTUJ PONIŻEJ" pada też w komentarzu na górze pliku.
+
+**Pominięte z listy „Odłożone":** zawężanie listy sekcji per klient (lista mówi „nic nie
+powstaje przed pierwszym klientem, który tego potrzebuje").
+
+### Dokumenty
+
+- **BRIEF** — dla klienta, bez żargonu. Bloki opisane nazwami ze Studio, limity znaków
+  wzięte ze schemy (np. tytuł hero 90, atuty 2–12, cennik 1–4 pakiety, galeria 2–24). Pyta
+  o pocztę i rejestratora (od tego zależy migracja DNS), prawa do zdjęć, zgody autorów opinii,
+  stare adresy do przekierowań, okres przechowywania wiadomości z formularza.
+- **CHECKLIST** — konfiguracja per klient z faz 5–6 zebrana w jednym miejscu, plus DNS
+  (porównanie MX/TXT przed zmianą serwerów), SSL, Search Console (usługa „Domena", sitemap),
+  Google Business Profile (NAP znak w znak jak w Studio), test formularza z sieci komórkowej,
+  test webhooka, test backupu (odtworzenie pełnego backupu do `backup-test` i usunięcie
+  datasetu), test klienta „telefon w < 60 s". Składnia `sanity datasets create/import/delete`
+  sprawdzona w `--help` zainstalowanego CLI.
+- **DLA-KLIENTA** — napisy przycisków (`Publish`, `Add item`, `Remove`, `Upload`,
+  `Validation errors`) sprawdzone w zasobach językowych `sanity` 6.13.2 — Studio nie ma
+  polskiego pakietu interfejsu, więc instrukcja podaje je po angielsku.
+
+### Budżet JS klienckiego
+
+Bez zmian — skrypt i dokumenty nie dotykają `web/src`. Najgorszy przypadek nadal 5,7 kB / 10 kB.
+
+### Weryfikacja
+
+- `pnpm check` 0/0/0, `pnpm lint`, `pnpm format:check` — czysto; skrypt `tsc --strict
+  --noUncheckedIndexedAccess --erasableSyntaxOnly` czysto; build startera bez regresji (SEO 4/4,
+  117 linków, 0 martwych).
+- **Kopia repo z odpowiedziami z potoku:** puste i błędne odpowiedzi odrzucane z komunikatem
+  i ponownym pytaniem (nazwa, kolor „zielony", project ID `AB12`, nazwa `zly_projekt`); adres
+  `https://www.Kowalski-Serwis.pl/kontakt` → `https://www.kowalski-serwis.pl`; apostrof
+  w nazwie → literał w podwójnych cudzysłowach (zgodnie z Prettierem); odmowa zapisu
+  i przerwane wejście (EOF, exit 1) — pliki bez zmian; istniejący `studio/.env` z CRLF,
+  tokenem i datasetem `staging` — CRLF, token i dataset zachowane, podsumowanie pokazuje
+  „nadpisuje SANITY_STUDIO_PROJECT_ID=…"; drugi przebieg — „katalogi demo już usunięte".
+- **Kopia repo po `pnpm nowy-klient` na projekcie `mebrv8ha`** (świeży `pnpm install`):
+  `pnpm check` 0/0/0, `lint`, `format:check` czysto — zmieniony `brand.ts` i `package.json`
+  przechodzą Prettiera bez poprawek. Build na realnym datasecie: SEO 4/4, 117 linków,
+  0 martwych, `dist/` bez katalogu `demo`, 0 odwołań do `/demo/` w HTML, `--brand-color-brand:#0f746c`,
+  canonical `https://serwis-testowy.pl/`.
+- **Lighthouse desktop na tej kopii:** 3 strony × 3 przebiegi — performance 100,
+  accessibility 100 (`color-contrast` zaliczony z kolorem wybranym przez skrypt), SEO 100.
+  Best-practices 81 — jedyny oblany audyt to `is-on-https` od skryptu AdGuarda (znany problem
+  z fazy 6, pkt 2), nie od strony.
+
+### Niezweryfikowane
+
+- **Zrzuty ekranu do DLA-KLIENTA nie istnieją.** Studio wymaga logowania do Sanity, a
+  przeglądarka sterowana z tej maszyny nie ma sesji. W pliku są odnośniki `docs/img/dla-klienta-1…5.png`
+  i komentarz HTML (niewidoczny po wyrenderowaniu), co dokładnie ma być na każdym zrzucie.
+- **Skrypt nie był uruchomiony na tym repo.** Klasyfikator uprawnień zablokował przebieg
+  kasujący katalogi demo w roboczym repo; wszystkie testy szły na kopiach w scratchpadzie.
+- Ścieżki w panelach Cloudflare, Resend, Search Console i Google Business Profile — z dokumentacji
+  i wiedzy, nie z klikania; nazwy menu mogą się różnić. Ustawienia buildu Workers
+  (`pnpm build` / `npx wrangler deploy`) nie są nigdzie zapisane w repo — do potwierdzenia
+  z konfiguracją startera w panelu.
+- Wprowadzanie w terminalu (TTY) nie było testowane interaktywnie — tylko potok. Iterator linii
+  `readline` działa w obu trybach, a w TTY echo robi terminal.
+
+### Do decyzji
+
+- **CLAUDE.md** nadal: „8 typów sekcji", próg mobile 90 vs 95, „wyspa tylko dla menu i FAQ".
+- `brand.ts` nadal eksportuje nieużywane `fullAddress` i `phoneHref` (od fazy 3) — skrypt ich
+  nie rusza; usunięcie to osobna zmiana.
+- PLAN.md „Na koniec" (lista świadomie pominiętych rzeczy z oszacowaniem) jest w dużej mierze
+  pokryta sekcją „Odłożone" poniżej.
+
+### Stan
+
+Nowy klient: brief → `pnpm nowy-klient` → checklista → instrukcja dla klienta. Skrypt odmawia
+koloru, który złamałby dostępność, i nie zapisuje niczego bez potwierdzenia. Brakuje zrzutów
+ekranu do instrukcji.
+
 ## Odłożone — do zrobienia, gdy klient zapłaci
 
 Zasada: nic z tej listy nie powstaje przed pierwszym klientem, który tego
