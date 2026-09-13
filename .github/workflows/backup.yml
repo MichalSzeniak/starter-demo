@@ -1,0 +1,144 @@
+# Nocny backup datasetu Sanity na VPS (rsync po SSH).
+#
+# Codziennie o 03:00 czasu polskiego. Scheduler GitHuba bywa opóźniony
+# (w godzinach szczytu nawet 1–2 h) — dla backupu bez znaczenia.
+#
+#   pon.–sob.  dzienny  `--raw`: dokumenty i dokumenty assetów bez zmian, referencje
+#                       do obrazów nietknięte, bez plików. Kilkadziesiąt kB.
+#   niedziela  pełny    dokumenty + pliki obrazów. Ratuje, gdy pliki zniknęły z projektu.
+#
+# Dlaczego NIE `--no-assets`: ta flaga usuwa z dokumentów wszystkie referencje do
+# obrazów (@sanity/export, AssetHandler.stripAssets). Przywrócenie takiego backupu
+# wyczyściłoby zdjęcia ze wszystkich stron.
+#
+# Przywracanie: `sanity dataset import <plik> <dataset>` w katalogu studio/.
+# Backup dzienny importuj WYŁĄCZNIE do tego samego projektu — odwołuje się do plików,
+# które w nim leżą. Do innego projektu tylko backup pełny.
+#
+# Konfiguracja repo (Settings → Secrets and variables → Actions):
+#   Variables:  BACKUP_ENABLED=true     włącza workflow (repo startera: brak = pomijany)
+#               SANITY_PROJECT_ID, SANITY_DATASET (domyślnie production)
+#               VPS_BACKUP_DIR          katalog na VPS, musi istnieć; przy rrsync: pusty
+#               VPS_PORT                domyślnie 22
+#   Secrets:    SANITY_BACKUP_TOKEN     token z rolą Viewer (sanity.io/manage → API → Tokens)
+#               VPS_HOST, VPS_USER
+#               VPS_SSH_KEY             klucz prywatny przeznaczony tylko do backupu
+#               VPS_KNOWN_HOSTS         wynik `ssh-keyscan -p <port> <host>` — sprawdzany ściśle
+#
+# Pliki lądują w <VPS_BACKUP_DIR>/<nazwa repo>/. Rotację starych kopii robi VPS —
+# klucz w GitHubie nie powinien móc niczego kasować (szczegóły w docs/POSTEP.md).
+#
+# Ręcznie: Actions → Backup Sanity → Run workflow (opcjonalnie „pełny").
+
+name: Backup Sanity
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+      timezone: Europe/Warsaw
+  workflow_dispatch:
+    inputs:
+      pelny:
+        description: Pełny backup (z plikami obrazów)
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    if: ${{ vars.BACKUP_ENABLED == 'true' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      SANITY_PROJECT_ID: ${{ vars.SANITY_PROJECT_ID }}
+      SANITY_DATASET: ${{ vars.SANITY_DATASET || 'production' }}
+    steps:
+      - name: Konfiguracja kompletna
+        env:
+          SANITY_AUTH_TOKEN: ${{ secrets.SANITY_BACKUP_TOKEN }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+        run: |
+          missing=()
+          for name in SANITY_PROJECT_ID SANITY_AUTH_TOKEN VPS_HOST VPS_USER VPS_SSH_KEY VPS_KNOWN_HOSTS; do
+            [ -n "${!name}" ] || missing+=("$name")
+          done
+          if [ ${#missing[@]} -gt 0 ]; then
+            echo "::error::Backup włączony (BACKUP_ENABLED), ale brakuje: ${missing[*]}"
+            exit 1
+          fi
+
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      - uses: pnpm/action-setup@v6
+        with:
+          cache: true
+
+      # Tylko studio — tam jest Sanity CLI w wersji z lockfile'a.
+      - run: pnpm install --frozen-lockfile --filter studio
+
+      - name: Eksport datasetu
+        id: eksport
+        env:
+          SANITY_AUTH_TOKEN: ${{ secrets.SANITY_BACKUP_TOKEN }}
+          PELNY_RECZNIE: ${{ inputs.pelny }}
+        run: |
+          set -euo pipefail
+          if [ "$PELNY_RECZNIE" = "true" ] || [ "$(TZ=Europe/Warsaw date +%u)" = "7" ]; then
+            kind=pelny; flags=()
+          else
+            kind=dzienny; flags=(--raw)
+          fi
+          stamp=$(TZ=Europe/Warsaw date +%Y-%m-%d_%H%M)
+          mkdir -p "$RUNNER_TEMP/backup"
+          file="$RUNNER_TEMP/backup/${SANITY_PROJECT_ID}-${SANITY_DATASET}-${stamp}-${kind}.tar.gz"
+
+          pnpm --filter studio exec sanity datasets export "$SANITY_DATASET" "$file" \
+            --project-id "$SANITY_PROJECT_ID" "${flags[@]}"
+
+          # Archiwum musi być całe i zawierać dokumenty — pusty backup jest gorszy niż żaden.
+          gzip -t "$file"
+          docs=$(tar -xzOf "$file" --wildcards '*/data.ndjson' | wc -l)
+          if [ "$docs" -eq 0 ]; then
+            echo "::error::Backup nie zawiera dokumentów."
+            exit 1
+          fi
+          echo "file=$file" >> "$GITHUB_OUTPUT"
+          echo "### Backup $kind: $docs dokumentów, $(du -h "$file" | cut -f1)" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Wysyłka na VPS
+        env:
+          FILE: ${{ steps.eksport.outputs.file }}
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          VPS_KNOWN_HOSTS: ${{ secrets.VPS_KNOWN_HOSTS }}
+          VPS_PORT: ${{ vars.VPS_PORT || '22' }}
+          VPS_BACKUP_DIR: ${{ vars.VPS_BACKUP_DIR }}
+          REPO: ${{ github.event.repository.name }}
+        run: |
+          set -euo pipefail
+          ssh_dir="$RUNNER_TEMP/ssh"
+          mkdir -p "$ssh_dir" && chmod 700 "$ssh_dir"
+          (umask 077 && printf '%s\n' "$VPS_SSH_KEY" > "$ssh_dir/key" && printf '%s\n' "$VPS_KNOWN_HOSTS" > "$ssh_dir/known_hosts")
+
+          command -v rsync > /dev/null || sudo apt-get install -y rsync
+          rsync --archive --chmod=D700,F600 --timeout=120 \
+            -e "ssh -i $ssh_dir/key -p $VPS_PORT -o IdentitiesOnly=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile=$ssh_dir/known_hosts -o BatchMode=yes" \
+            "$FILE" "$VPS_USER@$VPS_HOST:${VPS_BACKUP_DIR:+$VPS_BACKUP_DIR/}$REPO/"
+
+      - name: Sprzątanie klucza
+        if: ${{ always() }}
+        run: rm -rf "$RUNNER_TEMP/ssh" "$RUNNER_TEMP/backup"
