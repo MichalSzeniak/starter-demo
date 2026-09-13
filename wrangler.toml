@@ -1,13 +1,15 @@
 # Cloudflare Workers — statyczne assety z web/dist + Worker formularza kontaktowego.
 #
 # Statyczne pliki serwuje Cloudflare bez udziału naszego kodu. Worker (`main`)
-# dostaje wyłącznie ścieżki z `run_worker_first` — dziś tylko /api/kontakt.
+# dostaje wyłącznie ścieżki z `run_worker_first` — /api/kontakt i /api/przebuduj.
 #
 # Sekrety (panel Cloudflare → Worker → Settings → Variables and Secrets, typ
 # „Secret", albo `wrangler secret put`):
-#   RESEND_API_KEY   klucz API Resend
-#   CONTACT_TO       adresat wiadomości (kilka po przecinku)
-#   CONTACT_FROM     nadawca z domeny zweryfikowanej w Resend, np. Strona <formularz@firma.pl>
+#   RESEND_API_KEY         klucz API Resend
+#   CONTACT_TO             adresat wiadomości (kilka po przecinku)
+#   CONTACT_FROM           nadawca z domeny zweryfikowanej w Resend, np. Strona <formularz@firma.pl>
+#   SANITY_WEBHOOK_SECRET  sekret webhooka Sanity (ten sam wpisany w sanity.io/manage → API → Webhooks)
+#   DEPLOY_HOOK_URL        Worker → Settings → Builds → Deploy Hooks (URL jest poświadczeniem)
 # Celowo sekrety, nie [vars]: zmienne zwykłe ustawione w panelu wrangler kasuje
 # przy każdym deployu (chyba że keep_vars = true), a sekrety zostają.
 # Lokalnie: skopiuj .dev.vars.example do .dev.vars.
@@ -64,3 +66,15 @@ simple = { limit = 20, period = 60 }
 # Logi Workera w panelu — błędy wysyłki (bez danych osobowych) mają być widoczne.
 [observability]
 enabled = true
+
+# Debounce przebudowy po publikacji w Sanity (worker/rebuild.ts): jeden Durable Object
+# trzyma alarm serii publikacji. Plan Workers Free obsługuje wyłącznie Durable Objects
+# na SQLite — stąd new_sqlite_classes. Migracji z danym `tag` nie zmieniamy po deployu;
+# kolejna zmiana klas = nowy wpis [[migrations]].
+[[durable_objects.bindings]]
+name = "REBUILD_DEBOUNCE"
+class_name = "RebuildDebounce"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RebuildDebounce"]

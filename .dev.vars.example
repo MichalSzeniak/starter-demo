@@ -3,3 +3,6 @@
 RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxx
 CONTACT_TO=kontakt@example.com
 CONTACT_FROM=Strona <formularz@example.com>
+SANITY_WEBHOOK_SECRET=lokalny-sekret-do-testow
+# Lokalnie wskaż atrapę — prawdziwy deploy hook uruchomiłby build na Cloudflare.
+DEPLOY_HOOK_URL=http://127.0.0.1:8799/deploy-hook

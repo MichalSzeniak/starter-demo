@@ -1,5 +1,6 @@
 /**
- * Worker Cloudflare: formularz kontaktowy `POST /api/kontakt` → e-mail przez Resend.
+ * Worker Cloudflare: formularz kontaktowy `POST /api/kontakt` → e-mail przez Resend
+ * oraz webhook Sanity `POST /api/przebuduj` → przebudowa strony (worker/rebuild.ts).
  *
  * Wszystko inne serwują statyczne assety — `run_worker_first = ["/api/*"]`
  * w wrangler.toml kieruje tu wyłącznie ścieżki API. Fallback do `env.ASSETS`
@@ -25,6 +26,10 @@ import {
 	type ContactStatus,
 	type FieldErrors,
 } from '../src/lib/contact-form';
+import { handleRebuildWebhook, REBUILD_ENDPOINT, type RebuildEnv } from './rebuild';
+
+// Klasa Durable Object musi być eksportowana z głównego modułu Workera.
+export { RebuildDebounce } from './rebuild';
 
 /** Minimalne typy bindingów — bez zależności od @cloudflare/workers-types. */
 interface RateLimit {
@@ -35,7 +40,7 @@ interface Fetcher {
 	fetch(request: Request): Promise<Response>;
 }
 
-export interface Env {
+export interface Env extends RebuildEnv {
 	ASSETS: Fetcher;
 	/** Na adres IP — łagodny, bo za NAT-em biura albo operatora siedzi wiele osób. */
 	CONTACT_RATE_LIMIT_IP: RateLimit;
@@ -56,6 +61,7 @@ const MAX_BODY_BYTES = 32_000;
 export default {
 	async fetch(request: Request, env: Env): Promise<Response> {
 		const url = new URL(request.url);
+		if (url.pathname === REBUILD_ENDPOINT) return handleRebuildWebhook(request, env);
 		if (url.pathname !== CONTACT_ENDPOINT) return env.ASSETS.fetch(request);
 		if (request.method !== 'POST') {
 			return new Response('Method Not Allowed', { status: 405, headers: { Allow: 'POST' } });
