@@ -21,7 +21,7 @@ type SiteSettings = Extract<NonNullable<SITE_SETTINGS_QUERY_RESULT>, { companyNa
 type Navigation = NonNullable<NAVIGATION_QUERY_RESULT>;
 type Page = NonNullable<PAGE_BY_SLUG_QUERY_RESULT>;
 type Section = Page['sections'][number];
-type ImageWithKey = Extract<Section, { _type: 'gallery' }>['images'][number];
+type GalleryItem = Extract<Section, { _type: 'gallery' }>['items'][number];
 type Image = NonNullable<Extract<Section, { _type: 'hero' }>['image']>;
 type Link = Extract<Section, { _type: 'cta' }>['button']['link'];
 type Block = Extract<Section, { _type: 'faq' }>['items'][number]['answer'][number];
@@ -46,8 +46,14 @@ function image(name: string, alt: string, width: number, height: number): Image 
 	};
 }
 
-function galleryImage(name: string, alt: string): ImageWithKey {
-	return { ...image(name, alt, 800, 600), _key: key() };
+/** Element galerii. Podpis (tytuł, opis) jest opcjonalny; `alt` — zawsze. */
+function galleryItem(
+	name: string,
+	alt: string,
+	title: string | null = null,
+	description: string | null = null,
+): GalleryItem {
+	return { _key: key(), title, description, image: image(name, alt, 800, 600) };
 }
 
 const internal = (slug: string): Link => ({
@@ -153,7 +159,12 @@ const navigation: Navigation = {
  *   /o-nas   textImage · gallery (karuzela) · faq · cta
  *   /cennik  pricing · faq · contact
  *
- * Galeria występuje w obu układach na tych samych zdjęciach — da się je porównać.
+ * Galeria występuje w obu układach na tych samych zdjęciach — da się je porównać
+ * (karuzela: 10 kafelków z powtórzeniami, żeby było co przewijać).
+ *
+ * Tła ustawione ręcznie (rytm: podstawowe / alternatywne na zmianę, CTA w kolorze
+ * marki, ostatnia sekcja podstawowa — odcina się od stopki). W Studio domyślne
+ * jest „auto" — patrz `sectionBackgrounds` w sections.ts.
  */
 
 const home: Page = {
@@ -172,6 +183,7 @@ const home: Page = {
 		{
 			_key: key(),
 			_type: 'hero',
+			background: 'default',
 			heading: 'Naprawimy to szybciej, niż zdążysz się zdenerwować',
 			lead: 'Serwis dla domu i małych firm w Przykładowie i okolicy. Wycena przez telefon, dojazd w 24 godziny, gwarancja na każdą usługę.',
 			image: image('hero', 'Technik przy pracy w warsztacie (placeholder)', 1200, 800),
@@ -183,6 +195,7 @@ const home: Page = {
 		{
 			_key: key(),
 			_type: 'features',
+			background: 'alt',
 			heading: 'Dlaczego my',
 			lead: 'Trzy rzeczy, które słyszymy od klientów najczęściej.',
 			items: [
@@ -207,6 +220,7 @@ const home: Page = {
 		{
 			_key: key(),
 			_type: 'testimonials',
+			background: 'default',
 			heading: 'Co mówią klienci',
 			items: [
 				{
@@ -230,18 +244,40 @@ const home: Page = {
 		{
 			_key: key(),
 			_type: 'gallery',
+			background: 'alt',
 			heading: 'Nasze realizacje',
 			layout: 'grid',
-			images: [
-				galleryImage('galeria-1', 'Realizacja 1 (placeholder)'),
-				galleryImage('galeria-2', 'Realizacja 2 (placeholder)'),
-				galleryImage('galeria-3', 'Realizacja 3 (placeholder)'),
-				galleryImage('galeria-4', 'Realizacja 4 (placeholder)'),
+			items: [
+				galleryItem(
+					'galeria-1',
+					'Realizacja 1 (placeholder)',
+					'Nowa instalacja w kuchni',
+					'Mieszkanie w bloku, dwa dni pracy. Przyłącza wody i gniazda pod zabudowę.',
+				),
+				galleryItem(
+					'galeria-2',
+					'Realizacja 2 (placeholder)',
+					'Montaż pompy ciepła',
+					'Dom pod Przykładowem. Montaż, uruchomienie i instruktaż w jeden dzień.',
+				),
+				galleryItem(
+					'galeria-3',
+					'Realizacja 3 (placeholder)',
+					'Przegląd wentylacji w restauracji',
+					'Przegląd okresowy z protokołem, bez zamykania lokalu.',
+				),
+				galleryItem(
+					'galeria-4',
+					'Realizacja 4 (placeholder)',
+					'Awaria w biurze',
+					'Zgłoszenie o 8:00, sprawna instalacja przed południem.',
+				),
 			],
 		},
 		{
 			_key: key(),
 			_type: 'cta',
+			background: 'accent',
 			heading: 'Masz awarię albo pytanie?',
 			lead: 'Zadzwoń — wycenę podajemy od ręki.',
 			button: { _key: null, label: 'Zadzwoń teraz', link: external('tel:+48000000000', false) },
@@ -265,6 +301,7 @@ const about: Page = {
 		{
 			_key: key(),
 			_type: 'textImage',
+			background: 'default',
 			heading: 'Pracujemy w Przykładowie od 2009 roku',
 			body: [
 				paragraph(
@@ -290,19 +327,44 @@ const about: Page = {
 		{
 			_key: key(),
 			_type: 'gallery',
+			background: 'alt',
 			heading: 'Zespół i warsztat',
 			layout: 'carousel',
-			images: [
-				galleryImage('galeria-1', 'Z życia firmy 1 (placeholder)'),
-				galleryImage('galeria-2', 'Z życia firmy 2 (placeholder)'),
-				galleryImage('galeria-3', 'Z życia firmy 3 (placeholder)'),
-				galleryImage('galeria-4', 'Z życia firmy 4 (placeholder)'),
-				galleryImage('hero', 'Z życia firmy 5 (placeholder)'),
+			items: [
+				galleryItem(
+					'galeria-1',
+					'Z życia firmy 1 (placeholder)',
+					'Warsztat',
+					'Tu naprawiamy to, czego nie da się zrobić na miejscu.',
+				),
+				galleryItem('galeria-2', 'Z życia firmy 2 (placeholder)', 'Auta serwisowe'),
+				galleryItem(
+					'galeria-3',
+					'Z życia firmy 3 (placeholder)',
+					'Magazyn części',
+					'Najczęstsze części wozimy ze sobą — większość napraw kończy się na jednej wizycie.',
+				),
+				galleryItem('galeria-4', 'Z życia firmy 4 (placeholder)', 'Szkolenie zespołu'),
+				galleryItem(
+					'hero',
+					'Z życia firmy 5 (placeholder)',
+					'Pierwszy garaż, 2009',
+					'Dwie osoby i jeden samochód. Od tego się zaczęło.',
+				),
+				// Powtórzenia celowe: 10 kafelków, żeby karuzela realnie przewijała i było
+				// widać zachowanie na końcach. Seed wgrywa każdy plik raz (dedup po slocie).
+				// Część bez podpisu — pokazuje, że podpis jest opcjonalny.
+				galleryItem('o-nas', 'Z życia firmy 6 (placeholder)', 'Zespół w komplecie'),
+				galleryItem('galeria-1', 'Z życia firmy 7 (placeholder)'),
+				galleryItem('galeria-2', 'Z życia firmy 8 (placeholder)'),
+				galleryItem('galeria-3', 'Z życia firmy 9 (placeholder)'),
+				galleryItem('galeria-4', 'Z życia firmy 10 (placeholder)'),
 			],
 		},
 		{
 			_key: key(),
 			_type: 'faq',
+			background: 'default',
 			heading: 'Pytania o firmę',
 			items: [
 				{
@@ -337,6 +399,7 @@ const about: Page = {
 		{
 			_key: key(),
 			_type: 'cta',
+			background: 'accent',
 			heading: 'Porozmawiajmy o Twoim zleceniu',
 			lead: 'Ceny orientacyjne i formularz wyceny znajdziesz w cenniku.',
 			button: { _key: null, label: 'Zobacz cennik', link: internal('cennik') },
@@ -360,6 +423,7 @@ const pricing: Page = {
 		{
 			_key: key(),
 			_type: 'pricing',
+			background: 'default',
 			heading: 'Cennik',
 			lead: 'Ceny orientacyjne. Dokładną wycenę podajemy przed rozpoczęciem pracy.',
 			plans: [
@@ -403,6 +467,7 @@ const pricing: Page = {
 		{
 			_key: key(),
 			_type: 'faq',
+			background: 'alt',
 			heading: 'Pytania o ceny i rozliczenia',
 			items: [
 				{
@@ -438,6 +503,7 @@ const pricing: Page = {
 		{
 			_key: key(),
 			_type: 'contact',
+			background: 'default',
 			heading: 'Zapytaj o wycenę',
 			lead: 'Nie ma Twojej usługi na liście? Opisz, co trzeba zrobić — wycenimy indywidualnie w ciągu jednego dnia roboczego.',
 			showContactDetails: true,

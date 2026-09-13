@@ -926,3 +926,107 @@ sekcje mają różne tło i ostatnia różni się od stopki; najsłabszy kontras
 Regresja: formularz 22/22 (`/cennik`), karuzela 15/15 (`/o-nas`, 5 zdjęć),
 poprawki wizualne 20/20 (sticky header, fade-in, FAQ z klawiatury, reduced motion).
 Build realny i demo, 0 plików `.js`.
+
+## Poprawki po fazie 5: tła z danych, karuzela demo, podpisy w galerii — 2026-09-13
+
+### 1. Pole „Tło" w każdej sekcji
+
+Uzgodniony wariant: **automat zostaje domyślny, ręczny wybór go nadpisuje**
+(zamiast samych wartości ręcznych z domyślnym `default`). Przy samych ręcznych
+wartościach każda nowo dodana sekcja byłaby „default", więc dwie nowe sekcje
+z rzędu zlewałyby się jak dawniej, tyle że na biało. Do tego zmiana kolejności
+w Studio rozbijałaby rytm, a wdrożeniowiec musiałby ustawiać tła na każdej stronie.
+
+- **Schema.** Fabryka `backgroundField()` w `studio/schemaTypes/fields/background.ts`
+  (jak `layoutField`, bez nowego typu). Wartości: Automatyczne (`auto`, domyślne) /
+  Podstawowe (`default`) / Alternatywne (`alt`), a w CTA dodatkowo Kolor marki
+  (`accent`). Pole niewymagane; zapytanie zwraca `coalesce(background, "auto")`.
+- **`accent` tylko w CTA.** Pozostałe sekcje mają ciemny tekst, przyciski `bg-brand`
+  i akcenty `border-brand` — na tle marki straciłyby kontrast, a ten zależy od
+  palety klienta. Blokuje to już TypeGen: `accent` istnieje wyłącznie w typie CTA.
+  CTA obsługuje za to jasne tła (nagłówek `text-ink`, lead `text-muted`, przycisk
+  główny) — wcześniej miał biały tekst na sztywno.
+- **Renderer, nie komponent.** `sectionBackgrounds()` rozstrzyga „auto",
+  `backgroundClass()` daje klasy, SectionRenderer przekazuje je w `ctx.backgroundClass`.
+  Komponenty sekcji nie importują już niczego związanego z tłem.
+- **Automat działa na ciągach** sekcji „auto" między sekcjami o ustalonym tle: ciąg
+  idzie naprzemiennie, jego dół różni się od sekcji poniżej, a gdy góra powtarzałaby
+  ręczne tło sąsiada, cały ciąg się odwraca (jeśli pod nim jest kolor marki albo stopka).
+  Pierwsza wersja szła sekcja po sekcji i test złapał kolizję
+  `[alt ręcznie, auto, auto] → alt alt default`; teraz `alt default alt`.
+  Kolizja zostaje tylko wtedy, gdy ręczne tła z obu stron wykluczają każdy układ.
+- **Fixtures:** rytm ustawiony ręcznie (`/`: default · alt · default · alt · accent;
+  `/o-nas`: default · alt · default · accent; `/cennik`: default · alt · default).
+  Seed przenosi `background`.
+
+### 2. Karuzela demo: 10 kafelków
+
+`/o-nas`: 5 → 10 elementów przez **powtórzenie slotów w fixtures**, bez kopiowania
+plików w `demo-images/`. Seed deduplikuje uploady po slocie, a Sanity nadaje assetom
+id z hasza, więc kopie `.webp` dałyby w gicie ~1 MB identycznych binarek przy tym
+samym efekcie. Kolejność: to samo zdjęcie nigdy obok siebie. Dry-run: nadal
+10 unikalnych plików, 0 placeholderów.
+
+### 3. Galeria: tytuł i opis przy każdym zdjęciu
+
+- **Schema.** `images[]` (`imageWithAlt`) → `items[]` z obiektem `galleryItem`:
+  `image` (`imageWithAlt`, wymagane — więc `alt` nadal wymagany i osobny),
+  `title` (≤ 80, opcjonalny), `description` (≤ 160, opcjonalny). Obiekt zdefiniowany
+  w tablicy, nie jako nowy typ schemy. Podgląd elementu w Studio: tytuł, a gdy go
+  brak — alt.
+- **Układ: podpis pod zdjęciem** (`<figure>` + `<figcaption>`), uzgodniony.
+  Nakładka na hover nie działa na dotyku i ukrywa treść do czasu interakcji. Stała
+  nakładka na zdjęciu ma kontrast zależny od zdjęcia (którego nie kontrolujemy)
+  i zasłania kadr. Podpis pod spodem wygląda tak samo na myszy, dotyku, klawiaturze
+  i w czytniku ekranu, a do tego zero JS. Tytuł to nagłówek o poziom niżej od tytułu
+  sekcji (jak w Features) — nawigacja po nagłówkach przechodzi przez realizacje.
+  Element bez podpisu nie dostaje pustego `<figcaption>`.
+- **Siatka: `gap-y-10`** zamiast `gap-4`. Na zrzucie z 16 px podpis stał prawie
+  w równej odległości od swojego zdjęcia (12 px) i od zdjęcia z rzędu niżej —
+  nie było widać, do którego należy.
+- **Fixtures:** 4 realizacje na `/` z tytułem i opisem; w karuzeli 6 z 10 z podpisem
+  (część bez opisu, część bez niczego — pokazuje, że pola są opcjonalne).
+
+> **Zmiana łamiąca dla zapisanych danych.** Galerie zapisane w starym kształcie
+> (`images`) renderują się bez zdjęć, a Studio pokaże „nieznane pole". Dziś dotyczy
+> to wyłącznie datasetu demo `mebrv8ha` (sprawdzone: build przechodzi, SEO 4/4,
+> galerie puste) — naprawia to `pnpm --filter studio seed`. **Seed nie uruchomiony**
+> (nadpisuje dokumenty demo — czeka na zgodę). Klientów z danymi jeszcze nie ma,
+> więc migracja (deprecation pattern z `sanity-best-practices`) byłaby pracą na zapas.
+
+### Budżet JS
+
+Bez zmian: karuzela 1 691 B (tylko strony z karuzelą), formularz 1 174 B. Najgorszy
+przypadek nadal 5,7 kB / 10 kB. Podpisy i tła — czysty HTML/CSS.
+
+### Weryfikacja
+
+- `pnpm check`, `pnpm --filter studio check`, `pnpm lint`, `prettier --check` — czysto;
+  `sanity schema validate` — 0 błędów, 0 ostrzeżeń; `pnpm typegen` — `accent` tylko w CTA.
+- `sectionBackgrounds`, 17/17 (skrypt jednorazowy, poza repo): wszystko auto (dawne
+  wyniki bez zmian), strony demo, 7 sekcji, CTA w środku, dwa CTA obok, jedna/zero
+  sekcji, ręczne w środku, ręczne na górze (odwrócenie ciągu), CTA ręcznie na jasnym
+  tle, nieunikniona kolizja.
+- Build demo: SEO 4/4, 0 plików `.js`, tła w HTML zgodne z fixtures, 0 `<img>` bez `alt`,
+  0 odwołań do `cdn.sanity.io`. Build na realnym datasecie: SEO 4/4 (galerie puste — patrz wyżej).
+- **Chrome 152 (CDP, bez zależności), 35/35:** na 3 stronach sąsiednie sekcje różnią
+  się tłem, ostatnia różni się od stopki; CTA — biały nagłówek na kolorze marki.
+  Siatka: 4 podpisy widoczne bez interakcji, podpis 12 px pod zdjęciem, tytuł `h3`,
+  alt ≠ tytuł; 390 px — podpisy widoczne, bez poziomego scrolla. Karuzela 1280 px:
+  10 kafelków, „następne" 0 → 1056 → 2112 → 2384 (koniec, ostatni kafelek w całości,
+  przycisk nieaktywny, klik nic nie robi), „poprzednie" 2384 → 1408 → 352 → 0;
+  390 px: po jednym kafelku do 2829 i z powrotem do 0.
+  Uwaga do harnessu: zrzut z `captureBeyondViewport` zmienia na chwilę viewport
+  i przesuwa karuzelę — pierwszy przebieg pokazał fałszywy skok „poprzednie" do 0.
+
+### Niezweryfikowane
+
+- CTA na jasnym tle w przeglądarce — demo ma oba CTA na kolorze marki; klasy są te
+  same co w innych sekcjach (`text-ink`, `text-muted`, przycisk główny).
+- Studio z nowym polem i podpisami — schema się waliduje i buduje typy, ale edycja
+  w Studio nie była klikana.
+- Na telefonie w karuzeli kafelki bez podpisu mają pod zdjęciem pustą przestrzeń
+  (rząd ma wysokość najwyższego elementu) — przyciski nie skaczą przy przewijaniu;
+  do zmiany na życzenie.
+- Przy okazji zauważone, niepoprawiane: w nagłówku na 390 px numer telefonu łamie się
+  w przycisku na dwie linie.

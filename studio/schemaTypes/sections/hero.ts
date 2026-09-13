@@ -1,5 +1,6 @@
 import { RocketIcon } from '@sanity/icons/Rocket';
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { backgroundField } from '../fields/background';
 
 export const hero = defineType({
 	name: 'hero',
@@ -31,6 +32,7 @@ export const hero = defineType({
 			description: 'Maksymalnie dwa. Pierwszy jest wyróżniony.',
 			validation: (rule) => rule.max(2),
 		}),
+		backgroundField(),
 	],
 	preview: {
 		select: { title: 'heading', media: 'image' },

@@ -1,7 +1,7 @@
 ---
 import Heading from '~/components/Heading.astro';
 import LinkButton from '~/components/LinkButton.astro';
-import { toneClass, type SectionContext, type SectionOf } from '~/lib/sanity/sections';
+import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
 
 interface Props {
 	section: SectionOf<'pricing'>;
@@ -13,7 +13,7 @@ const plans = section.plans ?? [];
 const planLevel = ctx.headingLevel === 1 ? 2 : 3;
 ---
 
-<section class={toneClass(ctx.tone)}>
+<section class={ctx.backgroundClass}>
 	<div class="content-container py-section">
 		{section.heading && (
 			<Heading level={ctx.headingLevel} variant="section" class="text-ink">

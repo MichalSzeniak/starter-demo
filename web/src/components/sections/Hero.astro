@@ -2,7 +2,7 @@
 import Heading from '~/components/Heading.astro';
 import LinkButton from '~/components/LinkButton.astro';
 import SanityImage from '~/components/SanityImage.astro';
-import { toneClass, type SectionContext, type SectionOf } from '~/lib/sanity/sections';
+import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
 
 interface Props {
 	section: SectionOf<'hero'>;
@@ -14,7 +14,7 @@ const buttons = section.buttons ?? [];
 const hasImage = Boolean(section.image?.asset?.url);
 ---
 
-<section class={toneClass(ctx.tone)}>
+<section class={ctx.backgroundClass}>
 	<div
 		class:list={[
 			'content-container grid gap-10 py-section lg:py-section-lg',

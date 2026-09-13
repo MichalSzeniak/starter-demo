@@ -1,5 +1,6 @@
 import { CommentIcon } from '@sanity/icons/Comment';
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { backgroundField } from '../fields/background';
 
 export const testimonials = defineType({
 	name: 'testimonials',
@@ -55,6 +56,7 @@ export const testimonials = defineType({
 				}),
 			],
 		}),
+		backgroundField(),
 	],
 	preview: {
 		select: { title: 'heading', items: 'items' },

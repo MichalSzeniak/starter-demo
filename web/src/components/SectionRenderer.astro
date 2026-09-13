@@ -1,7 +1,8 @@
 ---
 import {
+	backgroundClass,
 	firstImageSectionIndex,
-	sectionTones,
+	sectionBackgrounds,
 	type Section,
 	type SectionContext,
 } from '~/lib/sanity/sections';
@@ -21,7 +22,8 @@ import TextImage from './sections/TextImage.astro';
  *
  * Dokłada kontekst: pierwsza sekcja dostaje h1, kolejne h2; sekcja z pierwszym
  * obrazem na stronie dostaje `priorityImage` (eager + fetchpriority=high);
- * każda sekcja dostaje `tone` — naprzemienne tło liczone z pozycji (sections.ts).
+ * każda sekcja dostaje tło — wybrane w Studio albo, przy „auto", naprzemienne
+ * liczone z pozycji (sections.ts). Klasę tła nakłada renderer, nie komponent.
  */
 interface Props {
 	sections: Section[] | null | undefined;
@@ -30,7 +32,7 @@ interface Props {
 const { sections } = Astro.props;
 const list = sections ?? [];
 const firstImage = firstImageSectionIndex(list);
-const tones = sectionTones(list);
+const backgrounds = sectionBackgrounds(list);
 // `#kontakt` wskazuje pierwszą sekcję kontaktową; kolejne (rzadkie) dostają unikalne id.
 const firstContact = list.findIndex((section) => section._type === 'contact');
 
@@ -39,7 +41,8 @@ function contextFor(index: number): SectionContext {
 		index,
 		headingLevel: index === 0 ? 1 : 2,
 		priorityImage: index === firstImage,
-		tone: tones[index]!,
+		background: backgrounds[index]!,
+		backgroundClass: backgroundClass(backgrounds[index]!),
 	};
 }
 ---

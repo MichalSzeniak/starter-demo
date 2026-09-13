@@ -241,7 +241,7 @@ function collectImageUrls(): string[] {
 					for (const entry of item.items) urls.push(entry.avatar?.asset?.url);
 					break;
 				case 'gallery':
-					for (const entry of item.images) urls.push(entry.asset?.url);
+					for (const entry of item.items) urls.push(entry.image.asset?.url);
 					break;
 			}
 		}
@@ -365,7 +365,7 @@ type SectionType = Section['_type'];
 type GalleryLayout = Extract<Section, { _type: 'gallery' }>['layout'];
 
 async function section(value: Section) {
-	const base = { _key: value._key, _type: value._type };
+	const base = { _key: value._key, _type: value._type, background: value.background };
 	switch (value._type) {
 		case 'hero':
 			return {
@@ -417,7 +417,15 @@ async function section(value: Section) {
 				...base,
 				heading: value.heading,
 				layout: value.layout,
-				images: await Promise.all(value.images.map(image)),
+				items: await Promise.all(
+					value.items.map(async (item) => ({
+						_type: 'galleryItem' as const,
+						_key: item._key,
+						title: item.title,
+						description: item.description,
+						image: await image(item.image),
+					})),
+				),
 			};
 		case 'contact':
 			return {

@@ -1,5 +1,6 @@
 import { CreditCardIcon } from '@sanity/icons/CreditCard';
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { backgroundField } from '../fields/background';
 
 export const pricing = defineType({
 	name: 'pricing',
@@ -90,6 +91,7 @@ export const pricing = defineType({
 				}),
 			],
 		}),
+		backgroundField(),
 	],
 	preview: {
 		select: { title: 'heading', plans: 'plans' },

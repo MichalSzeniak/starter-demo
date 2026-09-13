@@ -1,5 +1,6 @@
 import { EnvelopeIcon } from '@sanity/icons/Envelope';
 import { defineField, defineType } from 'sanity';
+import { backgroundField } from '../fields/background';
 
 /**
  * Sekcja kontaktowa: formularz + opcjonalnie dane kontaktowe i karta dojazdu.
@@ -47,6 +48,7 @@ export const contact = defineType({
 				'Przyciski „Pokaż na mapie" i „Wyznacz trasę" — otwierają Google Maps w nowej karcie. Na samej stronie nic od Google się nie ładuje. Korzysta z adresu w Ustawieniach strony.',
 			initialValue: true,
 		}),
+		backgroundField(),
 	],
 	preview: {
 		select: { title: 'heading', details: 'showContactDetails', map: 'showMap' },

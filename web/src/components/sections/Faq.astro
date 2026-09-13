@@ -1,7 +1,7 @@
 ---
 import Heading from '~/components/Heading.astro';
 import RichText from '~/components/portable/RichText.astro';
-import { toneClass, type SectionContext, type SectionOf } from '~/lib/sanity/sections';
+import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
 
 /**
  * Accordion na natywnym <details>/<summary> — zero JS, klawiatura i czytniki
@@ -26,7 +26,7 @@ const items = section.items ?? [];
 const questionLevel = ctx.headingLevel === 1 ? 2 : 3;
 ---
 
-<section class={toneClass(ctx.tone)}>
+<section class={ctx.backgroundClass}>
 	<div class="content-container py-section">
 		<div class="mx-auto max-w-3xl">
 			{section.heading && (

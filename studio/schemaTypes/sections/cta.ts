@@ -1,5 +1,6 @@
 import { StarIcon } from '@sanity/icons/Star';
 import { defineField, defineType } from 'sanity';
+import { backgroundField } from '../fields/background';
 
 export const cta = defineType({
 	name: 'cta',
@@ -27,6 +28,7 @@ export const cta = defineType({
 			type: 'labeledLink',
 			validation: (rule) => rule.required().error('Ta sekcja bez przycisku nie ma sensu.'),
 		}),
+		backgroundField({ accent: true }),
 	],
 	preview: {
 		select: { title: 'heading', subtitle: 'button.label' },

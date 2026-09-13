@@ -1,7 +1,7 @@
 ---
 import Heading from '~/components/Heading.astro';
 import SanityImage from '~/components/SanityImage.astro';
-import { toneClass, type SectionContext, type SectionOf } from '~/lib/sanity/sections';
+import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
 
 interface Props {
 	section: SectionOf<'testimonials'>;
@@ -12,7 +12,7 @@ const { section, ctx } = Astro.props;
 const items = section.items ?? [];
 ---
 
-<section class={toneClass(ctx.tone)}>
+<section class={ctx.backgroundClass}>
 	<div class="content-container py-section">
 		{section.heading && (
 			<Heading level={ctx.headingLevel} variant="section" class="text-ink">

@@ -48,6 +48,7 @@ const RICH_TEXT = /* groq */ `[]{
 const SECTIONS = /* groq */ `sections[]{
 	_key,
 	_type,
+	"background": coalesce(background, "auto"),
 	_type == "hero" => {
 		heading,
 		lead,
@@ -90,7 +91,7 @@ const SECTIONS = /* groq */ `sections[]{
 	_type == "gallery" => {
 		heading,
 		"layout": coalesce(layout, "grid"),
-		images[] ${IMAGE}
+		items[]{ _key, title, description, image ${IMAGE} }
 	},
 	_type == "contact" => {
 		heading,

@@ -1,5 +1,6 @@
 import { BlockContentIcon } from '@sanity/icons/BlockContent';
 import { defineField, defineType } from 'sanity';
+import { backgroundField } from '../fields/background';
 
 export const textImage = defineType({
 	name: 'textImage',
@@ -34,6 +35,7 @@ export const textImage = defineType({
 			},
 			initialValue: 'right',
 		}),
+		backgroundField(),
 	],
 	preview: {
 		select: { title: 'heading', media: 'image' },
