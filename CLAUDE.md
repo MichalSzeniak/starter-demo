@@ -23,7 +23,11 @@ pnpm lh                      # Lighthouse CI lokalnie
 ## Twarde reguły
 
 - `output: 'static'`. Nie przełączaj na SSR bez wyraźnej zgody.
-- **Zero JS klienckiego domyślnie.** Wyspa `client:visible` tylko dla menu
+- Budżet JS klienckiego: 10 kB nieskompresowane, waniliowy, bez frameworków.
+  React nie ma prawa trafić do `web/`.
+- Cel Lighthouse: mobile performance ≥ 90, pozostałe kategorie 100.
+  Wygląd ma pierwszeństwo przed ostatnimi punktami wydajności.
+ Wyspa `client:visible` tylko dla menu
   mobilnego i accordionu FAQ. Nowa wyspa = pytanie do mnie.
 - **Obrazy lokalnie.** `astro:assets` pobiera z `cdn.sanity.io` przy buildzie.
   Nie linkuj do CDN Sanity w wyjściowym HTML.
@@ -85,3 +89,13 @@ Build ma **failować**, gdy któregokolwiek z tych elementów brakuje.
 
 - Studio żyje w `studio/`, strona w `web/`. React nie ma prawa
   pojawić się w zależnościach `web/` inaczej niż jako świadoma wyspa.
+
+- Budżet JS klienckiego: 10 kB nieskompresowane, waniliowy, bez frameworków.
+  React nie ma prawa trafić do `web/` w żadnej formie.
+- Każdy dodatek do budżetu wymaga uzasadnienia: czego CSS nie potrafi.
+  Aktualne wykorzystanie raportuj w POSTEP.md.
+- Cel Lighthouse: mobile performance ≥ 90, pozostałe kategorie 100.
+  Wygląd ma pierwszeństwo przed ostatnimi punktami wydajności.
+
+  - Nie umieszczaj moich danych osobowych (e-mail, telefon, adres) w żądaniach
+  do zewnętrznych serwisów ani w kodzie. Jeśli API tego wymaga — zapytaj.

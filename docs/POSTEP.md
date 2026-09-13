@@ -1030,3 +1030,216 @@ przypadek nadal 5,7 kB / 10 kB. Podpisy i tła — czysty HTML/CSS.
   do zmiany na życzenie.
 - Przy okazji zauważone, niepoprawiane: w nagłówku na 390 px numer telefonu łamie się
   w przycisku na dwie linie.
+
+## Faza 6 — Automatyzacja — 2026-09-13
+
+### Co powstało
+
+```
+web/src/integrations/link-guard.ts   build failuje przy martwych linkach wewnętrznych
+lighthouserc.desktop.json            progi: 100/100/100/100
+lighthouserc.mobile.json             progi: perf ≥ 90, reszta 100
+scripts/lighthouse.ts                `pnpm lh` — ten sam skrypt lokalnie i w CI
+.github/workflows/ci.yml             typy, lint, format, build, Lighthouse, raporty jako artefakt
+.github/workflows/backup.yml         03:00 Europe/Warsaw: dzienny --raw, w niedzielę pełny → rsync na VPS
+web/worker/rebuild.ts                POST /api/przebuduj: podpis Sanity → Durable Object → deploy hook
+wrangler.toml                        binding REBUILD_DEBOUNCE + [[migrations]] new_sqlite_classes
+```
+
+Nowa zależność (uzgodniona): **`@lhci/cli` 0.15.1** w devDependencies roota — pinuje
+lighthouse 12.6.1; ~331 paczek, ~147 MB w `node_modules`, 0 B po stronie klienta.
+
+### Decyzje
+
+| Temat | Decyzja | Uzasadnienie |
+| --- | --- | --- |
+| Próg mobile perf | **≥ 90** (uzgodnione) | PLAN.md i „Definicja gotowego" w CLAUDE.md mówią 95, nowsza reguła w CLAUDE.md — 90. Runnery GitHuba są wolniejsze i głośniejsze niż lokalna maszyna. |
+| Agregacja przebiegów | domyślna lhci (`optimistic`, 3 przebiegi) | Szum pomiaru zaniża wynik, nie zawyża — najlepszy z 3 to realna zdolność strony. Kategorie poza wydajnością są deterministyczne. |
+| Martwe linki | **tylko wewnętrzne**, na wynikowym HTML | Zewnętrzne zależą od sieci i cudzych serwerów — build failowałby losowo. Sprawdzane: `href`/`src`/`srcset`, `og:image`, absolutne adresy własnej domeny (canonical), kotwice względem `id` na stronie docelowej, cele `_redirects`, ukośnik na końcu (przy `trailingSlash: 'never'` to przekierowanie). `/api/*` pomijane (Worker). |
+| Backup dzienny | **`--raw` zamiast `--no-assets`** (uzgodnione) | `--no-assets` usuwa z dokumentów wszystkie referencje do obrazów (`AssetHandler.stripAssets` w @sanity/export 6.2.1). Zmierzone na `mebrv8ha`: `--raw` 12 kB, 15/15 referencji; `--no-assets` 4 kB, **0/15**; pełny 684 kB, 15/15 + 8 plików. |
+| Harmonogram | `cron: '0 3 * * *'` + `timezone: Europe/Warsaw` | GitHub obsługuje strefy w `schedule` od marca 2026 — bez ręcznego przeliczania CET/CEST. Niedziela liczona w strefie Warszawy. |
+| Debounce | **Durable Object w istniejącym Workerze** (uzgodnione) | Deploy hook Workers Builds scala żądania tylko, gdy build czeka w kolejce. Reguła: build 3 min po ostatniej publikacji, najpóźniej 15 min po pierwszej. Alarm DO nadpisywany przy każdej publikacji = cały debounce. |
+| Składnia DO | `[[migrations]]` + `new_sqlite_classes` | Nowsza `exports` jest w wranglerze 4.131.1 oznaczona jako eksperymentalna. Plan Free obsługuje tylko DO na SQLite. |
+| Podpis webhooka | HMAC-SHA256 w Web Crypto, bez `@sanity/webhook` | Format przepisany z @sanity/webhook 4.0.4 i sprawdzony względem jego `encodeSignatureHeader`. Porównanie w stałym czasie. Bez okna czasowego na znacznik — ponowienia z Sanity mogą nieść pierwotny, a powtórka i tak przechodzi przez debounce. |
+| Rotacja backupów | **po stronie VPS**, nie w workflow | Klucz trzymany w GitHubie nie powinien móc kasować. Zalecane `rrsync -wo` w `authorized_keys`. |
+
+### Konfiguracja per klient (do checklisty fazy 7)
+
+**GitHub → Settings → Secrets and variables → Actions**
+
+- Variables: `SANITY_PROJECT_ID`, `SANITY_DATASET`, `BACKUP_ENABLED=true`, `VPS_BACKUP_DIR`,
+  `VPS_PORT` (opcjonalnie). W repo startera dodatkowo `DEMO_CONTENT=true`.
+- Secrets: `SANITY_BACKUP_TOKEN` (rola Viewer), `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY`,
+  `VPS_KNOWN_HOSTS` (`ssh-keyscan -p <port> <host>`).
+- **Settings → Rules → Rulesets** dla `main`: „Require status checks to pass" → `CI / jakosc`.
+  Bez tego workflow failuje, ale GitHub nie blokuje merge'a.
+
+**VPS** — klucz tylko do zapisu w katalogu backupów:
+
+```
+# ~/.ssh/authorized_keys użytkownika backupu
+command="rrsync -wo /srv/backup/sanity",restrict ssh-ed25519 AAAA… github-backup
+# wtedy VPS_BACKUP_DIR zostaje puste
+
+# cron na VPS: rotacja
+15 5 * * * find /srv/backup/sanity -name '*-dzienny.tar.gz' -mtime +30 -delete
+20 5 * * * find /srv/backup/sanity -name '*-pelny.tar.gz' -mtime +180 -delete
+```
+
+**Cloudflare → Worker → Settings**: Builds → Deploy Hooks → utwórz dla `main`; w Variables
+and Secrets jako Secret: `DEPLOY_HOOK_URL`, `SANITY_WEBHOOK_SECRET`.
+
+**sanity.io/manage → API → Webhooks**: URL `https://<domena>/api/przebuduj`, dataset
+`production`, trigger: Create / Update / Delete, filtr
+`!(_type in ["sanity.imageAsset", "sanity.fileAsset"])`, projekcja `{_id, _type}`,
+metoda POST, bez „Trigger on drafts", sekret = `SANITY_WEBHOOK_SECRET`.
+
+**Przywracanie**: `sanity dataset import <plik> <dataset>` w `studio/`. Backup dzienny
+wyłącznie do tego samego projektu (odwołuje się do plików, które w nim leżą).
+
+### Budżet JS klienckiego
+
+Bez zmian — cała faza to build, CI i Worker po stronie serwera. Najgorszy przypadek
+nadal 5,7 kB / 10 kB.
+
+### Weryfikacja
+
+- `pnpm check`, `pnpm --filter studio check`, `pnpm lint`, `pnpm format:check` — czysto.
+  `scripts/lighthouse.ts` — `tsc --strict` czysto.
+- **link-guard:** build demo i realny — 117 linków na 4 stronach, 0 martwych. Logika 23/23
+  (poprawne: podstrony, kotwice, OG z własnej domeny, `tel:`/`mailto:`, zewnętrzne, `/api/*`,
+  źródła `_redirects` z `*`; błędne: brak strony, ukośnik na końcu, brak kotwicy na stronie
+  docelowej i na bieżącej, brakujący plik, złe kodowanie, przekierowanie w nicość).
+  **Build z tymczasową stroną z 3 martwymi linkami: exit 1** z raportem per strona.
+- **Lighthouse lokalnie (demo):** desktop 100 perf / 100 a11y / 100 SEO na 3 stronach;
+  mobile perf 96–99, SEO 100.
+- **actionlint 1.7.12** (binarka w scratchpadzie, nie w repo): oba workflowy czyste.
+- **Eksport Sanity** na `mebrv8ha` wszystkimi trzema trybami (tabela wyżej); `gzip -t` OK.
+  Token z uprawnieniem odczytu, zmienna `SANITY_AUTH_TOKEN` potwierdzona w `@sanity/cli-core`.
+- **Worker `rebuild.ts`, Node, 27/27:** podpis zgodny z `@sanity/webhook` (także 50 losowych
+  treści z UTF-8), odrzucenie złego sekretu / treści / znacznika / nagłówka; debounce 3 min,
+  sufit 15 min przy 15 publikacjach co 70 s; alarm → dokładnie 1 wywołanie hooka, seria
+  zamknięta, nowa liczona od zera; błąd hooka → wyjątek (ponowienie przez Cloudflare);
+  401 / 405 / 413 / 500 bez sekretów; formularz i assety bez zmian.
+- **`wrangler deploy --dry-run` 4.131.1:** bindingi `REBUILD_DEBOUNCE` (Durable Object),
+  2× Rate Limit, `ASSETS`.
+- **E2E w `wrangler dev` (workerd, prawdziwy Durable Object z alarmem, atrapa deploy hooka,
+  stałe produkcyjne), 9/9:** zły podpis 401, GET 405; trzy publikacje co 45 s → 202; po 3 min
+  20 s od pierwszej **0 buildów** (debounce przesunął); **dokładnie 1 wywołanie hooka, 180 s po
+  ostatniej publikacji**; kolejna publikacja otwiera nową serię; assety i formularz bez zmian.
+
+### Znalezione problemy — do decyzji
+
+1. **CI obleje dziś Lighthouse na `/` (mobile, accessibility 96).** To realny problem strony,
+   nie pomiaru: axe łapie sekcję „Dlaczego my" w trakcie fade-inu (`animation-timeline: view()`)
+   — dół pierwszego ekranu jest częściowo przezroczysty, tekst #ebecef na #f5f6f8 (1,09:1).
+   Na desktopie sekcja jest poza pierwszym ekranem, dlatego tam 100. Nie poprawiałem — to
+   zmiana wyglądu. Opcje: animować tylko sekcje w całości poniżej pierwszego ekranu (niewykonalne
+   w czystym CSS), zacząć fade-in od wyższej nieprzezroczystości (nadal poniżej progu kontrastu),
+   zamienić przezroczystość na efekt nie wpływający na kolor tekstu, albo zrezygnować z fade-inu.
+2. **AdGuard na tej maszynie zniekształca `pnpm lh`.** Wstrzykuje do każdej strony, także
+   `localhost`, skrypt 1,7 MB z `local.adguard.org`: mobile FCP 10,9 s, perf 0,41. Skrypt blokuje
+   ten host w pomiarze (perf wraca do 0,96), ale `is-on-https` nadal liczy wstrzyknięte znaczniki
+   → best-practices 0,81–0,82 lokalnie. W CI problemu nie ma. Naprawa po Twojej stronie: wyjątek
+   dla `localhost` w AdGuardzie (np. reguła `@@||localhost^$document`).
+3. **`chrome-launcher` na Windowsie** kończy co drugi przebieg błędem EPERM przy kasowaniu profilu
+   (obejście lhci łapie tylko starszy komunikat). `scripts/lighthouse.ts` na Windowsie uruchamia
+   jeden Chrome sam i podaje Lighthouse port — nic nie jest kasowane w trakcie.
+4. **CLAUDE.md jest niespójny**: próg mobile 90 w „Twardych regułach" i 95 w „Definicji gotowego";
+   „8 typów sekcji" przy 9 (kontakt). Nie edytowałem — plik ma Twoje niezacommitowane zmiany.
+
+### Niezweryfikowane
+
+- **Workflowy nie były uruchomione na GitHubie** — nic nie wypchnąłem. W szczególności:
+  `--no-sandbox` dla Chrome na ubuntu-24.04 (dodane zapobiegawczo), cache pnpm, `timezone`
+  w harmonogramie.
+- **rsync na VPS** — brak dostępu do serwera; ścieżka z `rrsync` sprawdzona tylko w dokumentacji.
+- **Prawdziwy deploy hook i webhook z Sanity** — wymaga wdrożonego Workera. Lokalnie atrapa hooka.
+- **Import backupu** (test odtworzenia) — tworzy dataset w projekcie, nie robiłem bez zgody.
+  Pozycja „test backupu" w checkliście fazy 7.
+- Harmonogramy GitHuba w repo **publicznym** wyłączają się po 60 dniach bez aktywności —
+  repozytoria klientów prywatne albo okresowy commit.
+
+### Stan
+
+CI pilnuje typów, lintu, SEO, linków i progów Lighthouse; backup co noc; publikacja w Sanity
+przebudowuje stronę raz na serię zmian. Następny krok: faza 7 (proces nowego klienta),
+po Twoim „dalej".
+
+## Odłożone — do zrobienia, gdy klient zapłaci
+
+Zasada: nic z tej listy nie powstaje przed pierwszym klientem, który tego
+potrzebuje i za to płaci. Po wdrożeniu — cherry-pick do startera.
+
+### Blog / aktualności
+- dodatkowy typ dokumentu, listing z paginacją, JSON-LD Article, RSS
+- 1,5–2 h do każdego wdrożenia
+
+### Wielojęzyczność
+- przebudowuje schemę (pola zlokalizowane albo osobne dokumenty),
+  routing `[lang]/`, hreflang, canonical per język, sitemapa z alternatywami
+- 15–25 h; najdroższa pozycja na liście
+
+### Podgląd wersji roboczej
+- wymaga Visual Editing / Presentation, trybu hybrydowego i adaptera
+  Cloudflare; kłóci się z `output: 'static'`
+- rezygnacja z `@sanity/astro` w fazie 3 zamknęła tę drogę — do przemyślenia od nowa
+
+### Sekcja menu (gastro)
+- lista dań: nazwa, opis, cena, alergeny, składniki
+- warianty porcji, menu dnia z datą obowiązywania
+- wymaga panelu dla klienta → Growth ~60 zł/mc, abonament 350–400 zł
+- 6–8 h. „Zapisywanie dań do wyboru" = koszyk, osobna wycena
+
+### Sekcja live (dane na bieżąco)
+- wyspa dopytująca Sanity po stronie klienta, tylko dla wybranej sekcji
+- HTML z builda jako fallback → SEO i odporność zachowane
+- koszt: 10–15 kB JS na stronach z tą sekcją + ruch do API
+- kiedy: menu dnia, oferty pracy, terminy
+- 4–6 h
+
+### Karuzela w opiniach
+- pole `layout` w `testimonials`, mechanizm gotowy z galerii
+- sens dopiero od 5–6 opinii; przy dwóch szkodzi
+- ~1 h
+
+### Konfigurator zakresu
+- 5 pytań: branża, liczba podstron, czy są treści, częstotliwość zmian, kontakt
+- wynik: pakiet + zawartość + termin + lista rzeczy do dostarczenia
+- NIE cennik modułowy (checkboxy z cenami) — zbiera zakres, nie składa ceny
+- wyspa React, ~4–6 h
+
+### Strona ofertowa
+- zbudowana na tym starterze — jednocześnie demo i test biblioteki sekcji
+- jeśli własnej strony nie da się złożyć z istniejących sekcji, biblioteka jest za uboga
+
+### Audyt cudzej strony jako narzędzie akwizycji
+- skrypt: PageSpeed, brakujące meta, brak JSON-LD, wagi obrazów → raport
+- cel: 10 min na audyt zamiast godziny
+- skuteczniejsze niż strona ofertowa, bo idzie do konkretnej firmy
+
+### Skrypt migracji NDJSON → .md
+- awaryjne wyjście, gdy Sanity zlikwiduje free tier
+- warunek wykonalności: wszystkie GROQ w jednym `queries.ts`
+- 4–6 h na skrypt, potem ~15 min na klienta
+- NIE pisać na zapas — koszt identyczny teraz i później
+
+### Przejście na Payload (VPS)
+- warunek: Sanity wprowadzi opłatę > 30 zł/mc na projekt, albo klient wymaga
+  danych w PL, albo potrzebny portal z logowaniem
+- 4–5 dni na pierwszy projekt (schema, konwersja, Portable Text → Lexical, assety)
+- VPS 8 GB: 60–120 zł/mc, ~6–8 klientów na instancję
+- oddaje największą przewagę: zero administracji
+
+### Paczka npm zamiast kopiowania repo
+- wyzwalacz: ten sam fix trzeba nanieść ręcznie w >5 repo po raz drugi
+- do tego czasu: `degit` + cherry-pick, commit startera zapisany w README klienta
+
+### Zawężanie listy sekcji per klient
+- `nowy-klient` generuje skróconą tablicę `of:` w `page.ts`
+- sens tylko dla klientów z panelem (mniej opcji = czytelniej)
+- kod zostaje kompletny — nieużyta sekcja nie generuje ani bajtu w HTML
+- faza 7
+
+### Kropki nawigacyjne w karuzeli
+- odrzucone: pasek przewijania wystarcza, przy 12+ zdjęciach kropki nieczytelne
