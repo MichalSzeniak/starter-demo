@@ -1,6 +1,7 @@
 import tailwindcss from '@tailwindcss/vite';
 import { defineConfig, envField, fontProviders } from 'astro/config';
 import { brand } from './src/config/brand.ts';
+import { linkGuard } from './src/integrations/link-guard.ts';
 import { seoGuard } from './src/integrations/seo-guard.ts';
 
 // https://astro.build/config
@@ -8,8 +9,9 @@ export default defineConfig({
 	site: brand.siteUrl,
 	output: 'static',
 
-	// Po buildzie: walidacja SEO każdej strony (build failuje) i _redirects dla Cloudflare.
-	integrations: [seoGuard()],
+	// Po buildzie: walidacja SEO każdej strony i _redirects dla Cloudflare, potem martwe
+	// linki wewnętrzne. Obie integracje failują build.
+	integrations: [seoGuard(), linkGuard()],
 
 	// Jeden kanoniczny kształt URL-a: bez ukośnika na końcu — tak samo
 	// normalizuje adresy Cloudflare Pages, więc canonical zgadza się z tym,
