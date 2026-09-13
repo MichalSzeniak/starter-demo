@@ -1,0 +1,77 @@
+# Kontrola jakości: typy, lint, build (z walidacją SEO i martwych linków) i Lighthouse.
+#
+# PR nie przechodzi, jeśli którykolwiek krok failuje. Żeby GitHub faktycznie
+# BLOKOWAŁ merge, dodaj regułę dla `main` (Settings → Rules → Rulesets →
+# „Require status checks to pass") ze sprawdzeniem „CI / jakosc".
+#
+# Treść do builda — zmienne repozytorium (Settings → Secrets and variables →
+# Actions → Variables), nie sekrety: identyfikator projektu Sanity nie jest tajny,
+# a zmienne są dostępne także dla PR-ów z forków.
+#   SANITY_PROJECT_ID   projekt klienta (dataset musi być publiczny do odczytu)
+#   SANITY_DATASET      domyślnie production
+#   DEMO_CONTENT        true tylko w repo startera — bez projektu build celowo failuje
+#
+# Progi Lighthouse: lighthouserc.desktop.json i lighthouserc.mobile.json.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  jakosc:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      SANITY_PROJECT_ID: ${{ vars.SANITY_PROJECT_ID }}
+      SANITY_DATASET: ${{ vars.SANITY_DATASET || 'production' }}
+      DEMO_CONTENT: ${{ vars.DEMO_CONTENT || 'false' }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+
+      # Wersja pnpm z pola packageManager w package.json.
+      - uses: pnpm/action-setup@v6
+        with:
+          cache: true
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typy (web — astro check + tsc)
+        run: pnpm check
+
+      - name: Typy (studio)
+        run: pnpm --filter studio check
+
+      - name: Lint i formatowanie
+        run: pnpm lint && pnpm format:check
+
+      - name: Build (walidacja SEO i martwych linków)
+        run: pnpm build
+
+      - name: Lighthouse (desktop + mobile)
+        run: pnpm lh
+
+      - name: Raporty Lighthouse
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: lighthouse
+          path: .lighthouseci/raporty
+          # Katalog zaczyna się od kropki — bez tego akcja pomija go po cichu.
+          include-hidden-files: true
+          if-no-files-found: ignore
+          retention-days: 14
