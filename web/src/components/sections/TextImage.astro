@@ -2,7 +2,7 @@
 import Heading from '~/components/Heading.astro';
 import RichText from '~/components/portable/RichText.astro';
 import SanityImage from '~/components/SanityImage.astro';
-import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
+import { toneClass, type SectionContext, type SectionOf } from '~/lib/sanity/sections';
 
 interface Props {
 	section: SectionOf<'textImage'>;
@@ -13,7 +13,7 @@ const { section, ctx } = Astro.props;
 const imageLeft = section.imagePosition === 'left';
 ---
 
-<section>
+<section class={toneClass(ctx.tone)}>
 	<div class="content-container grid gap-10 py-section lg:grid-cols-2 lg:items-center">
 		<div class:list={[imageLeft && 'lg:order-2']}>
 			<Heading level={ctx.headingLevel} variant="section" class="text-ink">

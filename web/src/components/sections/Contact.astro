@@ -4,7 +4,7 @@ import Heading from '~/components/Heading.astro';
 import MapCard from '~/components/MapCard.astro';
 import { getSiteSettings } from '~/lib/content';
 import { formatAddress, formatOpeningHours, telHref } from '~/lib/format';
-import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
+import { toneClass, type SectionContext, type SectionOf } from '~/lib/sanity/sections';
 
 /**
  * Sekcja „Kontakt": formularz + dane kontaktowe z Ustawień strony + karta dojazdu.
@@ -29,7 +29,7 @@ const showMap = section.showMap && hasLocation;
 const showAside = hasDetails || showMap;
 ---
 
-<section id={anchor} class="scroll-mt-4">
+<section id={anchor} class:list={[toneClass(ctx.tone), 'scroll-mt-4']}>
 	<div class="content-container py-section">
 		<div class="max-w-2xl">
 			<Heading level={ctx.headingLevel} variant="section" class="text-ink">

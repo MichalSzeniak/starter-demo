@@ -1,7 +1,7 @@
 ---
 import Heading from '~/components/Heading.astro';
 import LinkButton from '~/components/LinkButton.astro';
-import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
+import { toneClass, type SectionContext, type SectionOf } from '~/lib/sanity/sections';
 
 interface Props {
 	section: SectionOf<'cta'>;
@@ -11,7 +11,7 @@ interface Props {
 const { section, ctx } = Astro.props;
 ---
 
-<section class="bg-brand text-white">
+<section class={toneClass(ctx.tone)}>
 	<div class="content-container flex flex-col items-start gap-6 py-section md:flex-row md:items-center md:justify-between">
 		<div>
 			<Heading level={ctx.headingLevel} variant="section">

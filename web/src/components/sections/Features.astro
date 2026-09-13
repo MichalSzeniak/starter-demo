@@ -1,6 +1,6 @@
 ---
 import Heading from '~/components/Heading.astro';
-import type { SectionContext, SectionOf } from '~/lib/sanity/sections';
+import { toneClass, type SectionContext, type SectionOf } from '~/lib/sanity/sections';
 
 interface Props {
 	section: SectionOf<'features'>;
@@ -12,7 +12,7 @@ const items = section.items ?? [];
 const itemLevel = ctx.headingLevel === 1 ? 2 : 3;
 ---
 
-<section class="bg-surface-alt">
+<section class={toneClass(ctx.tone)}>
 	<div class="content-container py-section">
 		{section.heading && (
 			<Heading level={ctx.headingLevel} variant="section" class="text-ink">

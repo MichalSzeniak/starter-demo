@@ -13,6 +13,9 @@ import { formatAddress } from '~/lib/format';
  * Linki to oficjalne Google Maps URLs (`api=1`, bez klucza). Na stronie nie
  * ładuje się nic od Google — dane trafiają tam dopiero, gdy ktoś kliknie,
  * i to w nowej karcie. Zero JS.
+ *
+ * Tło karty: `--tone-raised` z sekcji — kontrastuje z tłem sekcji niezależnie
+ * od tego, czy SectionRenderer dał jej tło białe, czy szare.
  */
 interface Props {
 	settings: SiteSettings;
@@ -41,7 +44,7 @@ const link =
 ---
 
 {searchUrl && directionsUrl && (
-	<div class="rounded-lg bg-surface-alt p-6">
+	<div class="rounded-lg bg-(--tone-raised) p-6">
 		<div class="flex items-start gap-3">
 			<svg
 				aria-hidden="true"

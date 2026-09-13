@@ -900,3 +900,29 @@ cztery takie sekcje z rzędu zlewają się w jeden szary blok — zmiana kolejno
 nie naprawi. Dotyczy każdego klienta, który ułoży te sekcje obok siebie. Propozycja:
 naprzemienne tło liczone w `SectionRenderer` z pozycji sekcji (CTA zostaje w kolorze
 marki) — do decyzji.
+
+## Naprzemienne tła sekcji — 2026-09-13
+
+Poprawka problemu z poprzedniego wpisu: cztery sekcje z tłem `bg-surface-alt`
+na sztywno zlewały się na stronie głównej w jeden szary blok.
+
+- **Tło nie należy już do komponentu ani do klienta.** `sectionTones()`
+  w `sections.ts` liczy je z pozycji, SectionRenderer przekazuje w `ctx.tone`,
+  każda z 9 sekcji używa `toneClass(ctx.tone)`. Sąsiednie sekcje zawsze się różnią,
+  niezależnie od ułożenia strony w Studio.
+- **Liczone od dołu strony.** Stopka jest szara i oddziela ją biały odstęp — ostatnia
+  sekcja jest więc zawsze biała, inaczej przy stopce powstałby pas szary–biały–szary.
+  CTA zawsze w kolorze marki; sekcja nad nim szara.
+- **`--tone-raised`** — kolor kontrastujący z tłem sekcji dla kart w środku
+  (karta dojazdu). Bez tego karta w kolorze `surface-alt` znikałaby na szarej sekcji.
+
+Przypadki brzegowe (`sectionTones`, 8/8): trzy strony demo, stara 7-sekcyjna
+strona główna, CTA w środku, dwa CTA obok siebie, jedna sekcja, pusta strona —
+sąsiedzi różni, ostatnia sekcja nie szara, CTA zawsze w kolorze marki.
+
+**Zweryfikowane w Chrome na realnym datasecie:** na każdej z 3 stron sąsiednie
+sekcje mają różne tło i ostatnia różni się od stopki; najsłabszy kontrast tekstu
+5,3:1 (CTA, `text-white/85` z nałożoną alfą); karta dojazdu odcina się od sekcji.
+Regresja: formularz 22/22 (`/cennik`), karuzela 15/15 (`/o-nas`, 5 zdjęć),
+poprawki wizualne 20/20 (sticky header, fade-in, FAQ z klawiatury, reduced motion).
+Build realny i demo, 0 plików `.js`.
