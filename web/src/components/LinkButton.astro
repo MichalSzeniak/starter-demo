@@ -21,7 +21,7 @@ const variants = {
 ---
 
 {item?.label && resolved && (
-	<a {...anchorAttributes(resolved)} class:list={[base, variants[variant], className]}>
+	<a {...anchorAttributes(resolved)} class:list={[base, variants[variant], className]} data-lift>
 		{item.label}
 	</a>
 )}

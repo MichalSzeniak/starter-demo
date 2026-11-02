@@ -70,39 +70,129 @@
 }
 
 /**
- * Łagodne wejście sekcji przy scrollu — czysty CSS, wątek kompozytora.
+ * ANIMACJE — `brand.motion` ("subtelny" | "brak") trafia do <html data-motion>.
+ * Czysty CSS, 0 kB JS. Przy „ogranicz animacje" w systemie nic tu nie działa.
  *
- * - Pierwsza sekcja jest pominięta: to h1 i obraz LCP.
- * - Animujemy zawartość, nie <section> — pasy tła zostają na miejscu.
- * - Tylko przesunięcie, BEZ opacity. Tekst ma pełny kontrast od pierwszej klatki.
- *   Przy fade od 0 sekcja wystająca u dołu pierwszego ekranu stała półprzezroczysta
- *   do pierwszego scrolla (axe: 1,09:1, mobile accessibility 96). Start od 0,4 też
- *   nie wystarcza: tekst `muted` ma wtedy 1,9:1, a próg 4,5:1 wypada dopiero przy 0,82.
- * - Sekcja zawierająca cel kotwicy (`:target`) się nie przesuwa. Przeglądarka liczy
- *   cel przewijania z przesunięciem z chwili skoku, a po skoku animacja się kończy —
- *   bez tego wyjątku cel podjeżdżał o całe przesunięcie pod sticky header
- *   (komunikat formularza po wysłaniu bez JS, `#kontakt-wyslano`).
- * - Zakres w rem, nie w %: przy procentach wysoka sekcja (długie FAQ) byłaby
- *   w ruchu w trakcie czytania.
- * - Bez `animation-timeline` albo przy „ogranicz animacje" reguła nie istnieje.
+ * Zasady wspólne dla wszystkich efektów:
+ * - Tylko transform i clip-path, BEZ opacity. Tekst ma pełny kontrast od pierwszej
+ *   klatki: przy fade od 0 sekcja wystająca u dołu pierwszego ekranu stała
+ *   półprzezroczysta do pierwszego scrolla (axe: 1,09:1, mobile accessibility 96).
+ *   Start od 0,4 też nie wystarcza: `muted` ma wtedy 1,9:1, próg 4,5:1 dopiero przy 0,82.
+ * - Obraz LCP (pierwsza sekcja) się nie animuje — clip-path zmieniałby jego
+ *   malowaną powierzchnię w chwili pomiaru LCP.
+ * - Longhandy, nie skrót `animation` przy `animation-timeline`: minifikator skleja skrót
+ *   w `animation: … view()`, którego Chrome nie przyjmuje, i animacja po cichu znika
+ *   (sprawdzone: Chrome 152, lightningcss 1.33).
  */
 @media (prefers-reduced-motion: no-preference) {
+	/* Hero: tytuł, opis i przyciski wjeżdżają kaskadą zaraz po załadowaniu. */
+	[data-motion='subtelny'] main > section:first-child [data-hero-text] > * {
+		animation-name: rise-in;
+		animation-duration: 0.9s;
+		animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+		animation-fill-mode: both;
+	}
+	[data-motion='subtelny'] main > section:first-child [data-hero-text] > :nth-child(2) {
+		animation-delay: 0.08s;
+	}
+	[data-motion='subtelny'] main > section:first-child [data-hero-text] > :nth-child(3) {
+		animation-delay: 0.16s;
+	}
+
+	/* Przyciski: lekkie uniesienie pod kursorem. */
+	[data-motion='subtelny'] [data-lift] {
+		transition-property: color, background-color, border-color, transform, box-shadow;
+		transition-duration: 0.2s;
+	}
+	[data-motion='subtelny'] [data-lift]:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 10px 24px -14px rgb(0 0 0 / 0.35);
+	}
+
 	@supports (animation-timeline: view()) {
-		main > section:not(:first-child):not(:target):not(:has(:target)) > * {
-			/* Longhandy, nie skrót `animation`: minifikator skleja skrót z
-			   `animation-timeline` w `animation: … view()`, którego Chrome nie przyjmuje,
-			   i animacja po cichu znika (sprawdzone: Chrome 152, lightningcss 1.33). */
+		/*
+		 * Wejście sekcji przy scrollu. Pierwsza sekcja pominięta (h1 i obraz LCP).
+		 * Animujemy zawartość, nie <section> — pasy tła zostają na miejscu.
+		 * Sekcja zawierająca cel kotwicy (`:target`) się nie przesuwa: przeglądarka liczy
+		 * cel przewijania z przesunięciem z chwili skoku, a po skoku animacja się kończy —
+		 * bez tego wyjątku cel podjeżdżał pod sticky header (`#kontakt-wyslano`, menu
+		 * strony jednostronicowej). Zakres w rem, nie w %: długie FAQ nie jeździ w trakcie czytania.
+		 */
+		[data-motion='subtelny'] main > section:not(:first-child):not(:target):not(:has(:target)) > * {
 			animation-name: section-reveal;
 			animation-timing-function: linear;
 			animation-fill-mode: both;
 			animation-timeline: view();
 			animation-range: entry 0% entry 12rem;
 		}
+
+		/* Zdjęcia w sekcjach: odsłaniają się od środka, bez przesuwania układu. */
+		[data-motion='subtelny'] main > section:not(:first-child) img {
+			animation-name: image-unveil;
+			animation-timing-function: ease-out;
+			animation-fill-mode: both;
+			animation-timeline: view();
+			animation-range: entry 10% cover 35%;
+		}
+	}
+
+	@supports (animation-timeline: scroll()) {
+		/* Nagłówek: cień pojawia się dopiero po przewinięciu, pod nim pasek postępu. */
+		[data-motion='subtelny'] [data-site-header] {
+			animation-name: header-lift;
+			animation-timing-function: linear;
+			animation-fill-mode: both;
+			animation-timeline: scroll(root);
+			animation-range: 0 8rem;
+		}
+		[data-motion='subtelny'] [data-site-header]::after {
+			content: '';
+			position: absolute;
+			inset-inline: 0;
+			bottom: -1px;
+			height: 2px;
+			background-color: var(--color-brand);
+			transform-origin: left;
+			animation-name: scroll-progress;
+			animation-timing-function: linear;
+			animation-fill-mode: both;
+			animation-timeline: scroll(root);
+		}
+	}
+}
+
+@keyframes rise-in {
+	from {
+		transform: translateY(1rem);
 	}
 }
 
 @keyframes section-reveal {
 	from {
 		transform: translateY(2.5rem);
+	}
+}
+
+@keyframes image-unveil {
+	from {
+		clip-path: inset(6% round var(--radius-lg));
+	}
+	to {
+		clip-path: inset(0);
+	}
+}
+
+@keyframes header-lift {
+	to {
+		box-shadow: 0 8px 24px -16px rgb(0 0 0 / 0.25);
+	}
+}
+
+@keyframes scroll-progress {
+	from {
+		transform: scaleX(0);
+	}
+	to {
+		transform: scaleX(1);
 	}
 }

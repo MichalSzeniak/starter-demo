@@ -78,6 +78,11 @@ export interface Brand {
 		sectionYLg: string;
 		contentMax: string;
 	};
+
+	/** Animacje (czysty CSS, 0 kB JS): „subtelny" — wejście hero i sekcji, odsłanianie
+	 *  zdjęć, cień nagłówka i pasek postępu przy przewijaniu, uniesienie przycisków;
+	 *  „brak" — strona bez ruchu. Ustawienie systemowe „ogranicz animacje" i tak wyłącza ruch. */
+	motion: 'subtelny' | 'brak';
 }
 
 export const brand: Brand = {
@@ -124,6 +129,8 @@ export const brand: Brand = {
 		sectionYLg: '6rem',
 		contentMax: '72rem',
 	},
+
+	motion: 'subtelny',
 };
 
 /* ------------------------------------------------------------------ */
