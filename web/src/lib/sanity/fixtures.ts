@@ -1,9 +1,15 @@
-import type {
-	NAVIGATION_QUERY_RESULT,
-	PAGE_BY_SLUG_QUERY_RESULT,
-	REDIRECTS_QUERY_RESULT,
-	SITE_SETTINGS_QUERY_RESULT,
-} from './types.gen';
+import {
+	contentBuilders,
+	external,
+	internal,
+	type GalleryItem,
+	type Image,
+	type Navigation,
+	type Page,
+	type Redirect,
+	type SiteContent,
+	type SiteSettings,
+} from './builders.ts';
 
 /**
  * TREŚCI DEMO — używane, gdy nie ma projektu Sanity.
@@ -18,18 +24,7 @@ import type {
  * i strażnik typów: zmiana schemy bez aktualizacji fixtures nie przejdzie `pnpm check`.
  */
 
-type SiteSettings = Extract<NonNullable<SITE_SETTINGS_QUERY_RESULT>, { companyName: string }>;
-type Navigation = NonNullable<NAVIGATION_QUERY_RESULT>;
-type Page = NonNullable<PAGE_BY_SLUG_QUERY_RESULT>;
-type Section = Page['sections'][number];
-type GalleryItem = Extract<Section, { _type: 'gallery' }>['items'][number];
-type Image = NonNullable<Extract<Section, { _type: 'hero' }>['image']>;
-type Link = Extract<Section, { _type: 'cta' }>['button']['link'];
-type Block = Extract<Section, { _type: 'faq' }>['items'][number]['answer'][number];
-type Redirect = REDIRECTS_QUERY_RESULT[number];
-
-let counter = 0;
-const key = () => `demo-${++counter}`;
+const { key, paragraph, bullet, paragraphWithLink } = contentBuilders('demo');
 
 function image(name: string, alt: string, width: number, height: number): Image {
 	return {
@@ -55,49 +50,6 @@ function galleryItem(
 	description: string | null = null,
 ): GalleryItem {
 	return { _key: key(), title, description, image: image(name, alt, 800, 600) };
-}
-
-const internal = (slug: string): Link => ({
-	kind: 'internal',
-	href: null,
-	newTab: null,
-	page: { slug },
-});
-const external = (href: string, newTab = true): Link => ({
-	kind: 'external',
-	href,
-	newTab,
-	page: null,
-});
-
-function paragraph(text: string, style: 'normal' | 'h2' | 'h3' = 'normal'): Block {
-	return {
-		_type: 'block',
-		_key: key(),
-		style,
-		markDefs: null,
-		children: [{ _type: 'span', _key: key(), text, marks: [] }],
-	};
-}
-
-function bullet(text: string): Block {
-	return { ...paragraph(text), listItem: 'bullet', level: 1 };
-}
-
-/** Akapit z jednym odnośnikiem w środku — ćwiczy adnotację `link` w Portable Text. */
-function paragraphWithLink(before: string, linkText: string, link: Link, after: string): Block {
-	const markKey = key();
-	return {
-		_type: 'block',
-		_key: key(),
-		style: 'normal',
-		markDefs: [{ _key: markKey, _type: 'link', ...link }],
-		children: [
-			{ _type: 'span', _key: key(), text: before, marks: [] },
-			{ _type: 'span', _key: key(), text: linkText, marks: [markKey] },
-			{ _type: 'span', _key: key(), text: after, marks: [] },
-		],
-	};
 }
 
 const siteSettings: SiteSettings = {
@@ -520,9 +472,9 @@ const redirects: Redirect[] = [
 	{ from: '/promocja', to: '/', permanent: false },
 ];
 
-export const demoContent = {
+export const demoContent: SiteContent = {
 	siteSettings,
 	navigation,
 	redirects,
-	pages: { '/': home, 'o-nas': about, cennik: pricing } as Record<string, Page>,
+	pages: { '/': home, 'o-nas': about, cennik: pricing },
 };
