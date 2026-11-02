@@ -1365,16 +1365,10 @@ potrzebuje i za to płaci. Po wdrożeniu — cherry-pick do startera.
 - oddaje największą przewagę: zero administracji
 
 ### Wariant bez CMS-u (treści w repo)
-- dla klienta, który nie edytuje sam — zmiany robię ja, w abonamencie
-- NIE osobny starter: trzecie źródło w `content.ts` obok `sanity` i `demo`,
-  np. `CONTENT_SOURCE=pliki`; treść klienta w pliku TS w kształcie fixtures,
-  pilnowana tymi samymi typami z TypeGen
-- główny koszt: obrazy — z `public/` idą jako zwykły `<img>` bez srcset
-  i konwersji; zdjęcia klienta muszą przejść przez `astro:assets`
-- odpada z checklisty: projekt Sanity, deploy Studio, webhook, backup (~1–2 h)
-- przejście na panel później: projekt Sanity + `pnpm seed` z tego samego pliku
+- zrobione 2026-11-02 — wpis „Wariant bez CMS-u" na końcu pliku
+- zostało: import treści z `web/src/tresci/` do Sanity (seed czyta dziś tylko fixtures),
+  gdy pierwszy klient bez panelu zechce panel
 - wspólny mechanizm ze „Skryptem migracji NDJSON → .md" — oba to treści w repo
-- kilka godzin; do potwierdzenia po sprawdzeniu lokalnych obrazów w `astro:assets`
 
 ### Paczka npm zamiast kopiowania repo
 - wyzwalacz: ten sam fix trzeba nanieść ręcznie w >5 repo po raz drugi
@@ -1388,3 +1382,81 @@ potrzebuje i za to płaci. Po wdrożeniu — cherry-pick do startera.
 
 ### Kropki nawigacyjne w karuzeli
 - odrzucone: pasek przewijania wystarcza, przy 12+ zdjęciach kropki nieczytelne
+
+## Wariant bez CMS-u — 2026-11-02
+
+Starter umie zbudować stronę bez panelu: treści i zdjęcia klienta leżą w repo, edytuje je
+deweloper. Przygotowanie startera, nie praca pod konkretnego klienta. Decyzja: trzecie źródło
+treści obok `sanity` i `demo` zamiast osobnego startera — sekcje, SEO, JSON-LD, formularz
+i Worker są wspólne, a poprawki dalej przenosi się jednym cherry-pickiem.
+
+### Co powstało
+
+- **`LOCAL_CONTENT=true`** → źródło `local` (`client.ts`). Razem z `SANITY_PROJECT_ID`
+  przerywa build (prawie na pewno pomyłka przy przejściu na panel); `DEMO_CONTENT`
+  ignorowane z ostrzeżeniem. `content.ts`: jedna funkcja `contentInCode()` zamiast pięciu
+  gałęzi `demo`; `src/tresci/` ładowane leniwie, tylko w trybie `local`.
+- **`web/src/tresci/index.ts`** — szablon: strona główna (hero, features, textImage, faq, cta)
+  i kontakt, wartości celowo fikcyjne. **`web/src/tresci/obrazy/`** — 4 pliki, ok. 90 kB
+  (zdjęcia z `demo-images`, logo wyrenderowane do PNG).
+- **`web/src/lib/sanity/builders.ts`** — typy i helpery (akapit, lista, linki) wydzielone
+  z fixtures; `demoContent` bez zmian (porównany JSON bajt w bajt). Moduł bez aliasu `~`
+  i bez Vite, bo przez fixtures importuje go seed uruchamiany czystym Node'em.
+- **`web/src/lib/local-images.ts`** — `await obraz('plik.webp', 'alt')` zwraca obraz
+  w kształcie z Sanity; wymiary z pliku, brak pliku albo pusty `alt` przerywa build.
+- **`ResolvedImage.source: 'sanity' | 'local' | 'demo'`** zamiast `remote`. Lokalne rastry
+  przez `<Image>` (srcset, WebP), lokalne SVG jako `<img>`. Obraz OG z lokalnego pliku →
+  JPG 1200×630. Logo w JSON-LD → PNG przez astro:assets; logo w SVG → plik SVG z ostrzeżeniem
+  przy buildzie (nie ma CDN-u, który zrobiłby raster). Karta OG czyta logo z dysku.
+- **`pnpm nowy-klient`** pyta „Panel Sanity — klient sam edytuje treści?". Bez panelu: bez
+  project ID, `LOCAL_CONTENT=true` w `web/.env`, `studio/.env` nietknięty. Z panelem dodatkowo
+  usuwa `web/src/tresci/obrazy/` (patrz niżej).
+- **Checklista**: pozycje **[panel]** i odpowiedniki **[bez CMS]**. **CI**: zmienna
+  `LOCAL_CONTENT`, a w repo startera osobny build wariantu bez CMS-u — brakujący plik obrazu
+  wychodzi dopiero w buildzie, nie w `astro check`.
+
+### Ustalenia z weryfikacji API (astro 7.3.2, typy w `node_modules`)
+
+- Import `.svg` zwraca `AstroComponentFactory & ImageMetadata` (`assets/runtime.d.ts`) —
+  stąd lokalne wektory jako `<img src={meta.src}>`, nie przez `<Image>`.
+- `<Image>` ma osobne warianty propsów dla adresu i `ImageMetadata`; `string | ImageMetadata`
+  nie przechodzi typów — w `SanityImage` źródło idzie jako unia obiektów.
+- **Astro emituje oryginały obrazów z modułu importowanego dynamicznie do `dist/_astro` nawet
+  wtedy, gdy nic ich nie renderuje** — sprawdzone na buildzie demo: 4 pliki z `src/tresci/obrazy`
+  w `dist/`. Dlatego `nowy-klient` przy panelu usuwa ten katalog, tak jak `web/public/demo`.
+
+### Budżet JS klienckiego
+
+Bez zmian — 0 B. Wszystko dzieje się przy buildzie.
+
+### Weryfikacja
+
+- `pnpm check` 0/0/0, `pnpm --filter studio check`, `lint`, `format:check` — czysto.
+- **Build `local`**: SEO 3/3, 69 linków, 0 martwych, 0 odwołań do `cdn.sanity.io`; zdjęcia
+  z srcset w WebP, hero z `fetchpriority="high"`; `og:image` → JPG z `og.webp`; logo w JSON-LD → PNG.
+- **Build demo** bez regresji: SEO 4/4, 122 linki, 0 martwych.
+- **Lighthouse `local`** (3 przebiegi): desktop performance 100, mobile 98–99, accessibility
+  i SEO 100. Best-practices 81/82 — jedyny oblany audyt to `is-on-https` od AdGuarda; build
+  demo daje na tej maszynie identyczne 81 (znany problem z fazy 6).
+- **`astro dev` w trybie `local`**: strona 200, zdjęcia przez `/_image` jako WebP, `/og/kontakt.png` 200.
+- **`nowy-klient` na kopii repo**: bez panelu — `LOCAL_CONTENT=true`, puste project ID,
+  `studio/.env` nie powstaje, `pnpm build` przechodzi od razu (SEO 3/3). Z panelem — usuwa
+  `src/tresci/obrazy/`, `pnpm check` 0/0/0. Komunikaty błędów: oba źródła naraz → „wybierz
+  jedno źródło treści"; brak pliku → „[treści] Brak pliku … Dostępne: (katalog pusty)".
+
+### Niezweryfikowane
+
+- **Build na prawdziwym projekcie Sanity po zmianie `ResolvedImage`.** Ścieżka `sanity`
+  zmieniona mechanicznie (`remote` → `source`), typy ją pilnują, ale build na realnym
+  datasecie nie był uruchomiony — zrobić przed pierwszym wdrożeniem z panelem.
+- Nowy krok CI i Lighthouse w CI (bez AdGuarda) — nie uruchomione na GitHubie.
+
+### Do decyzji
+
+- `nowy-klient` wpisuje nazwę firmy tylko do `brand.ts`; w wariancie bez CMS-u stronę
+  podpisuje `companyName` z `src/tresci/index.ts` — do ręcznej podmiany razem z treściami.
+
+### Stan
+
+Wariant bez CMS-u: `pnpm nowy-klient` → „n" → treści w `web/src/tresci/` → checklista bez
+pozycji **[panel]**. Przejście na panel później wymaga importu treści do Sanity — odłożone.
