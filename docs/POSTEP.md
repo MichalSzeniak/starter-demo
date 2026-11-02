@@ -1364,6 +1364,18 @@ potrzebuje i za to płaci. Po wdrożeniu — cherry-pick do startera.
 - VPS 8 GB: 60–120 zł/mc, ~6–8 klientów na instancję
 - oddaje największą przewagę: zero administracji
 
+### Wariant bez CMS-u (treści w repo)
+- dla klienta, który nie edytuje sam — zmiany robię ja, w abonamencie
+- NIE osobny starter: trzecie źródło w `content.ts` obok `sanity` i `demo`,
+  np. `CONTENT_SOURCE=pliki`; treść klienta w pliku TS w kształcie fixtures,
+  pilnowana tymi samymi typami z TypeGen
+- główny koszt: obrazy — z `public/` idą jako zwykły `<img>` bez srcset
+  i konwersji; zdjęcia klienta muszą przejść przez `astro:assets`
+- odpada z checklisty: projekt Sanity, deploy Studio, webhook, backup (~1–2 h)
+- przejście na panel później: projekt Sanity + `pnpm seed` z tego samego pliku
+- wspólny mechanizm ze „Skryptem migracji NDJSON → .md" — oba to treści w repo
+- kilka godzin; do potwierdzenia po sprawdzeniu lokalnych obrazów w `astro:assets`
+
 ### Paczka npm zamiast kopiowania repo
 - wyzwalacz: ten sam fix trzeba nanieść ręcznie w >5 repo po raz drugi
 - do tego czasu: `degit` + cherry-pick, commit startera zapisany w README klienta
