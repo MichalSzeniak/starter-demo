@@ -1,0 +1,5 @@
+# LF w każdym checkoucie, także na Windowsie z core.autocrlf=true.
+# Prettier wymaga LF (domyślne endOfLine), więc przy CRLF `pnpm format:check`
+# pada na każdym pliku, choć CI na Linuksie jest zielone.
+# Pliki binarne (webp, png) wykrywa `text=auto` i zostawia bez zmian.
+* text=auto eol=lf
