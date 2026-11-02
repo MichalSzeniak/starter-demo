@@ -4,7 +4,11 @@ Kolejność jest chronologiczna. Pozycje oznaczone ⏳ mają czas oczekiwania po
 kogoś innego (Google, rejestrator, DNS) — uruchom je pierwszego dnia, nawet jeśli
 reszta poczeka.
 
+Pozycje oznaczone **[panel]** dotyczą tylko klienta z panelem Sanity. W wariancie bez CMS-u
+(treści edytujesz Ty, w `web/src/tresci/`) pomijasz je — odpowiedniki są obok, oznaczone **[bez CMS]**.
+
 Klient: `__________`  Domena: `__________`  Start: `____-__-__`  Commit startera: `_______`
+Wariant: panel Sanity / bez CMS-u
 
 ---
 
@@ -23,18 +27,21 @@ Klient: `__________`  Domena: `__________`  Start: `____-__-__`  Commit startera
 - [ ] Nowe **prywatne** repo z aktualnego startera; hash commita startera wpisany wyżej
       (do późniejszych cherry-picków). Prywatne, bo harmonogramy GitHuba w repo publicznym
       wyłączają się po 60 dniach bez commitów — backup przestałby działać po cichu.
-- [ ] sanity.io/manage → nowy projekt, dataset `production`, widoczność **Public**
+- [ ] **[panel]** sanity.io/manage → nowy projekt, dataset `production`, widoczność **Public**
       (build czyta treści bez tokena).
-- [ ] sanity.io/manage → API → CORS origins: `http://localhost:3333` z „Allow credentials"
+- [ ] **[panel]** sanity.io/manage → API → CORS origins: `http://localhost:3333` z „Allow credentials"
       (Studio lokalnie).
-- [ ] `pnpm install && pnpm nowy-klient` — nazwa, domena, kolor marki, project ID.
+- [ ] `pnpm install && pnpm nowy-klient` — nazwa, domena, kolor marki, panel tak/nie, project ID.
 - [ ] `web/public/favicon.svg` — favicon klienta.
 - [ ] `pnpm check && pnpm lint && pnpm format:check` — czysto.
 - [ ] Commit: `chore: konfiguracja klienta <nazwa>`.
 
 ## 2. Studio i treści
 
-- [ ] `pnpm --filter studio deploy` → host `<nazwa>.sanity.studio`.
+- [ ] **[bez CMS]** Wszystko z tej sekcji wpisujesz w `web/src/tresci/index.ts` (ustawienia,
+      nawigacja, podstrony, przekierowania); zdjęcia przycięte do docelowych proporcji i logo
+      w PNG — do `web/src/tresci/obrazy/`. Przykładowe obrazy z szablonu usuń.
+- [ ] **[panel]** `pnpm --filter studio deploy` → host `<nazwa>.sanity.studio`.
 - [ ] Ustawienia strony: nazwa, adres, telefon, e-mail, NIP, godziny, social, logo, domyślny
       obraz udostępniania, współrzędne. **NAP znak w znak jak w wizytówce Google** — ten sam
       zapis ulicy, telefonu i nazwy.
@@ -54,9 +61,10 @@ Klient: `__________`  Domena: `__________`  Start: `____-__-__`  Commit startera
       (jak w repo startera). Nazwa Workera = `name` z `wrangler.toml` — ustawiona przez
       `nowy-klient`, unikalna na koncie.
 - [ ] Build variables: `SANITY_PROJECT_ID`, `SANITY_DATASET`. **Bez `DEMO_CONTENT`.**
+      **[bez CMS]** zamiast nich `LOCAL_CONTENT=true` (razem z `SANITY_PROJECT_ID` build się przerywa).
 - [ ] Settings → Variables and Secrets, typ **Secret**: `RESEND_API_KEY`, `CONTACT_TO`,
-      `CONTACT_FROM`, `SANITY_WEBHOOK_SECRET`, `DEPLOY_HOOK_URL`.
-- [ ] Settings → Builds → Deploy Hooks → hook dla `main`; jego URL do `DEPLOY_HOOK_URL`.
+      `CONTACT_FROM`; **[panel]** także `SANITY_WEBHOOK_SECRET`, `DEPLOY_HOOK_URL`.
+- [ ] **[panel]** Settings → Builds → Deploy Hooks → hook dla `main`; jego URL do `DEPLOY_HOOK_URL`.
 - [ ] Pierwszy deploy na `*.workers.dev` — strona otwiera się, `/o-nas/` przekierowuje
       na `/o-nas`.
 
@@ -92,20 +100,25 @@ Klient: `__________`  Domena: `__________`  Start: `____-__-__`  Commit startera
 
 ## 7. Automatyzacja
 
-- [ ] GitHub → Settings → Secrets and variables → Actions:
+- [ ] **[bez CMS]** GitHub → Settings → Secrets and variables → Actions → Variables:
+      `LOCAL_CONTENT=true`. Bez `SANITY_PROJECT_ID` i `DEMO_CONTENT`. Webhooka i backupu nie ma —
+      treści są w repo, a zmiana treści to commit, który sam uruchamia build.
+- [ ] **[panel]** GitHub → Settings → Secrets and variables → Actions:
       Variables `SANITY_PROJECT_ID`, `SANITY_DATASET`, `BACKUP_ENABLED=true`, `VPS_BACKUP_DIR`,
       `VPS_PORT`; Secrets `SANITY_BACKUP_TOKEN` (rola Viewer), `VPS_HOST`, `VPS_USER`,
       `VPS_SSH_KEY`, `VPS_KNOWN_HOSTS`. Zmiennej `DEMO_CONTENT` **nie ma**.
 - [ ] Settings → Rules → Rulesets dla `main`: wymagany status `CI / jakosc`.
 - [ ] CI zielone na `main` (typy, lint, build, Lighthouse).
-- [ ] sanity.io/manage → API → Webhooks: URL `https://<domena>/api/przebuduj`, dataset
+- [ ] **[panel]** sanity.io/manage → API → Webhooks: URL `https://<domena>/api/przebuduj`, dataset
       `production`, Create/Update/Delete, filtr
       `!(_type in ["sanity.imageAsset", "sanity.fileAsset"])`, projekcja `{_id, _type}`,
       POST, bez „Trigger on drafts", sekret = `SANITY_WEBHOOK_SECRET`.
-- [ ] **Test webhooka**: drobna zmiana w Studio → Publish → po ok. 3 min build w Cloudflare
+- [ ] **[panel]** **Test webhooka**: drobna zmiana w Studio → Publish → po ok. 3 min build w Cloudflare
       → zmiana na stronie. Trzy publikacje pod rząd dają **jeden** build.
 
 ## 8. Backup
+
+Całą sekcję pomijasz w wariancie **[bez CMS]** — treści i obrazy są w repo.
 
 - [ ] VPS: katalog backupu, klucz w `authorized_keys` z `command="rrsync -wo <katalog>",restrict`,
       cron rotacji (dzienne 30 dni, pełne 180 dni) — szczegóły w `docs/POSTEP.md`, faza 6.
@@ -138,9 +151,11 @@ Klient: `__________`  Domena: `__________`  Start: `____-__-__`  Commit startera
 
 ## 10. Przekazanie klientowi
 
-- [ ] Klient zaproszony do Sanity (Members → Invite) z rolą **Editor**, nie Administrator.
-- [ ] `docs/DLA-KLIENTA.md` — uzupełniony adres Studio i kontakt; wysłany jako PDF.
-- [ ] **Test klienta**: bez podpowiedzi zmienia numer telefonu w stopce (kryterium:
+- [ ] **[panel]** Klient zaproszony do Sanity (Members → Invite) z rolą **Editor**, nie Administrator.
+- [ ] **[panel]** `docs/DLA-KLIENTA.md` — uzupełniony adres Studio i kontakt; wysłany jako PDF.
+- [ ] **[bez CMS]** Klient wie, jak zgłaszać zmiany treści (komu, którędy, w jakim czasie
+      i za ile — jeśli zmiany są poza abonamentem).
+- [ ] **[panel]** **Test klienta**: bez podpowiedzi zmienia numer telefonu w stopce (kryterium:
       < 60 s) i widzi zmianę na stronie po kilku minutach. Jeśli nie — zapisz, gdzie utknął.
 - [ ] Klient ma dostęp do: Cloudflare (albo wie, że domenę trzymasz Ty), Search Console
       (użytkownik), wizytówki Google (właściciel), panelu analityki.
@@ -148,5 +163,5 @@ Klient: `__________`  Domena: `__________`  Start: `____-__-__`  Commit startera
 ## 11. Po starcie
 
 - [ ] +7 dni: Search Console — strony zaindeksowane, brak błędów 404 ze starych adresów;
-      backupy z każdej nocy na VPS; formularz bez spamu.
+      **[panel]** backupy z każdej nocy na VPS; formularz bez spamu.
 - [ ] +30 dni: Search Console — skuteczność i zapytania; Lighthouse na produkcji.

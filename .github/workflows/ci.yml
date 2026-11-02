@@ -10,6 +10,8 @@
 #   SANITY_PROJECT_ID   projekt klienta (dataset musi być publiczny do odczytu)
 #   SANITY_DATASET      domyślnie production
 #   DEMO_CONTENT        true tylko w repo startera — bez projektu build celowo failuje
+#   LOCAL_CONTENT       true w repo klienta bez panelu (treści w web/src/tresci/),
+#                       wtedy bez SANITY_PROJECT_ID
 #
 # Progi Lighthouse: lighthouserc.desktop.json i lighthouserc.mobile.json.
 
@@ -36,6 +38,7 @@ jobs:
       SANITY_PROJECT_ID: ${{ vars.SANITY_PROJECT_ID }}
       SANITY_DATASET: ${{ vars.SANITY_DATASET || 'production' }}
       DEMO_CONTENT: ${{ vars.DEMO_CONTENT || 'false' }}
+      LOCAL_CONTENT: ${{ vars.LOCAL_CONTENT || 'false' }}
     steps:
       - uses: actions/checkout@v7
 
@@ -58,6 +61,16 @@ jobs:
 
       - name: Lint i formatowanie
         run: pnpm lint && pnpm format:check
+
+      # Szablon web/src/tresci/ musi się budować — astro check nie wykryje brakującego
+      # pliku obrazu. Przed głównym buildem, bo ten nadpisuje web/dist pod Lighthouse.
+      - name: Build wariantu bez CMS-u (tylko repo startera)
+        if: ${{ vars.DEMO_CONTENT == 'true' }}
+        run: pnpm build
+        env:
+          LOCAL_CONTENT: 'true'
+          DEMO_CONTENT: 'false'
+          SANITY_PROJECT_ID: ''
 
       - name: Build (walidacja SEO i martwych linków)
         run: pnpm build

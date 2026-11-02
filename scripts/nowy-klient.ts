@@ -3,19 +3,24 @@
  *
  *   pnpm nowy-klient
  *
- * Pyta o nazwę firmy, domenę, kolor marki, Sanity project ID i nazwę projektu, pokazuje
- * podsumowanie i dopiero po potwierdzeniu:
+ * Pyta o nazwę firmy, domenę, kolor marki, czy klient dostaje panel Sanity (wtedy
+ * o project ID) i nazwę projektu, pokazuje podsumowanie i dopiero po potwierdzeniu:
  *
  *   web/src/config/brand.ts   siteUrl, company.name, colors.brand, colors.brandDark
- *   web/.env, studio/.env     project ID i dataset (istniejące klucze, np. token, zostają)
+ *   web/.env, studio/.env     project ID i dataset (istniejące klucze, np. token, zostają);
+ *                             bez panelu: LOCAL_CONTENT=true w web/.env, studio/.env bez zmian
  *   package.json              name
  *   wrangler.toml             name — nazwa Workera musi być unikalna na koncie Cloudflare,
  *                             inaczej deploy drugiego klienta nadpisze pierwszego
  *   web/public/demo/          usuwany — Astro kopiuje public/ do dist/, więc placeholdery demo
  *                             wisiałyby na domenie klienta
  *   studio/scripts/demo-images/  usuwany — zdjęcia do seeda (~800 kB), klientowi zbędne
+ *   web/src/tresci/obrazy/    usuwany przy panelu Sanity — Astro emituje te pliki do dist/
+ *                             nawet nieużywane; bez panelu zostają jako szablon do podmiany
  *
  * Czego NIE rusza, celowo:
+ *   - web/src/tresci/index.ts — przy panelu Sanity zostaje jak fixtures (import w content.ts),
+ *     bez panelu to punkt wyjścia do wpisania treści klienta.
  *   - web/src/lib/sanity/fixtures.ts i studio/scripts/seed.ts — fixtures są fallbackiem
  *     `astro dev` bez projektu i strażnikiem typów przy zmianie schemy; usunięcie ich
  *     psuje `pnpm check` i daje konflikty przy cherry-picku poprawek ze startera.
@@ -47,6 +52,8 @@ const FILES = {
 };
 
 const DEMO_DIRS = ['web/public/demo', 'studio/scripts/demo-images'];
+/** Przykładowe obrazy wariantu bez CMS-u — usuwane, gdy klient ma panel Sanity. */
+const LOCAL_TEMPLATE_IMAGES_DIR = 'web/src/tresci/obrazy';
 
 /** WCAG AA dla zwykłego tekstu — kolor marki występuje jako tekst linków i tło przycisków z białym napisem. */
 const MIN_CONTRAST = 4.5;
@@ -377,7 +384,8 @@ const siteUrl = await askValid('Domena produkcyjna (np. firma.pl)', parseDomain)
 const surfaces = readSurfaces(brandSource);
 const brandColor = await askBrandColor(surfaces);
 const brandDark = await askBrandDark(brandColor);
-const projectId = await askValid('Sanity project ID', parseProjectId);
+const withPanel = await confirm('Panel Sanity — klient sam edytuje treści?', true);
+const projectId = withPanel ? await askValid('Sanity project ID', parseProjectId) : '';
 const projectName = await askValid(
 	'Nazwa projektu (package.json, Worker Cloudflare)',
 	parseProjectName,
@@ -406,9 +414,11 @@ const webEnvBefore = envSource(FILES.webEnv, FILES.webEnvExample);
 const studioEnvBefore = envSource(FILES.studioEnv, FILES.studioEnvExample);
 const dataset = readEnvValue(webEnvBefore, 'SANITY_DATASET') || 'production';
 
+// Bez panelu SANITY_PROJECT_ID zostaje puste — razem z LOCAL_CONTENT=true przerwałoby build.
 let nextWebEnv = setEnv(webEnvBefore, 'SANITY_PROJECT_ID', projectId);
 nextWebEnv = setEnv(nextWebEnv, 'SANITY_DATASET', dataset);
 nextWebEnv = setEnv(nextWebEnv, 'DEMO_CONTENT', 'false');
+nextWebEnv = setEnv(nextWebEnv, 'LOCAL_CONTENT', withPanel ? 'false' : 'true');
 let nextStudioEnv = setEnv(studioEnvBefore, 'SANITY_STUDIO_PROJECT_ID', projectId);
 nextStudioEnv = setEnv(
 	nextStudioEnv,
@@ -416,7 +426,9 @@ nextStudioEnv = setEnv(
 	readEnvValue(studioEnvBefore, 'SANITY_STUDIO_DATASET') || dataset,
 );
 
-const demoDirs = DEMO_DIRS.filter((dir) => existsSync(rel(dir)));
+const demoDirs = [...DEMO_DIRS, ...(withPanel ? [LOCAL_TEMPLATE_IMAGES_DIR] : [])].filter((dir) =>
+	existsSync(rel(dir)),
+);
 
 // Podsumowanie
 const envNote = (file: string, before: string, key: string) => {
@@ -424,19 +436,25 @@ const envNote = (file: string, before: string, key: string) => {
 	const old = readEnvValue(before, key);
 	return old && old !== projectId ? `nadpisuje ${key}=${old}` : 'aktualizacja';
 };
+const contentLine = withPanel
+	? `${projectId}, dataset ${dataset}`
+	: 'bez panelu — treści w web/src/tresci/ (LOCAL_CONTENT=true)';
+const studioEnvLine = withPanel
+	? envNote(FILES.studioEnv, studioEnvBefore, 'SANITY_STUDIO_PROJECT_ID')
+	: 'bez zmian (Studio nieużywane)';
 
 console.log(`
 Podsumowanie
   Firma          ${companyName}
   Domena         ${siteUrl}
   Kolory         ${brandColor} / hover ${brandDark}
-  Sanity         ${projectId}, dataset ${dataset}
+  Treści         ${contentLine}
   Projekt        ${previousName} → ${projectName}
 
 Zmiany
   web/src/config/brand.ts     siteUrl, company.name, colors.brand, colors.brandDark
   web/.env                    ${envNote(FILES.webEnv, webEnvBefore, 'SANITY_PROJECT_ID')}
-  studio/.env                 ${envNote(FILES.studioEnv, studioEnvBefore, 'SANITY_STUDIO_PROJECT_ID')}
+  studio/.env                 ${studioEnvLine}
   package.json                name
   wrangler.toml               name
 ${demoDirs.map((dir) => `  ${`${dir}/`.padEnd(28)}usunięcie`).join('\n') || '  (katalogi demo już usunięte)'}
@@ -455,18 +473,32 @@ if (!(await confirm('Zapisać?', false))) {
 
 writeFileSync(FILES.brand, nextBrand);
 writeFileSync(FILES.webEnv, nextWebEnv);
-writeFileSync(FILES.studioEnv, nextStudioEnv);
+if (withPanel) writeFileSync(FILES.studioEnv, nextStudioEnv);
 writeFileSync(FILES.packageJson, nextPackage);
 writeFileSync(FILES.wrangler, nextWrangler);
 for (const dir of demoDirs) rmSync(rel(dir), { recursive: true, force: true });
 
-console.log(`
+const commitStep = `git add -A && git commit -m "chore: konfiguracja klienta ${projectName}"`;
+console.log(
+	withPanel
+		? `
 ✓ Zapisano.
 
 Dalej:
   1. Logo: web/public/favicon.svg (favicon), logo klienta wgrywasz w Studio → Ustawienia strony.
   2. Studio:  pnpm --filter studio deploy   (host *.sanity.studio, zaproś klienta z rolą Editor)
-  3. Commit:  git add -A && git commit -m "chore: konfiguracja klienta ${projectName}"
+  3. Commit:  ${commitStep}
   4. Reszta:  docs/CHECKLIST-WDROZENIE.md
-`);
+`
+		: `
+✓ Zapisano.
+
+Dalej:
+  1. Treści:  web/src/tresci/index.ts, zdjęcia i logo (PNG) w web/src/tresci/obrazy/
+  2. Favicon: web/public/favicon.svg
+  3. Commit:  ${commitStep}
+  4. Reszta:  docs/CHECKLIST-WDROZENIE.md — pozycje [panel] pomijasz, [bez CMS] wykonujesz;
+              w Cloudflare i GitHub Actions zmienna LOCAL_CONTENT=true zamiast SANITY_PROJECT_ID
+`,
+);
 process.exit(0);
