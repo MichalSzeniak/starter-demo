@@ -27,6 +27,7 @@ Wariant: panel Sanity / bez CMS-u
 - [ ] Nowe **prywatne** repo z aktualnego startera; hash commita startera wpisany wyżej
       (do późniejszych cherry-picków). Prywatne, bo harmonogramy GitHuba w repo publicznym
       wyłączają się po 60 dniach bez commitów — backup przestałby działać po cichu.
+      Polecenia krok po kroku: `docs/NOWY-PROJEKT.md`.
 - [ ] **[panel]** sanity.io/manage → nowy projekt, dataset `production`, widoczność **Public**
       (build czyta treści bez tokena).
 - [ ] **[panel]** sanity.io/manage → API → CORS origins: `http://localhost:3333` z „Allow credentials"

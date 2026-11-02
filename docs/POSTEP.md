@@ -1509,3 +1509,76 @@ Bez zmian — 0 B. Wszystko dzieje się przy buildzie.
 
 Wariant bez CMS-u: `pnpm nowy-klient` → „n" → treści w `web/src/tresci/` → checklista bez
 pozycji **[panel]**. Przejście na panel później wymaga importu treści do Sanity — odłożone.
+
+## Menu z bieżącą podstroną, projekt przykładowy i wnioski — 2026-11-02
+
+### Bieżąca podstrona w menu
+
+`Header.astro`: link do bieżącej podstrony dostaje `aria-current="page"` — liczone przy
+buildzie z `Astro.url.pathname` (ta sama normalizacja co canonical), bez JS. Desktop:
+podkreślenie w kolorze marki; menu mobilne: tło `surface-alt` i kolor marki. Linki zewnętrzne
+nigdy nie są aktywne. Demo: aktywny właściwy link na `/o-nas` i `/cennik` w obu menu, brak na
+`/` i 404 (nie ma ich w menu głównym). Lighthouse demo: accessibility 100 wszędzie, best-practices
+81/82 tylko przez `is-on-https` od AdGuarda. Budżet JS bez zmian.
+
+### Instrukcja nowego projektu
+
+`docs/NOWY-PROJEKT.md` — klon startera z historią, remote `starter`, prywatne repo klienta,
+`nowy-klient`, treści wariantu bez CMS-u, przenoszenie poprawek cherry-pickiem. Odnośnik
+w checkliście, sekcja 1. Zastępuje plan z „Paczki npm": `degit` → klon z historią.
+
+### Projekt przykładowy `D:\dev\gabinet-demo`
+
+Gabinet psychoterapii (osoba, adres, ceny fikcyjne; domena `psychoterapia.example.org`),
+wariant bez CMS-u, tylko lokalnie — nic w Sanity ani na GitHubie. Sklonowany z lokalnego
+startera (`3127ac9`), remote `starter` → GitHub. Commity: `925e758` konfiguracja z `nowy-klient`,
+`243bb1d` treści, `4635d68` cherry-pick podświetlania menu ze startera (`c0bd865`) bez konfliktów.
+
+- 4 strony: główna (hero, „Z czym możesz przyjść", pierwsze spotkanie, FAQ, CTA), o mnie,
+  cennik z FAQ płatności, kontakt. Bez sekcji opinii (etyka zawodowa); opis formularza prosi,
+  żeby nie podawać danych o zdrowiu (art. 9 RODO).
+- Motyw: zieleń `#1f6b4f` / `#164b37`, tło sekcji `#f0f6f2`, większe zaokrąglenia. Bez logo —
+  nazwa w nagłówku tekstem, OG generowane. Grafiki: 3 abstrakcje z SVG przez sharp, ok. 9 kB każda.
+- Build: SEO 5/5, 130 linków, 0 martwych. Lighthouse: perf 100 desktop / 98–99 mobile,
+  accessibility i SEO 100 (po poprawce poziomu śródtytułu — niżej).
+
+### Luki startera wykryte na przykładzie
+
+1. **Telefon w nagłówku łamie się na mobile na 4 linie** przy długiej nazwie firmy (zrzut
+   z Lighthouse mobile, 412 px). Demo tego nie pokazywało — „Firma Demo (przykład)" jest krótka.
+   Propozycja: na wąskim ekranie „Zadzwoń" zamiast numeru (nazwa mieści się w 2 liniach);
+   alternatywa `whitespace-nowrap` (nazwa w 3–4 liniach). **Do decyzji.**
+2. **Poziom śródtytułów w Portable Text nie zależy od pozycji sekcji.** `h3` w treści sekcji,
+   która jest pierwsza (nagłówek h1), daje `heading-order` i accessibility 98 — w przykładzie
+   poprawione treścią (`h2`), ale klient w Studio może zrobić to samo. Rozwiązanie: przesuwanie
+   poziomów w `Block.astro` względem nagłówka sekcji albo walidacja w schemie.
+3. **Brak sekcji „sam tekst".** Checklista wymaga podstrony „Polityka prywatności", a `textImage`
+   wymaga obrazu. Dziesiąty typ sekcji wymaga zgody (CLAUDE.md).
+
+### Do decyzji
+
+- Luki 1–3 powyżej.
+- **Strona jednostronicowa** — jako możliwość w każdym projekcie, nie osobny wariant (bez
+  przełącznika — nie zmienia źródła treści). Zakres ok. 2–3 h: opcjonalne pole „Kotwica"
+  w sekcjach (`id`), opcjonalna kotwica w linku wewnętrznym (`/#o-mnie`), zamykanie menu
+  mobilnego po kliknięciu kotwicy (kilkadziesiąt bajtów JS — nowy skrypt), podświetlanie
+  sekcji przy przewijaniu: CSS `scroll-target-group` / `:target-current` (0 kB, wsparcie
+  przeglądarek niesprawdzone) albo skrypt ~1 kB albo wcale. Gotowe już: płynne przewijanie,
+  `scroll-padding-top` pod sticky header, link-guard sprawdza kotwice. Uwaga SEO dla klienta:
+  jeden tytuł i opis zamiast osobnych podstron.
+- **Warianty animacji w CSS** wybierane w `brand.ts` („subtelna" / „wyrazista" / „bez"),
+  scroll-driven animations i View Transitions między podstronami — 0 kB JS. Bez animowania
+  obrazu LCP w hero (mobile perf ≥ 90).
+- **JSON-LD `businessType`** (np. bardziej precyzyjny typ niż `LocalBusiness`) — ok. 10 linii,
+  przydatne przy branżach typu gabinet.
+
+### Następne kroki (kolejność)
+
+1. `git push` startera — GitHub ma stan do `3127ac9`; podświetlanie menu (`c0bd865`) i ten wpis
+   są tylko lokalnie, a klon z GitHuba ich nie dostanie.
+2. Build na prawdziwym projekcie Sanity po zmianie `ResolvedImage` (pkt „Niezweryfikowane"
+   we wpisie o wariancie bez CMS-u) i zielone CI na GitHubie (także pierwszy pomiar Lighthouse
+   bez AdGuarda).
+3. Luka 1 (telefon w nagłówku) — widoczna od razu na telefonie u każdego klienta z dłuższą nazwą.
+4. Zrzuty ekranu do `DLA-KLIENTA.md` (wymagają logowania do Studio).
+5. Pierwszy klient: strona ofertowa na starterze albo skrypt audytu cudzej strony („Odłożone").
