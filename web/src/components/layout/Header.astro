@@ -12,6 +12,9 @@ import { anchorAttributes, resolveLink, type ResolvedLink } from '~/lib/links';
  * Na telefonie menu rozwija natywny <details> — zero JS. Klik poza menu go nie
  * zamyka; przy ≤6 pozycjach to akceptowalny kompromis, a podmiana na wyspę
  * to zmiana w jednym pliku.
+ *
+ * Bieżąca podstrona jest wyróżniona w menu i oznaczona `aria-current="page"` —
+ * liczone przy buildzie z adresu strony, bez JS.
  */
 interface Props {
 	settings: SiteSettings;
@@ -25,6 +28,10 @@ const items = (navigation.mainMenu ?? [])
 	.filter((item): item is { label: string; link: ResolvedLink } =>
 		Boolean(item.label && item.link),
 	);
+
+// Ta sama normalizacja co canonical w BaseLayout: bez ukośnika na końcu, korzeń to `/`.
+const currentPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
+const isCurrent = (link: ResolvedLink) => !link.external && link.href === currentPath;
 
 const hasLogo = Boolean(settings.logo?.asset?.url);
 const phone = telHref(settings.phone);
@@ -58,7 +65,13 @@ const phone = telHref(settings.phone);
 						<li>
 							<a
 								{...anchorAttributes(item.link)}
-								class="text-sm font-medium text-muted hover:text-ink"
+								aria-current={isCurrent(item.link) ? 'page' : undefined}
+								class:list={[
+									'text-sm font-medium underline-offset-8',
+									isCurrent(item.link)
+										? 'text-ink underline decoration-brand decoration-2'
+										: 'text-muted hover:text-ink',
+								]}
 							>
 								{item.label}
 							</a>
@@ -91,7 +104,13 @@ const phone = telHref(settings.phone);
 								<li>
 									<a
 										{...anchorAttributes(item.link)}
-										class="block rounded-sm px-3 py-2 text-sm font-medium text-ink hover:bg-surface-alt"
+										aria-current={isCurrent(item.link) ? 'page' : undefined}
+										class:list={[
+											'block rounded-sm px-3 py-2 text-sm text-ink hover:bg-surface-alt',
+											isCurrent(item.link)
+												? 'bg-surface-alt font-semibold text-brand'
+												: 'font-medium',
+										]}
 									>
 										{item.label}
 									</a>
