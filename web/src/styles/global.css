@@ -72,20 +72,23 @@
 /**
  * Łagodne wejście sekcji przy scrollu — czysty CSS, wątek kompozytora.
  *
- * - Pierwsza sekcja jest pominięta: to h1 i obraz LCP, animacja opacity
- *   opóźniłaby LCP.
+ * - Pierwsza sekcja jest pominięta: to h1 i obraz LCP.
  * - Animujemy zawartość, nie <section> — pasy tła zostają na miejscu.
- * - Tylko opacity, bez przesunięcia: `translate` zmieniał pozycję elementów
- *   w chwili liczenia celu przewijania do kotwicy, więc po animacji cel
- *   podjeżdżał pod sticky header (sprawdzone: komunikat formularza o 32 px).
+ * - Tylko przesunięcie, BEZ opacity. Tekst ma pełny kontrast od pierwszej klatki.
+ *   Przy fade od 0 sekcja wystająca u dołu pierwszego ekranu stała półprzezroczysta
+ *   do pierwszego scrolla (axe: 1,09:1, mobile accessibility 96). Start od 0,4 też
+ *   nie wystarcza: tekst `muted` ma wtedy 1,9:1, a próg 4,5:1 wypada dopiero przy 0,82.
+ * - Sekcja zawierająca cel kotwicy (`:target`) się nie przesuwa. Przeglądarka liczy
+ *   cel przewijania z przesunięciem z chwili skoku, a po skoku animacja się kończy —
+ *   bez tego wyjątku cel podjeżdżał o całe przesunięcie pod sticky header
+ *   (komunikat formularza po wysłaniu bez JS, `#kontakt-wyslano`).
  * - Zakres w rem, nie w %: przy procentach wysoka sekcja (długie FAQ) byłaby
- *   półprzezroczysta w trakcie czytania.
- * - Bez `animation-timeline` albo przy „ogranicz animacje" reguła nie istnieje,
- *   więc treść jest po prostu widoczna.
+ *   w ruchu w trakcie czytania.
+ * - Bez `animation-timeline` albo przy „ogranicz animacje" reguła nie istnieje.
  */
 @media (prefers-reduced-motion: no-preference) {
 	@supports (animation-timeline: view()) {
-		main > section:not(:first-child) > * {
+		main > section:not(:first-child):not(:target):not(:has(:target)) > * {
 			/* Longhandy, nie skrót `animation`: minifikator skleja skrót z
 			   `animation-timeline` w `animation: … view()`, którego Chrome nie przyjmuje,
 			   i animacja po cichu znika (sprawdzone: Chrome 152, lightningcss 1.33). */
@@ -100,6 +103,6 @@
 
 @keyframes section-reveal {
 	from {
-		opacity: 0;
+		transform: translateY(2.5rem);
 	}
 }

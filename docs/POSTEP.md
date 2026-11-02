@@ -1382,6 +1382,40 @@ potrzebuje i za to płaci. Po wdrożeniu — cherry-pick do startera.
 
 ### Kropki nawigacyjne w karuzeli
 - odrzucone: pasek przewijania wystarcza, przy 12+ zdjęciach kropki nieczytelne
+## Poprawka z fazy 6: fade-in sekcji bez przezroczystości — 2026-09-13
+
+**Problem.** Sekcja wystająca u dołu pierwszego ekranu (na telefonie „Dlaczego my") stała
+w pośrednim stanie animacji aż do pierwszego scrolla — tekst miał kontrast 1,09:1, mobile
+accessibility na `/` wynosiło 96. Realny problem czytelności, nie artefakt pomiaru.
+
+**Odrzucony wariant: start od `opacity: 0.4`.** Policzone: tekst `muted` ma wtedy 1,89–1,93:1,
+nagłówki 2,51–2,54:1. Próg WCAG 4,5:1 zaczyna się przy opacity 0,59 (ink) i 0,82 (muted) —
+fade od 0,82 jest niewidoczny.
+
+**Wdrożone: animacja samego `transform`** (`translateY(2.5rem)` → 0), opacity zawsze 1.
+Przesunięcie było usunięte w fazie 5, bo psuło skok do kotwicy (cel liczony z przesunięciem,
+po animacji podjeżdżał pod sticky header). Rozwiązane selektorem
+`section:not(:target):not(:has(:target))` — sekcja zawierająca cel kotwicy się nie przesuwa,
+a przesunięcie innych sekcji nie wpływa na jej pozycję.
+
+**Zweryfikowane w Chrome 152 (CDP), 11/11:** opacity 1 we wszystkich sekcjach na `/`, `/o-nas`,
+`/cennik` przy 390 px; animacja na sekcjach 2+, nie na pierwszej; efekt widoczny (40 px po
+wejściu przesunięcie 31,6 px, 400 px dalej 0); wejście z `#kontakt-wyslano` przy 1280 i 390 px —
+cel na 80 px, identycznie jak bez animacji, header kończy się na 65 px; **kontrola bez wyjątku
+`:target`: cel na 40 px, pod headerem** — wyjątek jest potrzebny; kotwica ze smooth scrollem po
+załadowaniu — 80 px; `prefers-reduced-motion` — zero animacji.
+
+**Lighthouse (`pnpm lh`):** mobile accessibility **100** na 3 stronach (było 96 na `/`),
+performance 96–99, SEO 100; desktop — tylko best-practices poniżej progu. Best-practices
+0,81–0,82 wszędzie: jedyny oblany audyt `is-on-https` wskazuje `http://local.adguard.org/…`
+(AdGuard na tej maszynie, faza 6 pkt 2). `pnpm lh` kończy się więc lokalnie exit 1 —
+w CI tego problemu nie ma.
+
+Przy okazji poprawione w CLAUDE.md (za zgodą): Astro 7 i Cloudflare Workers, 9 typów sekcji,
+próg mobile 90 w „Definicji gotowego", zasada skryptów zgodna ze stanem (`<details>` bez JS,
+uzgodnione skrypty karuzeli i formularza).
+
+Budżet JS bez zmian.
 
 ## Wariant bez CMS-u — 2026-11-02
 
