@@ -34,11 +34,24 @@ const list = sections ?? [];
 const firstImage = firstImageSectionIndex(list);
 const backgrounds = sectionBackgrounds(list);
 // `#kontakt` wskazuje pierwszą sekcję kontaktową; kolejne (rzadkie) dostają unikalne id.
+// Kotwica ze Studio ma pierwszeństwo — także w kontakcie.
 const firstContact = list.findIndex((section) => section._type === 'contact');
+const anchors = list.map((section, index) => {
+	if (section.anchor) return section.anchor;
+	if (section._type !== 'contact') return undefined;
+	return index === firstContact ? 'kontakt' : `kontakt-${index}`;
+});
+// Studio pilnuje unikalności w obrębie strony, ale treść w kodzie (src/tresci) i domyślne
+// `kontakt` już nie — dwa takie same `id` psułyby przewijanie z menu.
+const duplicate = anchors.find((anchor, index) => anchor && anchors.indexOf(anchor) !== index);
+if (duplicate) {
+	throw new Error(`[sekcje] Kotwica „${duplicate}" występuje na stronie więcej niż raz.`);
+}
 
 function contextFor(index: number): SectionContext {
 	return {
 		index,
+		anchor: anchors[index],
 		headingLevel: index === 0 ? 1 : 2,
 		priorityImage: index === firstImage,
 		background: backgrounds[index]!,
@@ -65,13 +78,7 @@ function contextFor(index: number): SectionContext {
 		case 'gallery':
 			return <Gallery section={section} ctx={ctx} />;
 		case 'contact':
-			return (
-				<Contact
-					section={section}
-					ctx={ctx}
-					anchor={index === firstContact ? 'kontakt' : `kontakt-${index}`}
-				/>
-			);
+			return <Contact section={section} ctx={ctx} anchor={ctx.anchor!} />;
 		case 'cta':
 			return <Cta section={section} ctx={ctx} />;
 		default: {

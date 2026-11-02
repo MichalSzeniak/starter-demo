@@ -14,7 +14,7 @@ const buttons = section.buttons ?? [];
 const hasImage = Boolean(section.image?.asset?.url);
 ---
 
-<section class={ctx.backgroundClass}>
+<section id={ctx.anchor} class={ctx.backgroundClass}>
 	<div
 		class:list={[
 			'content-container grid gap-10 py-section lg:py-section-lg',

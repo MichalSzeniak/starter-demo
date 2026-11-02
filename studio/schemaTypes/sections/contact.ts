@@ -1,5 +1,6 @@
 import { EnvelopeIcon } from '@sanity/icons/Envelope';
 import { defineField, defineType } from 'sanity';
+import { anchorField } from '../fields/anchor';
 import { backgroundField } from '../fields/background';
 
 /**
@@ -49,6 +50,7 @@ export const contact = defineType({
 			initialValue: true,
 		}),
 		backgroundField(),
+		anchorField(),
 	],
 	preview: {
 		select: { title: 'heading', details: 'showContactDetails', map: 'showMap' },

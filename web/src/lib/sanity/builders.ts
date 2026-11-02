@@ -35,11 +35,13 @@ export interface SiteContent {
 	pages: Record<string, Page>;
 }
 
-export const internal = (slug: string): Link => ({
+/** Odnośnik do podstrony; `anchor` = sekcja na niej (strona jednostronicowa: `internal('/', 'o-mnie')`). */
+export const internal = (slug: string, anchor: string | null = null): Link => ({
 	kind: 'internal',
 	href: null,
 	newTab: null,
 	page: { slug },
+	anchor,
 });
 
 export const external = (href: string, newTab = true): Link => ({
@@ -47,6 +49,7 @@ export const external = (href: string, newTab = true): Link => ({
 	href,
 	newTab,
 	page: null,
+	anchor: null,
 });
 
 /**

@@ -1,5 +1,6 @@
 import { BoltIcon } from '@sanity/icons/Bolt';
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { anchorField } from '../fields/anchor';
 import { backgroundField } from '../fields/background';
 
 export const features = defineType({
@@ -55,6 +56,7 @@ export const features = defineType({
 			],
 		}),
 		backgroundField(),
+		anchorField(),
 	],
 	preview: {
 		select: { title: 'heading', items: 'items' },

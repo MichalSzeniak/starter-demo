@@ -1,5 +1,6 @@
 import { HelpCircleIcon } from '@sanity/icons/HelpCircle';
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { anchorField } from '../fields/anchor';
 import { backgroundField } from '../fields/background';
 
 export const faq = defineType({
@@ -46,6 +47,7 @@ export const faq = defineType({
 			],
 		}),
 		backgroundField(),
+		anchorField(),
 	],
 	preview: {
 		select: { title: 'heading', items: 'items' },

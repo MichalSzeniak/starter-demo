@@ -26,7 +26,7 @@ const items = section.items ?? [];
 const questionLevel = ctx.headingLevel === 1 ? 2 : 3;
 ---
 
-<section class={ctx.backgroundClass}>
+<section id={ctx.anchor} class={ctx.backgroundClass}>
 	<div class="content-container py-section">
 		<div class="mx-auto max-w-3xl">
 			{section.heading && (

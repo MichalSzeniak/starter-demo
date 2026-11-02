@@ -95,6 +95,7 @@ const home: Page = {
 		{
 			_key: key(),
 			_type: 'hero',
+			anchor: null,
 			background: 'default',
 			heading: 'Nagłówek strony głównej — jedno zdanie o tym, co dostaje klient',
 			lead: 'Rozwinięcie w dwóch zdaniach: dla kogo, gdzie i dlaczego warto. Treść przykładowa.',
@@ -104,6 +105,7 @@ const home: Page = {
 		{
 			_key: key(),
 			_type: 'features',
+			anchor: null,
 			background: 'alt',
 			heading: 'Czym się zajmujemy',
 			lead: null,
@@ -116,6 +118,7 @@ const home: Page = {
 		{
 			_key: key(),
 			_type: 'textImage',
+			anchor: null,
 			background: 'default',
 			heading: 'O firmie',
 			body: [
@@ -130,6 +133,7 @@ const home: Page = {
 		{
 			_key: key(),
 			_type: 'faq',
+			anchor: null,
 			background: 'alt',
 			heading: 'Najczęstsze pytania',
 			items: [
@@ -148,6 +152,7 @@ const home: Page = {
 		{
 			_key: key(),
 			_type: 'cta',
+			anchor: null,
 			background: 'accent',
 			heading: 'Masz pytanie?',
 			lead: 'Zadzwoń albo napisz — odpowiadamy w dni robocze.',
@@ -172,6 +177,7 @@ const contact: Page = {
 		{
 			_key: key(),
 			_type: 'contact',
+			anchor: null,
 			background: 'default',
 			heading: 'Kontakt',
 			lead: 'Napisz, w czym możemy pomóc — odpowiemy w ciągu jednego dnia roboczego.',

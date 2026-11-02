@@ -19,6 +19,8 @@ export type SectionBackground = Exclude<BackgroundChoice, 'auto'>;
 export interface SectionContext {
 	/** Pozycja sekcji na stronie, od 0. */
 	index: number;
+	/** `id` sekcji — kotwica ze Studio; kontakt bez kotwicy dostaje `kontakt`. */
+	anchor: string | undefined;
 	/** Pierwsza sekcja dostaje h1, każda kolejna h2. Jeden h1 na stronę. */
 	headingLevel: HeadingLevel;
 	/**

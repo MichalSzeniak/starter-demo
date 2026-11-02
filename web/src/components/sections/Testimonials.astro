@@ -12,7 +12,7 @@ const { section, ctx } = Astro.props;
 const items = section.items ?? [];
 ---
 
-<section class={ctx.backgroundClass}>
+<section id={ctx.anchor} class={ctx.backgroundClass}>
 	<div class="content-container py-section">
 		{section.heading && (
 			<Heading level={ctx.headingLevel} variant="section" class="text-ink">

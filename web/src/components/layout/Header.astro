@@ -15,6 +15,13 @@ import { anchorAttributes, resolveLink, type ResolvedLink } from '~/lib/links';
  *
  * Bieżąca podstrona jest wyróżniona w menu i oznaczona `aria-current="page"` —
  * liczone przy buildzie z adresu strony, bez JS.
+ *
+ * Strona jednostronicowa (linki do kotwic `/#o-mnie`):
+ * - sekcja widoczna na ekranie podświetla swój link czystym CSS-em
+ *   (`scroll-target-group` + `:target-current`). Przeglądarki bez wsparcia po prostu
+ *   nie podświetlają — nic się nie psuje;
+ * - menu mobilne zamyka mały skrypt (tylko gdy w menu są kotwice): <details> sam się
+ *   nie zamyka, a po kliknięciu kotwicy zasłaniałby sekcję, do której przewijamy.
  */
 interface Props {
 	settings: SiteSettings;
@@ -32,6 +39,8 @@ const items = (navigation.mainMenu ?? [])
 // Ta sama normalizacja co canonical w BaseLayout: bez ukośnika na końcu, korzeń to `/`.
 const currentPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
 const isCurrent = (link: ResolvedLink) => !link.external && link.href === currentPath;
+
+const hasAnchorLinks = items.some((item) => !item.link.external && item.link.href.includes('#'));
 
 const hasLogo = Boolean(settings.logo?.asset?.url);
 const phone = telHref(settings.phone);
@@ -60,7 +69,7 @@ const phone = telHref(settings.phone);
 
 		{items.length > 0 && (
 			<nav aria-label="Menu główne" class="hidden sm:block">
-				<ul class="flex items-center gap-6" role="list">
+				<ul class="flex items-center gap-6 [scroll-target-group:auto]" role="list">
 					{items.map((item) => (
 						<li>
 							<a
@@ -70,7 +79,7 @@ const phone = telHref(settings.phone);
 									'text-sm font-medium underline-offset-8',
 									isCurrent(item.link)
 										? 'text-ink underline decoration-brand decoration-2'
-										: 'text-muted hover:text-ink',
+										: 'text-muted hover:text-ink [&:target-current]:text-ink [&:target-current]:underline [&:target-current]:decoration-brand [&:target-current]:decoration-2',
 								]}
 							>
 								{item.label}
@@ -91,7 +100,7 @@ const phone = telHref(settings.phone);
 				</a>
 			)}
 			{items.length > 0 && (
-				<details class="relative sm:hidden">
+				<details class="relative sm:hidden" data-mobile-menu>
 					<summary class="cursor-pointer list-none rounded-md border border-border px-3 py-2 text-sm font-medium text-ink [&::-webkit-details-marker]:hidden">
 						Menu
 					</summary>
@@ -99,7 +108,7 @@ const phone = telHref(settings.phone);
 						aria-label="Menu mobilne"
 						class="absolute right-0 z-40 mt-2 w-56 rounded-md border border-border bg-surface p-2 shadow-lg"
 					>
-						<ul role="list">
+						<ul class="[scroll-target-group:auto]" role="list">
 							{items.map((item) => (
 								<li>
 									<a
@@ -109,7 +118,7 @@ const phone = telHref(settings.phone);
 											'block rounded-sm px-3 py-2 text-sm text-ink hover:bg-surface-alt',
 											isCurrent(item.link)
 												? 'bg-surface-alt font-semibold text-brand'
-												: 'font-medium',
+												: 'font-medium [&:target-current]:bg-surface-alt [&:target-current]:text-brand',
 										]}
 									>
 										{item.label}
@@ -123,3 +132,10 @@ const phone = telHref(settings.phone);
 		</div>
 	</div>
 </header>
+
+{hasAnchorLinks && <script>
+	document.querySelector('[data-mobile-menu]')?.addEventListener('click', (event) => {
+		const link = (event.target as Element).closest('a[href*="#"]');
+		if (link) link.closest('details')?.removeAttribute('open');
+	});
+</script>}

@@ -21,6 +21,7 @@ export type Cta = {
 	lead?: string;
 	button: LabeledLink;
 	background?: 'auto' | 'default' | 'alt' | 'accent';
+	anchor?: string;
 };
 
 export type Contact = {
@@ -30,6 +31,7 @@ export type Contact = {
 	showContactDetails?: boolean;
 	showMap?: boolean;
 	background?: 'auto' | 'default' | 'alt';
+	anchor?: string;
 };
 
 export type Gallery = {
@@ -44,6 +46,7 @@ export type Gallery = {
 	}>;
 	layout?: 'grid' | 'carousel';
 	background?: 'auto' | 'default' | 'alt';
+	anchor?: string;
 };
 
 export type Faq = {
@@ -56,6 +59,7 @@ export type Faq = {
 		_key: string;
 	}>;
 	background?: 'auto' | 'default' | 'alt';
+	anchor?: string;
 };
 
 export type Testimonials = {
@@ -70,6 +74,7 @@ export type Testimonials = {
 		_key: string;
 	}>;
 	background?: 'auto' | 'default' | 'alt';
+	anchor?: string;
 };
 
 export type Pricing = {
@@ -88,6 +93,7 @@ export type Pricing = {
 		_key: string;
 	}>;
 	background?: 'auto' | 'default' | 'alt';
+	anchor?: string;
 };
 
 export type Features = {
@@ -101,6 +107,7 @@ export type Features = {
 		_key: string;
 	}>;
 	background?: 'auto' | 'default' | 'alt';
+	anchor?: string;
 };
 
 export type TextImage = {
@@ -110,6 +117,7 @@ export type TextImage = {
 	image: ImageWithAlt;
 	imagePosition?: 'right' | 'left';
 	background?: 'auto' | 'default' | 'alt';
+	anchor?: string;
 };
 
 export type Hero = {
@@ -123,6 +131,7 @@ export type Hero = {
 		} & LabeledLink
 	>;
 	background?: 'auto' | 'default' | 'alt';
+	anchor?: string;
 };
 
 export type LabeledLink = {
@@ -142,6 +151,7 @@ export type Link = {
 	_type: 'link';
 	kind: 'internal' | 'external';
 	page?: PageReference;
+	anchor?: string;
 	href?: string;
 	newTab?: boolean;
 };
@@ -545,7 +555,7 @@ export type SITE_SETTINGS_QUERY_RESULT =
 
 // Source: ../web/src/lib/sanity/queries.ts
 // Variable: NAVIGATION_QUERY
-// Query: *[_id == "navigation"][0]{		mainMenu[] {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current }}},		footerMenu[] {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current }}}	}
+// Query: *[_id == "navigation"][0]{		mainMenu[] {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current },	anchor}},		footerMenu[] {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current },	anchor}}	}
 export type NAVIGATION_QUERY_RESULT =
 	| {
 			mainMenu: null;
@@ -562,6 +572,7 @@ export type NAVIGATION_QUERY_RESULT =
 					page: {
 						slug: string;
 					} | null;
+					anchor: string | null;
 				};
 			}> | null;
 			footerMenu: Array<{
@@ -574,6 +585,7 @@ export type NAVIGATION_QUERY_RESULT =
 					page: {
 						slug: string;
 					} | null;
+					anchor: string | null;
 				};
 			}> | null;
 	  }
@@ -599,7 +611,7 @@ export type REDIRECTS_QUERY_RESULT = Array<{
 
 // Source: ../web/src/lib/sanity/queries.ts
 // Variable: PAGE_BY_SLUG_QUERY
-// Query: *[_type == "page" && slug.current == $slug][0]{		_id,		_updatedAt,		title,		"slug": slug.current,		seo{			metaTitle,			metaDescription,			noindex,			ogImage {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		mimeType,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}}		},		sections[]{	_key,	_type,	"background": coalesce(background, "auto"),	_type == "hero" => {		heading,		lead,		image {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		mimeType,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		buttons[] {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current }}}	},	_type == "textImage" => {		heading,		body []{	...,	markDefs[]{		...,		_type == "link" => {	kind,	href,	newTab,	page->{ "slug": slug.current }}	}},		image {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		mimeType,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		imagePosition	},	_type == "features" => {		heading,		lead,		items[]{ _key, title, description }	},	_type == "pricing" => {		heading,		lead,		plans[]{			_key,			name,			price,			unit,			description,			includes,			recommended,			button {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current }}}		}	},	_type == "testimonials" => {		heading,		items[]{ _key, quote, author, role, avatar {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		mimeType,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}} }	},	_type == "faq" => {		heading,		items[]{ _key, question, answer []{	...,	markDefs[]{		...,		_type == "link" => {	kind,	href,	newTab,	page->{ "slug": slug.current }}	}} }	},	_type == "gallery" => {		heading,		"layout": coalesce(layout, "grid"),		items[]{ _key, title, description, image {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		mimeType,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}} }	},	_type == "contact" => {		heading,		lead,		"showContactDetails": coalesce(showContactDetails, true),		"showMap": coalesce(showMap, true)	},	_type == "cta" => {		heading,		lead,		button {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current }}}	}}	}
+// Query: *[_type == "page" && slug.current == $slug][0]{		_id,		_updatedAt,		title,		"slug": slug.current,		seo{			metaTitle,			metaDescription,			noindex,			ogImage {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		mimeType,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}}		},		sections[]{	_key,	_type,	"background": coalesce(background, "auto"),	anchor,	_type == "hero" => {		heading,		lead,		image {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		mimeType,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		buttons[] {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current },	anchor}}	},	_type == "textImage" => {		heading,		body []{	...,	markDefs[]{		...,		_type == "link" => {	kind,	href,	newTab,	page->{ "slug": slug.current },	anchor}	}},		image {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		mimeType,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}},		imagePosition	},	_type == "features" => {		heading,		lead,		items[]{ _key, title, description }	},	_type == "pricing" => {		heading,		lead,		plans[]{			_key,			name,			price,			unit,			description,			includes,			recommended,			button {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current },	anchor}}		}	},	_type == "testimonials" => {		heading,		items[]{ _key, quote, author, role, avatar {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		mimeType,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}} }	},	_type == "faq" => {		heading,		items[]{ _key, question, answer []{	...,	markDefs[]{		...,		_type == "link" => {	kind,	href,	newTab,	page->{ "slug": slug.current },	anchor}	}} }	},	_type == "gallery" => {		heading,		"layout": coalesce(layout, "grid"),		items[]{ _key, title, description, image {	_key,	alt,	hotspot,	crop,	asset->{		_id,		url,		mimeType,		"width": metadata.dimensions.width,		"height": metadata.dimensions.height	}} }	},	_type == "contact" => {		heading,		lead,		"showContactDetails": coalesce(showContactDetails, true),		"showMap": coalesce(showMap, true)	},	_type == "cta" => {		heading,		lead,		button {	_key,	label,	link {	kind,	href,	newTab,	page->{ "slug": slug.current },	anchor}}	}}	}
 export type PAGE_BY_SLUG_QUERY_RESULT = {
 	_id: string;
 	_updatedAt: string;
@@ -628,6 +640,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 				_key: string;
 				_type: 'contact';
 				background: 'alt' | 'auto' | 'default';
+				anchor: string | null;
 				heading: string;
 				lead: string | null;
 				showContactDetails: boolean | true;
@@ -637,6 +650,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 				_key: string;
 				_type: 'cta';
 				background: 'accent' | 'alt' | 'auto' | 'default';
+				anchor: string | null;
 				heading: string;
 				lead: string | null;
 				button: {
@@ -649,6 +663,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 						page: {
 							slug: string;
 						} | null;
+						anchor: string | null;
 					};
 				};
 		  }
@@ -656,6 +671,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 				_key: string;
 				_type: 'faq';
 				background: 'alt' | 'auto' | 'default';
+				anchor: string | null;
 				heading: string | null;
 				items: Array<{
 					_key: string;
@@ -676,6 +692,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 							page: {
 								slug: string;
 							} | null;
+							anchor: string | null;
 							href: string | null;
 							newTab: boolean | null;
 						}> | null;
@@ -689,6 +706,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 				_key: string;
 				_type: 'features';
 				background: 'alt' | 'auto' | 'default';
+				anchor: string | null;
 				heading: string | null;
 				lead: string | null;
 				items: Array<{
@@ -701,6 +719,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 				_key: string;
 				_type: 'gallery';
 				background: 'alt' | 'auto' | 'default';
+				anchor: string | null;
 				heading: string | null;
 				layout: 'carousel' | 'grid';
 				items: Array<{
@@ -726,6 +745,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 				_key: string;
 				_type: 'hero';
 				background: 'alt' | 'auto' | 'default';
+				anchor: string | null;
 				heading: string;
 				lead: string | null;
 				image: {
@@ -751,6 +771,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 						page: {
 							slug: string;
 						} | null;
+						anchor: string | null;
 					};
 				}> | null;
 		  }
@@ -758,6 +779,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 				_key: string;
 				_type: 'pricing';
 				background: 'alt' | 'auto' | 'default';
+				anchor: string | null;
 				heading: string | null;
 				lead: string | null;
 				plans: Array<{
@@ -778,6 +800,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 							page: {
 								slug: string;
 							} | null;
+							anchor: string | null;
 						};
 					} | null;
 				}>;
@@ -786,6 +809,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 				_key: string;
 				_type: 'testimonials';
 				background: 'alt' | 'auto' | 'default';
+				anchor: string | null;
 				heading: string | null;
 				items: Array<{
 					_key: string;
@@ -811,6 +835,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 				_key: string;
 				_type: 'textImage';
 				background: 'alt' | 'auto' | 'default';
+				anchor: string | null;
 				heading: string;
 				body: Array<{
 					children?: Array<{
@@ -828,6 +853,7 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 						page: {
 							slug: string;
 						} | null;
+						anchor: string | null;
 						href: string | null;
 						newTab: boolean | null;
 					}> | null;
@@ -857,10 +883,10 @@ export type PAGE_BY_SLUG_QUERY_RESULT = {
 declare global {
 	interface SanityQueries {
 		'\n\t*[_id == "siteSettings"][0]{\n\t\tcompanyName,\n\t\ttagline,\n\t\tnip,\n\t\taddress,\n\t\tgeo,\n\t\tphone,\n\t\temail,\n\t\topeningHours[]{ _key, days, closed, opens, closes },\n\t\tsocial[]{ _key, platform, url },\n\t\tlogo {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\tmimeType,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tdefaultOgImage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\tmimeType,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tcontactForm{\n\t\t\tconsentLabel,\n\t\t\tprivacyNotice,\n\t\t\tsuccessMessage,\n\t\t\t"privacyPolicySlug": privacyPolicyPage->slug.current\n\t\t},\n\t\tanalytics{ provider, domain, websiteId, scriptHost }\n\t}\n': SITE_SETTINGS_QUERY_RESULT;
-		'\n\t*[_id == "navigation"][0]{\n\t\tmainMenu[] {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n},\n\t\tfooterMenu[] {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n}\n\t}\n': NAVIGATION_QUERY_RESULT;
+		'\n\t*[_id == "navigation"][0]{\n\t\tmainMenu[] {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current },\n\tanchor\n}\n},\n\t\tfooterMenu[] {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current },\n\tanchor\n}\n}\n\t}\n': NAVIGATION_QUERY_RESULT;
 		'\n\t*[_type == "page" && defined(slug.current)]{\n\t\t"slug": slug.current,\n\t\t_updatedAt,\n\t\t"noindex": seo.noindex == true\n\t}\n': PAGE_INDEX_QUERY_RESULT;
 		'\n\t*[_type == "redirect" && defined(from) && defined(to)]{ from, to, permanent }\n': REDIRECTS_QUERY_RESULT;
-		'\n\t*[_type == "page" && slug.current == $slug][0]{\n\t\t_id,\n\t\t_updatedAt,\n\t\ttitle,\n\t\t"slug": slug.current,\n\t\tseo{\n\t\t\tmetaTitle,\n\t\t\tmetaDescription,\n\t\t\tnoindex,\n\t\t\togImage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\tmimeType,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n}\n\t\t},\n\t\tsections[]{\n\t_key,\n\t_type,\n\t"background": coalesce(background, "auto"),\n\t_type == "hero" => {\n\t\theading,\n\t\tlead,\n\t\timage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\tmimeType,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tbuttons[] {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n}\n\t},\n\t_type == "textImage" => {\n\t\theading,\n\t\tbody []{\n\t...,\n\tmarkDefs[]{\n\t\t...,\n\t\t_type == "link" => {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n\t}\n},\n\t\timage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\tmimeType,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\timagePosition\n\t},\n\t_type == "features" => {\n\t\theading,\n\t\tlead,\n\t\titems[]{ _key, title, description }\n\t},\n\t_type == "pricing" => {\n\t\theading,\n\t\tlead,\n\t\tplans[]{\n\t\t\t_key,\n\t\t\tname,\n\t\t\tprice,\n\t\t\tunit,\n\t\t\tdescription,\n\t\t\tincludes,\n\t\t\trecommended,\n\t\t\tbutton {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n}\n\t\t}\n\t},\n\t_type == "testimonials" => {\n\t\theading,\n\t\titems[]{ _key, quote, author, role, avatar {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\tmimeType,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n} }\n\t},\n\t_type == "faq" => {\n\t\theading,\n\t\titems[]{ _key, question, answer []{\n\t...,\n\tmarkDefs[]{\n\t\t...,\n\t\t_type == "link" => {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n\t}\n} }\n\t},\n\t_type == "gallery" => {\n\t\theading,\n\t\t"layout": coalesce(layout, "grid"),\n\t\titems[]{ _key, title, description, image {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\tmimeType,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n} }\n\t},\n\t_type == "contact" => {\n\t\theading,\n\t\tlead,\n\t\t"showContactDetails": coalesce(showContactDetails, true),\n\t\t"showMap": coalesce(showMap, true)\n\t},\n\t_type == "cta" => {\n\t\theading,\n\t\tlead,\n\t\tbutton {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current }\n}\n}\n\t}\n}\n\t}\n': PAGE_BY_SLUG_QUERY_RESULT;
+		'\n\t*[_type == "page" && slug.current == $slug][0]{\n\t\t_id,\n\t\t_updatedAt,\n\t\ttitle,\n\t\t"slug": slug.current,\n\t\tseo{\n\t\t\tmetaTitle,\n\t\t\tmetaDescription,\n\t\t\tnoindex,\n\t\t\togImage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\tmimeType,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n}\n\t\t},\n\t\tsections[]{\n\t_key,\n\t_type,\n\t"background": coalesce(background, "auto"),\n\tanchor,\n\t_type == "hero" => {\n\t\theading,\n\t\tlead,\n\t\timage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\tmimeType,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\tbuttons[] {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current },\n\tanchor\n}\n}\n\t},\n\t_type == "textImage" => {\n\t\theading,\n\t\tbody []{\n\t...,\n\tmarkDefs[]{\n\t\t...,\n\t\t_type == "link" => {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current },\n\tanchor\n}\n\t}\n},\n\t\timage {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\tmimeType,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n},\n\t\timagePosition\n\t},\n\t_type == "features" => {\n\t\theading,\n\t\tlead,\n\t\titems[]{ _key, title, description }\n\t},\n\t_type == "pricing" => {\n\t\theading,\n\t\tlead,\n\t\tplans[]{\n\t\t\t_key,\n\t\t\tname,\n\t\t\tprice,\n\t\t\tunit,\n\t\t\tdescription,\n\t\t\tincludes,\n\t\t\trecommended,\n\t\t\tbutton {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current },\n\tanchor\n}\n}\n\t\t}\n\t},\n\t_type == "testimonials" => {\n\t\theading,\n\t\titems[]{ _key, quote, author, role, avatar {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\tmimeType,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n} }\n\t},\n\t_type == "faq" => {\n\t\theading,\n\t\titems[]{ _key, question, answer []{\n\t...,\n\tmarkDefs[]{\n\t\t...,\n\t\t_type == "link" => {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current },\n\tanchor\n}\n\t}\n} }\n\t},\n\t_type == "gallery" => {\n\t\theading,\n\t\t"layout": coalesce(layout, "grid"),\n\t\titems[]{ _key, title, description, image {\n\t_key,\n\talt,\n\thotspot,\n\tcrop,\n\tasset->{\n\t\t_id,\n\t\turl,\n\t\tmimeType,\n\t\t"width": metadata.dimensions.width,\n\t\t"height": metadata.dimensions.height\n\t}\n} }\n\t},\n\t_type == "contact" => {\n\t\theading,\n\t\tlead,\n\t\t"showContactDetails": coalesce(showContactDetails, true),\n\t\t"showMap": coalesce(showMap, true)\n\t},\n\t_type == "cta" => {\n\t\theading,\n\t\tlead,\n\t\tbutton {\n\t_key,\n\tlabel,\n\tlink {\n\tkind,\n\thref,\n\tnewTab,\n\tpage->{ "slug": slug.current },\n\tanchor\n}\n}\n\t}\n}\n\t}\n': PAGE_BY_SLUG_QUERY_RESULT;
 	}
 }
 // Lets @sanity/client releases that predate the global registry read it too

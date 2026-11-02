@@ -1,5 +1,6 @@
 import { LinkIcon } from '@sanity/icons/Link';
 import { defineField, defineType } from 'sanity';
+import { ANCHOR_FORMAT_ERROR, ANCHOR_PATTERN } from '../fields/anchor';
 
 /**
  * Odnośnik: albo do podstrony tego serwisu, albo pod adres zewnętrzny.
@@ -39,6 +40,16 @@ export const link = defineType({
 					if (parent?.kind === 'internal' && !value) return 'Wskaż podstronę.';
 					return true;
 				}),
+		}),
+		defineField({
+			name: 'anchor',
+			title: 'Sekcja na stronie (opcjonalnie)',
+			type: 'string',
+			description:
+				'Kotwica sekcji z wybranej podstrony, np. „o-mnie" — strona przewinie się prosto do niej. Puste = początek strony.',
+			hidden: ({ parent }) => parent?.kind !== 'internal',
+			validation: (rule) =>
+				rule.custom((value) => (!value || ANCHOR_PATTERN.test(value) ? true : ANCHOR_FORMAT_ERROR)),
 		}),
 		defineField({
 			name: 'href',

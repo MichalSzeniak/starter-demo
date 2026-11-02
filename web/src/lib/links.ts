@@ -4,6 +4,8 @@ export type LinkLike = {
 	href?: string | null;
 	newTab?: boolean | null;
 	page?: { slug: string | null } | null;
+	/** Kotwica sekcji na stronie docelowej (strona jednostronicowa). */
+	anchor?: string | null;
 };
 
 export interface ResolvedLink {
@@ -32,7 +34,8 @@ export function resolveLink(link: LinkLike | null | undefined): ResolvedLink | n
 	}
 
 	if (!link.page?.slug) return null;
-	return { href: hrefForSlug(link.page.slug), external: false, newTab: false };
+	const hash = link.anchor ? `#${link.anchor}` : '';
+	return { href: hrefForSlug(link.page.slug) + hash, external: false, newTab: false };
 }
 
 /** Atrybuty dla <a> — rel/target tylko tam, gdzie mają sens. */

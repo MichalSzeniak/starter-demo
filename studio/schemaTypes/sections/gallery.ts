@@ -1,5 +1,6 @@
 import { ImagesIcon } from '@sanity/icons/Images';
 import { defineArrayMember, defineField, defineType } from 'sanity';
+import { anchorField } from '../fields/anchor';
 import { backgroundField } from '../fields/background';
 import { layoutField } from '../fields/layout';
 
@@ -71,6 +72,7 @@ export const gallery = defineType({
 			'Siatka pokazuje wszystkie zdjęcia naraz. Karuzela mieści je w jednym rzędzie przewijanym w bok — lepsza przy wielu zdjęciach.',
 		),
 		backgroundField(),
+		anchorField(),
 	],
 	preview: {
 		select: { title: 'heading', items: 'items', layout: 'layout', media: 'items.0.image' },

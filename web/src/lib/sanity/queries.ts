@@ -27,7 +27,8 @@ const LINK = /* groq */ `{
 	kind,
 	href,
 	newTab,
-	page->{ "slug": slug.current }
+	page->{ "slug": slug.current },
+	anchor
 }`;
 
 const LABELED_LINK = /* groq */ `{
@@ -49,6 +50,7 @@ const SECTIONS = /* groq */ `sections[]{
 	_key,
 	_type,
 	"background": coalesce(background, "auto"),
+	anchor,
 	_type == "hero" => {
 		heading,
 		lead,

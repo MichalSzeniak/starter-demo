@@ -13,7 +13,7 @@ const { section, ctx } = Astro.props;
 const imageLeft = section.imagePosition === 'left';
 ---
 
-<section class={ctx.backgroundClass}>
+<section id={ctx.anchor} class={ctx.backgroundClass}>
 	<div class="content-container grid gap-10 py-section lg:grid-cols-2 lg:items-center">
 		<div class:list={[imageLeft && 'lg:order-2']}>
 			<Heading level={ctx.headingLevel} variant="section" class="text-ink">

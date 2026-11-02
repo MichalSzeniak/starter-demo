@@ -136,6 +136,7 @@ const home: Page = {
 		{
 			_key: key(),
 			_type: 'hero',
+			anchor: null,
 			background: 'default',
 			heading: 'Naprawimy to szybciej, niż zdążysz się zdenerwować',
 			lead: 'Serwis dla domu i małych firm w Przykładowie i okolicy. Wycena przez telefon, dojazd w 24 godziny, gwarancja na każdą usługę.',
@@ -148,6 +149,7 @@ const home: Page = {
 		{
 			_key: key(),
 			_type: 'features',
+			anchor: null,
 			background: 'alt',
 			heading: 'Dlaczego my',
 			lead: 'Trzy rzeczy, które słyszymy od klientów najczęściej.',
@@ -173,6 +175,7 @@ const home: Page = {
 		{
 			_key: key(),
 			_type: 'testimonials',
+			anchor: null,
 			background: 'default',
 			heading: 'Co mówią klienci',
 			items: [
@@ -197,6 +200,7 @@ const home: Page = {
 		{
 			_key: key(),
 			_type: 'gallery',
+			anchor: null,
 			background: 'alt',
 			heading: 'Nasze realizacje',
 			layout: 'grid',
@@ -230,6 +234,7 @@ const home: Page = {
 		{
 			_key: key(),
 			_type: 'cta',
+			anchor: null,
 			background: 'accent',
 			heading: 'Masz awarię albo pytanie?',
 			lead: 'Zadzwoń — wycenę podajemy od ręki.',
@@ -254,6 +259,7 @@ const about: Page = {
 		{
 			_key: key(),
 			_type: 'textImage',
+			anchor: null,
 			background: 'default',
 			heading: 'Pracujemy w Przykładowie od 2009 roku',
 			body: [
@@ -280,6 +286,7 @@ const about: Page = {
 		{
 			_key: key(),
 			_type: 'gallery',
+			anchor: null,
 			background: 'alt',
 			heading: 'Zespół i warsztat',
 			layout: 'carousel',
@@ -317,6 +324,7 @@ const about: Page = {
 		{
 			_key: key(),
 			_type: 'faq',
+			anchor: null,
 			background: 'default',
 			heading: 'Pytania o firmę',
 			items: [
@@ -352,6 +360,7 @@ const about: Page = {
 		{
 			_key: key(),
 			_type: 'cta',
+			anchor: null,
 			background: 'accent',
 			heading: 'Porozmawiajmy o Twoim zleceniu',
 			lead: 'Ceny orientacyjne i formularz wyceny znajdziesz w cenniku.',
@@ -376,6 +385,7 @@ const pricing: Page = {
 		{
 			_key: key(),
 			_type: 'pricing',
+			anchor: null,
 			background: 'default',
 			heading: 'Cennik',
 			lead: 'Ceny orientacyjne. Dokładną wycenę podajemy przed rozpoczęciem pracy.',
@@ -420,6 +430,7 @@ const pricing: Page = {
 		{
 			_key: key(),
 			_type: 'faq',
+			anchor: null,
 			background: 'alt',
 			heading: 'Pytania o ceny i rozliczenia',
 			items: [
@@ -456,6 +467,7 @@ const pricing: Page = {
 		{
 			_key: key(),
 			_type: 'contact',
+			anchor: null,
 			background: 'default',
 			heading: 'Zapytaj o wycenę',
 			lead: 'Nie ma Twojej usługi na liście? Opisz, co trzeba zrobić — wycenimy indywidualnie w ciągu jednego dnia roboczego.',
