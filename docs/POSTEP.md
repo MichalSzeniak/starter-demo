@@ -1582,3 +1582,60 @@ startera (`3127ac9`), remote `starter` → GitHub. Commity: `925e758` konfigurac
 3. Luka 1 (telefon w nagłówku) — widoczna od razu na telefonie u każdego klienta z dłuższą nazwą.
 4. Zrzuty ekranu do `DLA-KLIENTA.md` (wymagają logowania do Studio).
 5. Pierwszy klient: strona ofertowa na starterze albo skrypt audytu cudzej strony („Odłożone").
+
+## Strona jednostronicowa i animacje — 2026-11-02
+
+Możliwość w każdym projekcie, nie osobny wariant — bez przełącznika, bo nie zmienia źródła
+treści. Commity startera: `3a88b74` (kotwice), `a2bd3f4` (animacje); w `gabinet-demo`
+cherry-pick bez konfliktów i przebudowa na jedną stronę (`8329dc2`).
+
+### Strona jednostronicowa
+
+- **Schema:** opcjonalne pole „Kotwica" w każdej z 9 sekcji (`fields/anchor.ts`: format
+  `a-z0-9-`, unikalność w obrębie strony) i „Sekcja na stronie" w odnośniku wewnętrznym.
+  Bez nowego typu sekcji. `pnpm typegen` → `anchor: string | null` w sekcjach i linkach;
+  fixtures i szablon `src/tresci` dostały `anchor: null`, `internal(slug, anchor?)`.
+- **Strona:** sekcja z kotwicą ma `id`; link → `/strona#kotwica`; kontakt bez kotwicy nadal
+  `#kontakt`. Zdublowana kotwica przerywa build (Studio pilnuje unikalności, treść w kodzie
+  i domyślne `kontakt` — nie). Link-guard sprawdza kotwice jak dotąd.
+- **Menu:** sekcja na ekranie podświetla swój link — `scroll-target-group: auto` na liście
+  i `:target-current` na linkach, 0 kB JS. Menu mobilne (`<details>`) zamyka po kliknięciu
+  kotwicy skrypt 165 B, renderowany tylko gdy w menu są kotwice (demo startera: 0 B więcej).
+
+### Animacje — `brand.motion: 'subtelny' | 'brak'`
+
+`<html data-motion>`; wszystko w `@media (prefers-reduced-motion: no-preference)`:
+wejście tekstu hero kaskadą (transform, 0,9 s), dotychczasowe wejście sekcji przy scrollu,
+odsłanianie zdjęć `clip-path` (poza pierwszą sekcją — obraz LCP bez animacji), cień nagłówka
+i pasek postępu 2 px przy przewijaniu (`animation-timeline: scroll(root)`), uniesienie
+przycisków (`data-lift`). Bez opacity — kontrast od pierwszej klatki (patrz poprawka z fazy 6).
+Minifikat sprawdzony: longhandy `animation-timeline` zachowane, `:target-current` też.
+
+### Weryfikacja
+
+- `pnpm check`, `studio check`, `lint`, `format:check` — czysto. Demo startera: SEO 4/4,
+  122 linki, 0 martwych; Lighthouse bez zmian (perf 100 / 98–99, a11y 100), CLS 0.
+- **gabinet-demo w Chrome 152 przez CDP** (skrypt w scratchpadzie sesji): animacje
+  `rise-in`, `section-reveal`, `image-unveil`, `header-lift`, `scroll-progress` aktywne;
+  przy `#cennik` aktywny link „Cennik"; klik „Kontakt" → sekcja 96 px od góry, nagłówek
+  kończy się na 61 px; cień i pasek (60 % przy cenniku) po przewinięciu; menu mobilne
+  zamknięte po kliknięciu „Cennik"; przy „ogranicz animacje" 0 animacji i `scroll-behavior: auto`.
+- gabinet-demo: SEO 2/2 (strona + 404), 69 linków, 0 martwych; Lighthouse perf 100 desktop /
+  98–99 mobile, a11y i SEO 100, CLS 0; JS na stronie 1,3 kB (formularz + menu 165 B).
+
+### Niezweryfikowane
+
+- Firefox i Safari — `:target-current` prawdopodobnie bez wsparcia (menu bez podświetlenia,
+  reszta działa); nie testowane.
+- Nowe pola w Studio nie były oglądane (wymaga logowania) — sprawdzone tylko `schema extract`
+  i TypeGen.
+
+### Do decyzji
+
+- **Luka 1 jest teraz pilniejsza:** na mobile przycisk telefonu ma 96 px wysokości, nagłówek
+  121 px, a `scroll-padding-top` 80 px — przy skoku do sekcji jej górny margines chowa się pod
+  nagłówkiem (tytuł akurat jeszcze widać). Rekomendacja bez zmian: „Zadzwoń" zamiast numeru
+  na wąskim ekranie.
+- Na samej górze strony podświetla się pierwszy link menu (przeglądarka uznaje go za bieżący,
+  zanim przewinie się do którejkolwiek sekcji z menu).
+- CLAUDE.md, „Uzgodnione skrypty": dopisać skrypt zamykania menu przy kotwicach (165 B).

@@ -70,6 +70,15 @@ Dlaczego tak:
 - Po zmianie treści podbij `UPDATED` (data w `<lastmod>` sitemapy).
 - `companyName` w treści ustawiasz ręcznie — `nowy-klient` wpisuje nazwę tylko do `brand.ts`.
 
+## Strona jednostronicowa i animacje
+
+- **Jedna strona:** sekcjom na `/` nadaj kotwice (pole „Kotwica", w kodzie `anchor: 'o-mnie'`),
+  a w menu wskaż sekcje (`internal('/', 'o-mnie')` albo „Sekcja na stronie" w Studio).
+  Podświetlanie przy przewijaniu i zamykanie menu mobilnego działają same.
+  Uprzedź klienta: jedna strona to jeden tytuł i opis w Google zamiast kilku podstron.
+  Przykład: `D:\dev\gabinet-demo`.
+- **Animacje:** `motion` w `brand.ts` — `'subtelny'` (domyślnie) albo `'brak'`.
+
 ## Poprawki ze startera u klienta
 
 ```bash
