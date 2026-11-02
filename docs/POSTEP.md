@@ -1417,6 +1417,21 @@ uzgodnione skrypty karuzeli i formularza).
 
 Budżet JS bez zmian.
 
+## Propozycje do wyboru: font nagłówków i paleta — 2026-09-13
+
+Nic nie wdrożone — podglądy wstrzykiwane do zbudowanego `dist/`, zrzuty w scratchpadzie sesji.
+
+- **Font nagłówków** (Inter zostaje w treści; waga latin + latin-ext z API Google Fonts,
+  zakres 600–800): Fraunces 70 kB, Bricolage Grotesque 60 kB, Instrument Serif 33 kB (tylko 400).
+  Odrzucone: Syne (w h1 na desktopie „zdenerwować" wychodzi poza kolumnę pod zdjęcie),
+  Unbounded (169 kB, sam latin-ext 118 kB).
+- **Palety** (kontrast liczony kodem z `nowy-klient`, każda przepuszczona przez skrypt):
+  zieleń `#1f6b4f`/`#164b37`/`#f0f6f2` (5,15:1), terakota `#a3401f`/`#722d16`/`#fbf3ee` (5,05:1),
+  śliwka `#7b2d5c`/`#561f40`/`#f8f1f5` (6,87:1). Jaśniejsza terakota `#b4462b` odrzucona
+  przez skrypt (CTA 4,39:1).
+- Logo demo w Sanity to SVG z kolorem na sztywno — po zmianie palety wymaga
+  `images:generate` i ponownego seeda.
+
 ## Wariant bez CMS-u — 2026-11-02
 
 Starter umie zbudować stronę bez panelu: treści i zdjęcia klienta leżą w repo, edytuje je
