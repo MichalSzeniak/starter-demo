@@ -389,7 +389,8 @@ let nextBrand = setBrandValue(brandSource, 'siteUrl', tsString(siteUrl));
 nextBrand = setBrandValue(nextBrand, 'name', tsString(companyName));
 nextBrand = setBrandValue(nextBrand, 'brand', tsString(brandColor));
 nextBrand = setBrandValue(nextBrand, 'brandDark', tsString(brandDark));
-nextBrand = nextBrand.replace(/^\t\/\/ Placeholder na zarezerwowanej domenie.*\n/m, '');
+// \r? — przy core.autocrlf=true (Windows) plik ma CRLF, a `.` nie łapie \r.
+nextBrand = nextBrand.replace(/^\t\/\/ Placeholder na zarezerwowanej domenie.*\r?\n/m, '');
 
 const packageSource = readFileSync(FILES.packageJson, 'utf8');
 const packageJson = JSON.parse(packageSource) as { name: string };
