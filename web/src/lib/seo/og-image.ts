@@ -1,13 +1,13 @@
 import { getImage } from 'astro:assets';
-import { cdnRasterUrl, type ImageLike } from '~/lib/sanity/image';
+import { cdnRasterUrl, resolveImage, type ImageLike } from '~/lib/sanity/image';
 
 /**
  * Obraz Open Graph strony. Kolejność:
  *   1. własny obraz podstrony (`seo.ogImage`),
  *   2. domyślny z ustawień (`siteSettings.defaultOgImage`) — tak obiecuje opis pola w Studio,
  *   3. wygenerowany przy buildzie z tytułu i logo (`/og/<id>.png`).
- * Obrazy z Sanity przechodzą przez astro:assets do lokalnego JPG 1200×630 —
- * w HTML nie ma linku do CDN.
+ * Obrazy z Sanity (i z src/tresci/obrazy w wariancie bez CMS-u) przechodzą przez
+ * astro:assets do lokalnego JPG 1200×630 — w HTML nie ma linku do CDN.
  */
 
 export const OG_WIDTH = 1200;
@@ -36,14 +36,21 @@ export async function ogImageFromSanity(
 	image: ImageLike | null | undefined,
 	site: URL,
 ): Promise<OgImage | null> {
+	// Wariant bez CMS-u: plik z src/tresci/obrazy/. Wektora nie da się tu użyć
+	// (podgląd linku go nie wyrenderuje) — wtedy spadamy do obrazu generowanego.
+	const local = resolveImage(image, OG_WIDTH);
+	const localSrc = local?.source === 'local' && !local.vector ? local.src : null;
+
 	// Raster już z CDN: gdyby klient wgrał tu SVG, podgląd linku i tak by go nie
 	// wyrenderował, a astro:assets odmówiłby rasteryzacji.
-	const src = cdnRasterUrl(image, {
-		width: OG_WIDTH,
-		height: OG_HEIGHT,
-		format: 'jpg',
-		fit: 'crop',
-	});
+	const src =
+		localSrc ??
+		cdnRasterUrl(image, {
+			width: OG_WIDTH,
+			height: OG_HEIGHT,
+			format: 'jpg',
+			fit: 'crop',
+		});
 	if (!src) return null;
 
 	// JPG, nie WebP: część serwisów społecznościowych nadal nie renderuje WebP w podglądzie linku.

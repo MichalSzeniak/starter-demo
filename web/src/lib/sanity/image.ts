@@ -1,4 +1,6 @@
 import { createImageUrlBuilder } from '@sanity/image-url';
+import type { ImageMetadata } from 'astro';
+import { localImageById } from '../local-images';
 import { sanityDataset, sanityProjectId } from './client';
 
 /**
@@ -23,17 +25,25 @@ export interface ImageLike {
 	} | null;
 }
 
-export interface ResolvedImage {
-	/** Adres do pobrania przy buildzie (CDN Sanity) albo lokalny plik demo. */
-	src: string;
+/**
+ * Skąd pochodzi obraz:
+ * - `sanity` — CDN Sanity, pobierany i optymalizowany przy buildzie przez astro:assets,
+ * - `local`  — plik z src/tresci/obrazy/ (wariant bez CMS-u), też przez astro:assets,
+ * - `demo`   — placeholder z public/demo, zwykły <img> bez optymalizacji.
+ */
+export type ImageSource = 'sanity' | 'local' | 'demo';
+
+export type ResolvedImage = {
 	width: number;
 	height: number;
 	alt: string;
-	/** true = obraz z CDN Sanity, przechodzi przez astro:assets. */
-	remote: boolean;
 	/** true = SVG. Idzie do dist/ w oryginale, bez rasteryzacji i bez srcset. */
 	vector: boolean;
-}
+} & (
+	| { source: 'sanity'; /** Adres CDN do pobrania przy buildzie. */ src: string }
+	| { source: 'local'; src: ImageMetadata; /** Ścieżka pliku na dysku. */ file: string }
+	| { source: 'demo'; /** Ścieżka w public/. */ src: string }
+);
 
 const builder = sanityProjectId
 	? createImageUrlBuilder({ projectId: sanityProjectId, dataset: sanityDataset })
@@ -76,10 +86,23 @@ export function resolveImage(
 	if (!asset?.url || !asset.width || !asset.height) return null;
 
 	const alt = image?.alt ?? '';
+	const vector = isVector(asset);
+
+	// Wariant bez CMS-u: bez kadru i hotspotu — zdjęcie przygotowujemy przed wrzuceniem.
+	const local = localImageById(asset._id);
+	if (local) {
+		const width = vector ? local.meta.width : Math.min(targetWidth, local.meta.width);
+		const height = Math.round((width * local.meta.height) / local.meta.width);
+		return { source: 'local', src: local.meta, file: local.file, width, height, alt, vector };
+	}
+
 	const remote = asset.url.startsWith('http');
 
-	if (isVector(asset)) {
-		return { src: asset.url, width: asset.width, height: asset.height, alt, remote, vector: true };
+	if (vector) {
+		const size = { width: asset.width, height: asset.height, alt, vector };
+		return remote
+			? { source: 'sanity', src: asset.url, ...size }
+			: { source: 'demo', src: asset.url, ...size };
 	}
 
 	const crop = image?.crop ?? {};
@@ -92,7 +115,7 @@ export function resolveImage(
 
 	// Treści demo: pliki z web/public/demo — bez CDN i bez optymalizacji.
 	if (!remote || !builder) {
-		return { src: asset.url, width, height, alt, remote: false, vector: false };
+		return { source: 'demo', src: asset.url, width, height, alt, vector: false };
 	}
 
 	const src = builder
@@ -101,7 +124,7 @@ export function resolveImage(
 		.fit('max')
 		.url();
 
-	return { src, width, height, alt, remote: true, vector: false };
+	return { source: 'sanity', src, width, height, alt, vector: false };
 }
 
 /**

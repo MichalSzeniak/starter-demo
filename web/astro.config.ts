@@ -54,7 +54,8 @@ export default defineConfig({
 
 	// Zmienne środowiskowe z walidacją typu na starcie builda.
 	// Brak SANITY_PROJECT_ID w buildzie produkcyjnym przerywa build z czytelnym
-	// komunikatem — chyba że DEMO_CONTENT=true (treści demo z web/src/lib/sanity/fixtures.ts).
+	// komunikatem — chyba że DEMO_CONTENT=true (treści demo z web/src/lib/sanity/fixtures.ts)
+	// albo LOCAL_CONTENT=true (wariant bez CMS-u: treści klienta z web/src/tresci/).
 	env: {
 		schema: {
 			SANITY_PROJECT_ID: envField.string({ context: 'server', access: 'secret', optional: true }),
@@ -64,6 +65,7 @@ export default defineConfig({
 				default: 'production',
 			}),
 			DEMO_CONTENT: envField.boolean({ context: 'server', access: 'secret', default: false }),
+			LOCAL_CONTENT: envField.boolean({ context: 'server', access: 'secret', default: false }),
 		},
 	},
 

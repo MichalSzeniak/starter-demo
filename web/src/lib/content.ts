@@ -1,5 +1,6 @@
 import { brand } from '~/config/brand';
 import { contentSource, sanityClient } from './sanity/client';
+import type { SiteContent } from './sanity/builders';
 import { demoContent } from './sanity/fixtures';
 import {
 	NAVIGATION_QUERY,
@@ -74,9 +75,21 @@ function settingsFromBrand(): SiteSettings {
 	};
 }
 
+/**
+ * Treści zapisane w kodzie: demo (fixtures) albo klienta bez CMS-u (src/tresci/).
+ * `null` = źródłem jest Sanity. Treści klienta ładowane leniwie — w buildzie
+ * z Sanity albo demo moduł src/tresci/ (i jego obrazy) w ogóle się nie wykonuje.
+ */
+async function contentInCode(): Promise<SiteContent | null> {
+	if (contentSource === 'demo') return demoContent;
+	if (contentSource === 'local') return (await import('~/tresci')).content;
+	return null;
+}
+
 export function getSiteSettings(): Promise<SiteSettings> {
 	return once('siteSettings', async () => {
-		if (contentSource === 'demo') return demoContent.siteSettings;
+		const inCode = await contentInCode();
+		if (inCode) return inCode.siteSettings;
 		const result = await sanityClient!.fetch<SITE_SETTINGS_QUERY_RESULT>(SITE_SETTINGS_QUERY);
 		if (!result?.companyName) {
 			console.warn('[sanity] Brak dokumentu siteSettings — używam danych z brand.ts.');
@@ -88,7 +101,8 @@ export function getSiteSettings(): Promise<SiteSettings> {
 
 export function getNavigation(): Promise<Navigation> {
 	return once('navigation', async () => {
-		if (contentSource === 'demo') return demoContent.navigation;
+		const inCode = await contentInCode();
+		if (inCode) return inCode.navigation;
 		const result = await sanityClient!.fetch<NAVIGATION_QUERY_RESULT>(NAVIGATION_QUERY);
 		return result ?? { mainMenu: null, footerMenu: null };
 	});
@@ -97,8 +111,9 @@ export function getNavigation(): Promise<Navigation> {
 /** Wszystkie strony ze slugiem — do getStaticPaths i sitemapy. */
 export function getPageIndex(): Promise<PageIndexEntry[]> {
 	return once('pageIndex', async () => {
-		if (contentSource === 'demo') {
-			return Object.values(demoContent.pages).map((page) => ({
+		const inCode = await contentInCode();
+		if (inCode) {
+			return Object.values(inCode.pages).map((page) => ({
 				slug: page.slug,
 				_updatedAt: page._updatedAt,
 				noindex: page.seo.noindex === true,
@@ -111,14 +126,16 @@ export function getPageIndex(): Promise<PageIndexEntry[]> {
 
 export function getRedirects(): Promise<Redirect[]> {
 	return once('redirects', async () => {
-		if (contentSource === 'demo') return demoContent.redirects;
+		const inCode = await contentInCode();
+		if (inCode) return inCode.redirects;
 		return sanityClient!.fetch<REDIRECTS_QUERY_RESULT>(REDIRECTS_QUERY);
 	});
 }
 
 export function getPage(slug: string): Promise<Page | null> {
 	return once(`page:${slug}`, async () => {
-		if (contentSource === 'demo') return demoContent.pages[slug] ?? null;
+		const inCode = await contentInCode();
+		if (inCode) return inCode.pages[slug] ?? null;
 		return sanityClient!.fetch<PAGE_BY_SLUG_QUERY_RESULT>(PAGE_BY_SLUG_QUERY, { slug });
 	});
 }

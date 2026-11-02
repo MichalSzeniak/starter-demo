@@ -41,9 +41,12 @@ function h(
 async function logoDataUri(logo: ResolvedImage | null): Promise<string | null> {
 	if (!logo) return null;
 	try {
-		const source = logo.remote
-			? Buffer.from(await (await fetch(logo.src)).arrayBuffer())
-			: await readFile(path.join(process.cwd(), 'public', logo.src));
+		const source =
+			logo.source === 'sanity'
+				? Buffer.from(await (await fetch(logo.src)).arrayBuffer())
+				: await readFile(
+						logo.source === 'local' ? logo.file : path.join(process.cwd(), 'public', logo.src),
+					);
 		// Rasteryzujemy w 2× docelowej wysokości (96 px w karcie), żeby logo było ostre.
 		// Wektor (SVG) można powiększać bez strat, rastra nie ma sensu rozciągać.
 		const isSvg = (await sharp(source).metadata()).format === 'svg';

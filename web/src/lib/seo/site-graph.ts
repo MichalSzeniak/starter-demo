@@ -20,7 +20,26 @@ async function logoUrl(site: URL): Promise<string | null> {
 	if (!logo) return null;
 
 	// Treści demo: plik leży w public/, podajemy go wprost.
-	if (!logo.remote) return new URL(logo.src, site).href;
+	if (logo.source === 'demo') return new URL(logo.src, site).href;
+
+	// Wariant bez CMS-u: raster przez astro:assets. Wektora nie ma kto zamienić na
+	// raster (nie ma CDN-u), więc podajemy plik SVG i ostrzegamy przy buildzie.
+	if (logo.source === 'local') {
+		if (logo.vector) {
+			console.warn(
+				'[treści] Logo jest w SVG — w danych strukturalnych Google oczekuje rastra. ' +
+					'Dla JSON-LD lepiej wgrać logo jako PNG (src/tresci/obrazy/).',
+			);
+			return new URL(logo.src.src, site).href;
+		}
+		const result = await getImage({
+			src: logo.src,
+			width: logo.width,
+			height: logo.height,
+			format: 'png',
+		});
+		return new URL(result.src, site).href;
+	}
 
 	// Google nie przyjmuje tu SVG, a astro:assets nie rasteryzuje wektorów.
 	// Konwersję zleca się więc CDN-owi Sanity (fm=png) — astro:assets dostaje
