@@ -1,6 +1,7 @@
 # CLAUDE.md
 
-Starter stron wizytówek: Astro 5 (SSG) + Sanity + Tailwind 4, hosting Cloudflare Pages.
+Starter stron wizytówek: Astro 7 (SSG) + Sanity + Tailwind 4, hosting Cloudflare Workers
+(statyczne assety + Worker dla `/api/*`).
 Repo jest **szablonem**, nie projektem jednego klienta.
 
 ## Naczelna zasada
@@ -27,12 +28,14 @@ pnpm lh                      # Lighthouse CI lokalnie
   React nie ma prawa trafić do `web/`.
 - Cel Lighthouse: mobile performance ≥ 90, pozostałe kategorie 100.
   Wygląd ma pierwszeństwo przed ostatnimi punktami wydajności.
- Wyspa `client:visible` tylko dla menu
-  mobilnego i accordionu FAQ. Nowa wyspa = pytanie do mnie.
+- Menu mobilne i FAQ działają na `<details>`, bez JS. Uzgodnione skrypty: karuzela
+  i formularz kontaktowy (tylko na stronach, które je renderują). Każdy nowy
+  skrypt albo wyspa = pytanie do mnie.
 - **Obrazy lokalnie.** `astro:assets` pobiera z `cdn.sanity.io` przy buildzie.
   Nie linkuj do CDN Sanity w wyjściowym HTML.
 - **Nie dodawaj zależności bez pytania.** Podaj wagę i uzasadnienie.
-- **Schema jest zamknięta**: 8 typów sekcji. Dziewiąty wymaga mojej zgody.
+- **Schema jest zamknięta**: 9 typów sekcji (dziewiąty, `contact`,
+  za zgodą w fazie 5). Dziesiąty wymaga mojej zgody.
 - Każde pole obrazu ma wymagany `alt` (walidacja w schemie).
 - Żadnych pól typu „surowy HTML" ani rich texta w miejscach strukturalnych.
 - Etykiety pól w Studio po polsku.
@@ -70,7 +73,8 @@ Zmiana jest skończona, gdy:
 
 - `pnpm check` przechodzi,
 - build przechodzi (w tym walidacja SEO),
-- Lighthouse: desktop 100/100/100/100, mobile perf ≥ 95,
+- Lighthouse: desktop 100/100/100/100, mobile perf ≥ 90, reszta 100
+  (próg 90 uzgodniony w fazie 6 — tak samo w `lighthouserc.mobile.json`),
 - nie przybyło JS-u klienckiego, chyba że uzgodnione,
 - nowa sekcja ma `preview` w Studio i wpis w `SectionRenderer`.
 
