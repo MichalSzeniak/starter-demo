@@ -1894,3 +1894,85 @@ w formularzu, `materials()` w serwerze) — opisane w komentarzu.
 1. Presety stylów (Spokojny / Rzeczowy / Wyrazisty) i krój nagłówków w starterze — uzgodnione.
 2. Ankieta treści z JSON-a zapytania → `src/tresci/index.ts`.
 3. `git push` startera — od `8778eab` wszystko tylko lokalnie.
+
+## Stan na koniec dnia i decyzje z rozmowy — 2026-11-03
+
+Podsumowanie całej sesji, żeby następna mogła zacząć bez czytania rozmowy.
+
+### Repozytoria
+
+| Repo | Stan |
+| --- | --- |
+| `D:\dev\sanity` (starter) | GitHub do `a021291`; lokalnie 4 commity: `8c6e85f`, `d29d583`, `fad0b3a`, `b1ab69b` |
+| `D:\dev\gabinet-demo` | lokalnie, 13 commitów przed `starter/main`; ostatni `7deccf1` (polityka prywatności) |
+| `D:\dev\zapytanie-ofertowe` | nowe lokalne repo, bez remote; `835beac`, tag `v1-przed-stylami` (= `22f6872`) |
+
+Prototyp uruchamia `node server.mjs` → `http://localhost:4400`; zapytania lądują w `zapytania/`
+(w `.gitignore`, dane osobowe — przy testach usuwać tylko własne pliki).
+
+### Decyzje podjęte
+
+- **Telefon w nagłówku:** `brand.headerPhone`, domyślnie `false` (wdrożone).
+- **Polityka prywatności:** generowana z Ustawień zamiast dziesiątego typu sekcji (wdrożone).
+- **Formularz kontaktowy ma być wyborem klienta** — nie w każdym pakiecie obowiązkowo
+  (do wdrożenia, niżej).
+- **Jak najmniej kontaktu z klientem** — zasada dla oferty i narzędzi: bez rozmów, szkoleń
+  na żywo i „wyceny po rozmowie”; zamiast tego formularze, ankiety, nagrania, limity.
+- **Przy rozstaniu oddawać jak najmniej kodu.** Licencja w umowie realnie nie chroni (korekta
+  argumentu z wpisu o eksporcie). Kierunek: klient dostaje zbudowaną stronę (`dist/`) i swoje
+  treści, nie źródła; wykup kodu źródłowego jako płatna opcja w umowie. **Formalnie jeszcze
+  niezatwierdzone** — patrz „Do decyzji”.
+- **Formularz zapytania ofertowego zamiast kalkulatora z cenami:** wybór sekcji bez dopłat,
+  dobrany pakiet, „od ____ zł”; dodatki wyceniane osobno. Kroki pojedynczo, styl, kolor.
+- **Style strony** (Spokojny / Rzeczowy / Wyrazisty) jako presety w `brand.ts` — zgoda;
+  najpierw były w prototypie (zrobione), teraz starter.
+- **ComfyUI:** nie ma projektu. Ocena: sensowne tylko jako lokalny skrypt (poprawa zdjęć
+  klienta, grafiki dekoracyjne/podglądowe), nigdy „prawdziwe” zdjęcia firmy, nie w buildzie;
+  sprawdzić licencje modeli. Niski priorytet.
+
+### Do decyzji (czeka na właściciela)
+
+1. **Eksport przy rozstaniu — wariant B:** `dist/` bez formularza + treści i oryginały zdjęć +
+   `_redirects` i `.htaccess` + README; obecny eksport źródeł jako `--zrodla` przy wykupie.
+   Pytanie: oddawać zbudowany Worker formularza czy nie (rekomendacja: nie — wariant B).
+   Szacunek przebudowy `eksport-klienta`: 2–3 h. Do zmiany też PRZEKAZANIE.md i OFERTA.md
+   („klient dostaje kod strony” → „gotową stronę i treści” + pozycja „wykup kodu”).
+2. **Pole „Pokaż formularz” w sekcji „Kontakt”** (obok „Pokaż mapę”) — pole, nie nowy typ.
+   Realizuje wybór klienta i jednocześnie eksport bez formularza (pkt 1).
+3. **OFERTA.md — poprawki 1–7 z rozmowy:** Lighthouse „przy oddaniu, z raportem”; nie pisać
+   „zgodna z WCAG”; limit adresów w przenoszeniu (np. 20); czy abonament „Wizytówki” jest
+   obowiązkowy; liczba rund poprawek (np. 2); copywriting nie „za podstronę”; dodatek „dane na
+   bieżąco” przekracza budżet 10 kB JS. Plus: szkolenie → nagranie 3–5 min; zmiany w abonamencie
+   przez formularz z limitem. **Ceny** (`____ zł`) — nadal puste.
+4. Podgląd własnego koloru w prototypie: jedna linia JS (~80 B) — tak/nie.
+5. `scroll-padding-top` (7,5rem poniżej `lg`) przy `headerPhone: false` ma ok. 50 px zapasu —
+   zmniejszać tylko po pomiarze nazwy ~55 znaków.
+6. Etykiety stylów w Studio „Nagłówek 2/3” → „Śródtytuł” / „Śródtytuł niższego rzędu”.
+
+### Propozycje i kolejność (uzgodniona)
+
+Zrobione: lista „Co przygotować” (4), polityka prywatności (3). Dalej:
+
+1. **Presety stylów w starterze** — `brand.style` (albo zestaw wartości) + osobny krój nagłówków
+   (kandydaci z 2026-09-13: Fraunces 70 kB, Instrument Serif 33 kB, Bricolage Grotesque 60 kB;
+   wagi kroju i wpływ na mobile perf ≥ 90 do zmierzenia). Prototyp ma już podgląd stylów na
+   krojach systemowych.
+2. **Ankieta treści** po akceptacji oferty: z JSON-a zapytania formularz dopasowany do sekcji
+   → zapis `web/src/tresci/index.ts`; zdjęcia przez link do folderu. Szacunek 6–10 h.
+   Razem z etapem 2: `pnpm nowy-klient --z-zapytania zapytanie.json`.
+3. **Prawdziwy szkic strony** z JSON-a, wystawiony pod adresem podglądu (wymaga 2).
+4. Formularz „zgłoś zmianę” dla abonamentu (z limitem z OFERTA.md).
+5. gabinet-demo pod publicznym adresem jako przykład „Wizytówki” — wymaga zgody (wdrożenie).
+6. Mierzenie czasu wdrożeń w checkliście (podstawa cen i terminów).
+
+### Wnioski techniczne z sesji
+
+- **Kod i `docs/` w osobnych commitach** — repo klientów nie mają dokumentów startera, wspólny
+  commit daje przy cherry-picku konflikt modify/delete.
+- Edycje plików Pythonem na Windows: zapis w trybie tekstowym daje CRLF — pisać z
+  `newline='\n'`, a w podmienianych napisach nie używać `\n` w zwykłych stringach (rozwija się
+  w regexach JS).
+- `git stash` nie chowa nieśledzonych plików — do porównań „przed/po” użyć `git worktree`.
+- Weryfikacja w Chrome: skrypty CDP w scratchpadzie sesji (Node 24, wbudowany WebSocket) —
+  zrzuty z emulacją szerokości, klikanie przez `Runtime.evaluate`, pomiar nagłówka
+  i pozycji sekcji po skoku do kotwicy. Nie są w repo — pisać od nowa.
