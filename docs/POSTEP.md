@@ -1976,3 +1976,19 @@ Zrobione: lista „Co przygotować” (4), polityka prywatności (3). Dalej:
 - Weryfikacja w Chrome: skrypty CDP w scratchpadzie sesji (Node 24, wbudowany WebSocket) —
   zrzuty z emulacją szerokości, klikanie przez `Runtime.evaluate`, pomiar nagłówka
   i pozycji sekcji po skoku do kotwicy. Nie są w repo — pisać od nowa.
+
+## Pierwsze zlecenie — 2026-11-03
+
+Zapytanie od pierwszego klienta: gabinet psychoterapii, **jedna strona z kotwicami**
+(góra z przyciskiem „Umów się na spotkanie” → formularz, O mnie, Oferta, Cennik, Kontakt).
+Pokrywa się z wariantem bez CMS-u i stroną jednostronicową — jak gabinet-demo, bez nowego kodu.
+
+Szczegóły (prośba klienta, mapowanie na sekcje, pytania, mail, otwarte sprawy) są **poza repo
+startera** — starter jest publiczny na GitHubie, a to dane i korespondencja klienta:
+`D:\dev\zlecenia\gabinet-psychoterapii-krakow\ZLECENIE.md`. Po założeniu prywatnego repo klienta
+dokument przenieść tam.
+
+Blokuje start: cena, termin i liczba rund poprawek (OFERTA.md), warunki umowy (przekazanie przy
+rozstaniu — „Do decyzji” 1 we wpisie „Stan na koniec dnia”), `git push` startera przed klonem,
+domena klienta (potrzebna do wysyłki z formularza przez Resend). To pierwsze wdrożenie —
+zmierzyć czas (start i uruchomienie w checkliście).
