@@ -18,7 +18,8 @@
     "format:check": "prettier --check .",
     "typegen": "pnpm --filter studio run schema:extract && pnpm --filter studio exec sanity typegen generate",
     "lh": "node --no-warnings scripts/lighthouse.ts",
-    "nowy-klient": "node --no-warnings scripts/nowy-klient.ts"
+    "nowy-klient": "node --no-warnings scripts/nowy-klient.ts",
+    "eksport-klienta": "node --no-warnings scripts/eksport-klienta.ts"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
