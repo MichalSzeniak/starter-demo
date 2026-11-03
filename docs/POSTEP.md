@@ -1639,3 +1639,91 @@ Minifikat sprawdzony: longhandy `animation-timeline` zachowane, `:target-current
 - Na samej górze strony podświetla się pierwszy link menu (przeglądarka uznaje go za bieżący,
   zanim przewinie się do którejkolwiek sekcji z menu).
 - CLAUDE.md, „Uzgodnione skrypty": dopisać skrypt zamykania menu przy kotwicach (165 B).
+
+## Nagłówek przy długiej nazwie, poziomy śródtytułów — 2026-11-03
+
+Luki 1 i 2 z wpisu o projekcie przykładowym. Commity startera: `8778eab` (nagłówek),
+`3a25e2b` (śródtytuły), `ef37d97` (CLAUDE.md); w `gabinet-demo` cherry-pick bez konfliktów:
+`284c3ee`, `35e074a`, `1fb73fe`. Nic nie wypchnięte.
+
+### Luka 1 — nagłówek a `scroll-padding-top`
+
+Decyzja: „Zadzwoń" zamiast numeru. Sam „Zadzwoń" nie wystarczył — pomiar w gabinet-demo
+(„Gabinet Psychoterapii Przystań (przykład)"): 412 px → 81 px przy paddingu 80 px, 360 px →
+nazwa w 4 liniach, 137 px. Bez obcinania nazwy nie da się zagwarantować wysokości nagłówka
+dla dowolnej nazwy klienta; wybrano pełną nazwę i większy zapas (obcinanie do 2 linii dawało
+przy 360–375 px „Gabinet Psychoterapii…").
+
+- **Telefon:** poniżej `lg` „Zadzwoń", od `lg` numer; `whitespace-nowrap`. Granica `lg`, nie
+  `sm`: przy 640 px numer bez łamania ściskał nazwę do 4 linii (137 px, gorzej niż przed zmianą —
+  81 px), a „O mnie" w menu łamało się w pionie.
+- **Nazwa firmy:** na telefonie `text-base/snug`, od `sm` `text-lg` z oryginalną wysokością
+  linii (sprawdzone w skompilowanym CSS — `text-base/snug` nie ustawia `--tw-leading`).
+- **Linki menu desktop:** `whitespace-nowrap`.
+- **`scroll-padding-top`:** 7,5rem poniżej `lg` (mieści 4 linie nazwy, 113 px przy 360 px),
+  5rem od `lg`. Koszt: przy krótkiej nazwie po skoku widać ok. 50 px poprzedniej sekcji więcej.
+
+### Luka 2 — poziomy śródtytułów w Portable Text
+
+Przesuwanie w renderowaniu, bez zmian w schemie (działa też dla treści w kodzie i istniejących
+dokumentów). `RichText` dostaje `headingLevel` — nagłówek sekcji (`TextImage`) albo pytania
+(`Faq`) — i liczy znacznik: „Nagłówek 2" → poziom + 1, „Nagłówek 3" → poziom + 2 tylko po
+„Nagłówku 2" w tej samej treści, inaczej + 1. Wygląd dalej wynika ze stylu. Maks. `h5`
+(h3 pytania + 2).
+
+### Budżet JS klienckiego
+
+Bez zmian — 0 B. gabinet-demo: 1339 B na stronie (formularz + menu 165 B), jak dotąd.
+
+### Weryfikacja
+
+- `pnpm check` 0/0/0, `lint`, `format:check` — czysto, w obu repo `check` i build.
+- **Chrome 156 przez CDP** (skrypt od nowa w scratchpadzie sesji): gabinet-demo, klik każdej
+  kotwicy w menu (mobile przez `<details>`), z animacjami i z „ogranicz animacje":
+
+  | szerokość | nagłówek | linie nazwy | telefon | `scroll-padding-top` | sekcja po skoku |
+  | --- | --- | --- | --- | --- | --- |
+  | 360 | 113 px | 4 | Zadzwoń | 120 px | 120 px (kontakt 136) |
+  | 375 | 91 px | 3 | Zadzwoń | 120 px | 120 px |
+  | 412 | 69 px | 2 | Zadzwoń | 120 px | 120 px |
+  | 640 / 768 | 81 px | 2 | Zadzwoń | 120 px | 120 px |
+  | 1024 / 1280 | 61 px | 1 | numer | 80 px | 80 px |
+
+  Przed zmianą (412 px): nagłówek 121 px, sekcja od 80 px — 41 px pod nagłówkiem. Bez
+  przewijania w poziomie na żadnej szerokości; menu mobilne zamknięte po kliknięciu.
+  Demo startera (logo): 65 px na każdej szerokości.
+- **Śródtytuły** na tymczasowo zmienionych fixtures (wycofane): h3 bez h2 w sekcji h1 → `h2`;
+  w sekcji h2: h3 przed h2 → `h3`, h2 → `h3`, h3 po h2 → `h4`; w odpowiedzi FAQ: h2 → `h4`,
+  h3 po nim → `h5`; klasy wyglądu zgodne ze stylem. gabinet-demo: „Wykształcenie i szkolenia"
+  `h3` pod `h2`, konspekt bez przeskoków.
+- **Lighthouse** — starter: desktop perf/a11y/SEO 100, mobile perf 96–99, a11y i SEO 100;
+  gabinet-demo: desktop 100, mobile 98, a11y i SEO 100; CLS 0 wszędzie. Best-practices 81/82
+  tylko przez `is-on-https` (AdGuard).
+
+### Ustalenie przy okazji
+
+`web/.env` startera ma `SANITY_PROJECT_ID` i `DEMO_CONTENT=false` — lokalny `pnpm build`
+startera bierze treści z **prawdziwego datasetu**, nie z fixtures. Wszystkie buildy startera
+w tej sesji przeszły na nim (SEO 4/4, 117 linków, 0 martwych, 0 odwołań do `cdn.sanity.io`),
+więc punkt „Build na prawdziwym projekcie Sanity po zmianie `ResolvedImage`" z wpisu
+o wariancie bez CMS-u jest prawdopodobnie zamknięty — do potwierdzenia, czy ten dataset to
+docelowy projekt testowy. Fixtures buduje `SANITY_PROJECT_ID= DEMO_CONTENT=true pnpm build`
+(SEO 4/4, 122 linki, 0 martwych — tyle, ile we wcześniejszych wpisach o „demo").
+
+### Niezweryfikowane
+
+- Firefox i Safari — nagłówek mierzony tylko w Chrome (inne metryki fontu mogą zmienić
+  łamanie nazwy o linię; zapas do 120 px to pokrywa przy ≤ 4 liniach).
+- Nazwa łamiąca się na 5+ linii przy 360 px (ok. 55+ znaków bez logo) nadal przekroczy zapas.
+
+### Do decyzji
+
+- Etykiety stylów w Studio „Nagłówek 2/3" nie mówią już wprost o znaczniku — propozycja:
+  „Śródtytuł" / „Śródtytuł niższego rzędu" (zmiana `title`, bez migracji danych).
+- Bez zmian: na samej górze strony podświetla się pierwszy link menu.
+
+### Następne kroki
+
+1. `git push` startera (`8778eab`, `3a25e2b`, `ef37d97` i ten wpis są tylko lokalnie).
+2. Potwierdzić, że dataset z `web/.env` startera zamyka punkt o buildzie z Sanity; zielone CI.
+3. Luka 3 (sekcja „sam tekst" dla polityki prywatności) — wymaga zgody na dziesiąty typ.
