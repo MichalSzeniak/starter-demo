@@ -133,10 +133,10 @@ z logo i nazwy firmy albo użyć Państwa grafiki (1200×630 px). Preferencja: `
 | --- | --- |
 | Na jaki adres (adresy) mają przychodzić wiadomości? | |
 | Jak długo przechowują Państwo wiadomości z formularza? (np. 12 miesięcy) | |
-| Czy mają Państwo politykę prywatności? Proszę przesłać treść. | |
+| Czy mają Państwo własną politykę prywatności? Jeśli tak, proszę przesłać treść. | |
 | Czy dane z formularza trafiają gdzieś dalej (CRM, księgowość, inna firma)? | |
 
-Na stronie przygotuję wzór klauzuli informacyjnej złożony z danych firmy. **To wzór, nie
+Na stronie przygotuję wzór klauzuli informacyjnej i polityki prywatności złożony z danych firmy. **To wzór, nie
 porada prawna** — treść polityki prywatności i klauzuli zatwierdza właściciel strony,
 najlepiej z prawnikiem.
 

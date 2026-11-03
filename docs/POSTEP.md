@@ -1837,3 +1837,60 @@ Teksty bez obietnic rozmów i szkoleń — cel: jak najmniej kontaktu z klientem
 - Formularz kontaktowy jako wybór klienta: pole „Pokaż formularz” w sekcji „Kontakt” (obok
   „Pokaż mapę”) — rozwiązuje też eksport strony bez formularza (wariant B).
 - Podgląd własnego koloru w prototypie wymaga jednej linii JS.
+
+## Polityka prywatności generowana, lista materiałów w zapytaniu — 2026-11-03
+
+Luka 3 dla polityki prywatności zamknięta **bez dziesiątego typu sekcji**. Commit startera
+`fad0b3a` (kod) + ten wpis i dokumenty osobno; w gabinet-demo cherry-pick bez konfliktów:
+`7deccf1`. Nic nie wypchnięte.
+
+### Co powstało
+
+- **`lib/privacy-policy.ts`** + trasa **`pages/[politykaPrywatnosci].astro`** — strona
+  `/polityka-prywatnosci` składana z Ustawień: administrator (nazwa, adres, NIP, e-mail),
+  formularz (ta sama klauzula co pod formularzem; własna klauzula klienta w całości),
+  odwiedziny (logi Cloudflare, art. 6 ust. 1 lit. f; statystyki tylko przy włączonej
+  analityce, z nazwą dostawcy; brak cookies do statystyk i reklam), linki zewnętrzne
+  („Jak dojechać”, profile społecznościowe — nic nie jest osadzone), prawa, data zmiany
+  (`POLICY_UPDATED`).
+- Powstaje tylko, gdy klient **nie wskazał własnej podstrony** w Ustawieniach i nie ma
+  podstrony o tym adresie — wtedy `getStaticPaths` zwraca pustą listę, a własna strona idzie
+  przez `[...slug]`. Tytuł ≤ 60 znaków: z nazwą firmy, przy długiej nazwie sam „Polityka
+  prywatności” (gabinet-demo).
+- Obraz OG (`/og/polityka-prywatnosci.png`), wpis w sitemapie (`lastmod` = `POLICY_UPDATED`),
+  link w stopce (pomijany, gdy klient ma go w menu stopki) i zawsze pod klauzulą formularza.
+- `privacy.ts`: wzór klauzuli rozbity na nazwane części (`defaultNoticeParts`) — polityka bierze
+  z nich tylko akapity o formularzu, bez powtórzenia administratora i praw. Klauzula pod
+  formularzem bez zmian (6 akapitów, sprawdzone w zbudowanym HTML).
+- Opis pola „Polityka prywatności” w Studio mówi, co znaczy puste pole. Bez zmian w strukturze schemy.
+- Dokumenty: checklista (polityka generowana, kiedy potrzebna własna), brief (pytanie o własną
+  politykę), OFERTA (polityka w standardzie; „nie obiecywać” — sprawdzenia przez prawnika).
+
+### Weryfikacja
+
+- `check` 0/0/0, `studio check`, `lint`, `format:check` — czysto.
+- Buildy startera: dataset SEO 5/5, 140 linków; fixtures 5/5, 145; bez CMS-u 4/4, 89 — 0 martwych.
+  gabinet-demo: 3/3, 95 linków, 0 martwych.
+- **Lighthouse** (starter, 3 przebiegi): polityka desktop 100/100/100, mobile 99/100/100
+  (perf/a11y/SEO), CLS 0; pozostałe strony bez regresji (desktop 100, mobile 96–99).
+  Best-practices 81/82 — wyłącznie `is-on-https` (AdGuard).
+
+### Prototyp zapytania (`D:\dev\zapytanie-ofertowe`)
+
+Commit `835beac`: lista „Co przygotować” na stronie po wysłaniu (na górze, z podpowiedzią
+o zapisaniu/wydruku) i w treści maila do wykonawcy. Warunki w dwóch miejscach (CSS `:has()`
+w formularzu, `materials()` w serwerze) — opisane w komentarzu.
+
+### Niezweryfikowane
+
+- **Treść wzoru nie była sprawdzona przez prawnika** — dopisać do listy razem z licencją
+  i klauzulą wyjścia (wpis o eksporcie).
+- Cloudflare może ustawić techniczny plik cookie ochrony przed botami (zależnie od ustawień
+  strefy) — wzór pisze tylko, że strona nie zapisuje cookies do statystyk ani reklam.
+- Strona bez sekcji „Kontakt” nadal ma w polityce akapit o formularzu.
+
+### Następne kroki
+
+1. Presety stylów (Spokojny / Rzeczowy / Wyrazisty) i krój nagłówków w starterze — uzgodnione.
+2. Ankieta treści z JSON-a zapytania → `src/tresci/index.ts`.
+3. `git push` startera — od `8778eab` wszystko tylko lokalnie.

@@ -22,6 +22,8 @@ Uwagi wewnętrzne są oznaczone „Dla Ciebie".
   dla każdej podstrony.
 - **Formularz kontaktowy** z ochroną przed spamem (pułapka na boty, limit zgłoszeń), zgodą RODO
   i wzorem klauzuli informacyjnej.
+- **Polityka prywatności** przygotowana z danych firmy i zgodna z tym, co strona robi naprawdę
+  (formularz, hosting, statystyki) — do Twojej akceptacji.
 - **Kontakt i dojazd** — dane, godziny otwarcia i przycisk „Jak dojechać" (Google Maps).
 - **Dostępność** — wynik Lighthouse „Dostępność" 100, kontrast kolorów na poziomie WCAG AA
   (kolor firmowy sprawdzany automatycznie), menu i FAQ obsługiwane klawiaturą.
@@ -126,9 +128,8 @@ Po rozwiązaniu umowy klient dostaje kod strony, treści i dostępy — `docs/PR
 
 - **Osadzonej mapy Google** — jest karta „Jak dojechać" z linkiem (decyzja z fazy 5: bez
   klucza API i bez ładowania czegokolwiek od Google).
-- **Podstrony „Polityka prywatności" bez zdjęcia** — „Tekst z obrazem" wymaga obrazu,
-  a sekcji „sam tekst" nie ma (luka 3, wymaga zgody na dziesiąty typ). Rozwiązać przed
-  pierwszą sprzedażą albo dodawać grafikę.
+- **Polityki prywatności sprawdzonej przez prawnika** — to wzór z danych firmy. Gdy dane
+  z formularza trafiają dalej (CRM, inna firma), potrzebna jest własna treść klienta.
 - **Podglądu przed publikacją w panelu** — odłożone.
 - **Formularza na hostingu klienta** — działa tylko na Cloudflare Workers. „Klient ma swój
   hosting" = strona tak, formularz nie.

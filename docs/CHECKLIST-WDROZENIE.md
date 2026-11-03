@@ -48,8 +48,11 @@ Wariant: panel Sanity / bez CMS-u
       obraz udostępniania, współrzędne. **NAP znak w znak jak w wizytówce Google** — ten sam
       zapis ulicy, telefonu i nazwy.
 - [ ] Podstrony z briefu. Strona główna ma adres `/`. Każda: tytuł i opis w zakładce SEO.
-- [ ] Podstrona „Polityka prywatności" (treść od klienta) i link do niej w Ustawienia →
-      Formularz kontaktowy oraz w menu stopki.
+- [ ] Polityka prywatności: generuje się sama pod `/polityka-prywatnosci` z Ustawień
+      (nazwa, adres, NIP, e-mail, analityka) — przejrzyj ją z klientem. Link jest w stopce
+      i pod klauzulą. Dane z formularza idą dalej (CRM, inna firma) albo klient ma własną
+      politykę → podstrona z jego treścią i wskazanie jej w Ustawienia → Formularz
+      kontaktowy → Polityka prywatności (generowana wtedy znika). Wzór nie jest poradą prawną.
 - [ ] Nawigacja: menu główne (≤ 6 pozycji) i stopka.
 - [ ] Przekierowania ze starej strony: każdy adres, który ma ruch lub linki (Search Console
       starej domeny, sitemap starej strony) → odpowiednik na nowej, „Trwałe".
