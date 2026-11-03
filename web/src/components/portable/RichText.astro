@@ -10,13 +10,20 @@ import ListItem from './ListItem.astro';
  * Renderuje pole `richText` z Sanity własnymi komponentami.
  * Klucze `block`/`mark`/`list`/`listItem` są w liczbie pojedynczej —
  * tak nazywa je astro-portabletext (inaczej niż @portabletext/react).
+ *
+ * Śródtytuły: styl ze Studio („Nagłówek 2/3") decyduje o wyglądzie, a znacznik liczymy
+ * względem nagłówka, pod którym stoi treść (`headingLevel`). Ta sama treść daje wtedy
+ * poprawny konspekt w pierwszej sekcji (h1) i w kolejnych (h2), a „Nagłówek 3" bez
+ * „Nagłówka 2" nad sobą nie przeskakuje poziomu.
  */
 interface Props {
 	value: TypedObject[] | null | undefined;
+	/** Poziom nagłówka bezpośrednio nad treścią: sekcji albo pytania w FAQ. */
+	headingLevel: 1 | 2 | 3;
 	class?: string;
 }
 
-const { value, class: className } = Astro.props;
+const { value, headingLevel, class: className } = Astro.props;
 
 const components = {
 	block: Block,
@@ -24,10 +31,19 @@ const components = {
 	list: List,
 	listItem: ListItem,
 };
+
+let afterH2 = false;
+const blocks = (value ?? []).map((node) => {
+	const style = 'style' in node ? node.style : undefined;
+	if (style !== 'h2' && style !== 'h3') return node;
+	const depth = style === 'h3' && afterH2 ? 2 : 1;
+	if (style === 'h2') afterH2 = true;
+	return { ...node, headingLevel: headingLevel + depth };
+});
 ---
 
-{value && value.length > 0 && (
+{blocks.length > 0 && (
 	<div class={className}>
-		<PortableText value={value} components={components} />
+		<PortableText value={blocks} components={components} />
 	</div>
 )}

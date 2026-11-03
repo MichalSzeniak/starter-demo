@@ -5,21 +5,29 @@ import type { BlockProps } from 'astro-portabletext/types';
  * Style bloków dopuszczone w schemie `richText`: akapit, h2, h3.
  * Nic innego nie przejdzie przez Studio, ale gdyby przeszło — renderujemy jako akapit,
  * zamiast rozwalać stronę nieznanym elementem.
+ *
+ * Styl wybiera wygląd, a znacznik śródtytułu (`headingLevel`) dokłada RichText —
+ * względem nagłówka sekcji. Bez niego (blok spoza RichText) znacznik = styl.
  */
 type Props = BlockProps;
 
 const { node } = Astro.props;
 const style = node.style ?? 'normal';
+const level = (node as typeof node & { headingLevel?: number }).headingLevel;
+const Tag = (level ? `h${level}` : style) as 'h2' | 'h3' | 'h4' | 'h5';
+
+const headingClass =
+	style === 'h2'
+		? 'mt-10 mb-4 text-2xl font-semibold tracking-tight text-ink first:mt-0'
+		: style === 'h3'
+			? 'mt-8 mb-3 text-xl font-semibold text-ink first:mt-0'
+			: null;
 ---
 
-{style === 'h2' ? (
-	<h2 class="mt-10 mb-4 text-2xl font-semibold tracking-tight text-ink first:mt-0">
+{headingClass ? (
+	<Tag class={headingClass}>
 		<slot />
-	</h2>
-) : style === 'h3' ? (
-	<h3 class="mt-8 mb-3 text-xl font-semibold text-ink first:mt-0">
-		<slot />
-	</h3>
+	</Tag>
 ) : (
 	<p class="mb-4 leading-relaxed text-muted last:mb-0">
 		<slot />

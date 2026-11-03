@@ -19,7 +19,7 @@ const imageLeft = section.imagePosition === 'left';
 			<Heading level={ctx.headingLevel} variant="section" class="text-ink">
 				{section.heading}
 			</Heading>
-			<RichText value={section.body} class="mt-6" />
+			<RichText value={section.body} headingLevel={ctx.headingLevel} class="mt-6" />
 		</div>
 		<SanityImage
 			image={section.image}

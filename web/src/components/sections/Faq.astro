@@ -50,7 +50,7 @@ const questionLevel = ctx.headingLevel === 1 ? 2 : 3;
 						</summary>
 						<div class="faq-panel">
 							<div class="min-h-0 overflow-hidden">
-								<RichText value={item.answer} class="pt-3 pr-10" />
+								<RichText value={item.answer} headingLevel={questionLevel} class="pt-3 pr-10" />
 							</div>
 						</div>
 					</details>
