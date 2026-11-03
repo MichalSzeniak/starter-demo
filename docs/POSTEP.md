@@ -1793,3 +1793,47 @@ Konsekwencja: wycinanie niekupionych modułów przy eksporcie niepotrzebne — f
 w każdym pakiecie.
 
 Do rozwiązania przed sprzedażą: podstrona „Polityka prywatności" bez zdjęcia (luka 3).
+
+## Telefon w nagłówku jako opcja, prototyp zapytania ofertowego — 2026-11-03
+
+### `brand.headerPhone` — domyślnie `false`
+
+Decyzja: przycisk telefonu w nagłówku ma sens tylko tam, gdzie klienci głównie dzwonią
+(awarie, rezerwacje, taksówka); u reszty dubluje telefon z hero i kontaktu i ściska nazwę firmy.
+`Header.astro` pokazuje go tylko przy `brand.headerPhone: true`. Telefon w hero, kontakcie
+i JSON-LD bez zmian. Commit startera `8c6e85f`, w gabinet-demo `1b70521`.
+
+- Starter: `check` 0/0/0, `lint`, `format:check` czysto; build SEO 4/4, 113 linków, 0 martwych;
+  w `<header>` 0 linków `tel:`, na stronie 2.
+- gabinet-demo: SEO 2/2, 67 linków (było 69 — dwa linki z nagłówka). Chrome przez CDP,
+  „ogranicz animacje”, skok do każdej kotwicy z menu:
+
+  | szerokość | nagłówek (było) | linie nazwy (było) | `scroll-padding-top` | sekcja po skoku |
+  | --- | --- | --- | --- | --- |
+  | 360 / 375 / 412 | 69 px (113 / 91 / 69) | 2 (4 / 3 / 2) | 120 px | 120 px |
+  | 640 | 81 px (81) | 2 | 120 px | 120 px |
+  | 768 | 53 px (81) | 1 (2) | 120 px | 120 px |
+  | 1024 / 1280 | 53 px (61) | 1 | 80 px | 80 px |
+
+- **Cherry-pick do gabinet-demo:** konflikt modify/delete na `docs/NOWY-PROJEKT.md` (repo klienta
+  nie ma dokumentów startera) — rozwiązany usunięciem. Wniosek: zmiany w `docs/` commitować
+  osobno od kodu, wtedy cherry-pick kodu do klientów przechodzi bez konfliktów.
+
+### Prototyp `D:\dev\zapytanie-ofertowe`
+
+Formularz zapytania o stronę, osobne repo (nie starter — to formularz jednego „klienta”, czyli
+wykonawcy). Commity `0a184a6`…`22f6872`, tylko lokalnie. 4 kroki bez JS (radio poza `<form>`
++ `:has()`), szkic strony na żywo (sekcje, kolor, stos ekranów przy kilku podstronach), dobrany
+pakiet, lista „Co przygotować”; sposoby kontaktu (telefon, e-mail, formularz, adres) osobno.
+Serwer w Node bez zależności zapisuje treść maila i JSON (pod `nowy-klient --z-zapytania`).
+Teksty bez obietnic rozmów i szkoleń — cel: jak najmniej kontaktu z klientem.
+
+### Do decyzji
+
+- `scroll-padding-top` 7,5rem poniżej `lg` był liczony pod nagłówek z przyciskiem telefonu.
+  Bez niego przy 360 px nagłówek ma 69 px — zapas ok. 50 px. Można go uzależnić od
+  `headerPhone`, ale nazwa dłuższa niż w gabinet-demo dalej łamie się na więcej linii — wymaga
+  pomiaru na nazwie ok. 55 znaków.
+- Formularz kontaktowy jako wybór klienta: pole „Pokaż formularz” w sekcji „Kontakt” (obok
+  „Pokaż mapę”) — rozwiązuje też eksport strony bez formularza (wariant B).
+- Podgląd własnego koloru w prototypie wymaga jednej linii JS.
