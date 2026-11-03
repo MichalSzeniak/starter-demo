@@ -1727,3 +1727,57 @@ docelowy projekt testowy. Fixtures buduje `SANITY_PROJECT_ID= DEMO_CONTENT=true 
 1. `git push` startera (`8778eab`, `3a25e2b`, `ef37d97` i ten wpis są tylko lokalnie).
 2. Potwierdzić, że dataset z `web/.env` startera zamyka punkt o buildzie z Sanity; zielone CI.
 3. Luka 3 (sekcja „sam tekst" dla polityki prywatności) — wymaga zgody na dziesiąty typ.
+
+## Eksport kodu i przekazanie przy rozstaniu z klientem — 2026-11-03
+
+Commity startera: `01f5df0` (skrypt), `9b39ced` (dokumenty), `906189d` (komunikat);
+w `gabinet-demo` cherry-pick skryptu bez konfliktów: `2d26ab0`, `6e76a8e`. Dokumenty
+zostają w starterze, jak wcześniejsze wpisy.
+
+### Co powstało
+
+- **`pnpm eksport-klienta [katalog]`** (`scripts/eksport-klienta.ts`, bez zależności) — w repo
+  klienta: kopia HEAD bez historii (`git clone --depth=1`, potem bez `.git`), bez narzędzi
+  startera (CLAUDE.md, skille, `docs/`, `scripts/`, Lighthouse, backup, seed i zdjęcia demo,
+  generator obrazów; `studio/` w wariancie bez CMS-u), z nowym README, uproszczonym CI
+  i `.env.example` dla wariantu. Wariant z `web/.env`. Weryfikacja w katalogu eksportu:
+  install, check (+ studio check przy panelu), lint, format, build. Wynik: repo z jednym
+  commitem + `.zip`; `node_modules`/`dist` usuwane `rmSync` (`git clean -X` na Windows nie
+  radzi sobie z długimi ścieżkami w `node_modules/.pnpm`). Odmawia bez remote `starter`,
+  na nieczystym drzewie i do niepustego katalogu.
+- **Zostaje celowo cały `web/`** — ścieżka Sanity, fixtures demo i endpoint przebudowy są
+  wplecione w kod strony (6+ plików); wycinanie przy każdym kliencie to koszt i ryzyko
+  bez realnej ochrony. Ochrona: licencja w umowie. Skrypt wypisuje komentarze odsyłające do
+  usuniętych plików (4 w wariancie bez CMS-u, 6 z panelem) — informacyjnie.
+- **`docs/PRZEKAZANIE.md`** — czyje konta od startu, co ustalić w umowie (licencja
+  niewyłączna, klauzula wyjścia; nie porada prawna), checklista rozstania z kolejnością
+  domena → eksport strefy DNS → przełączenie → sprzątanie, wzór maila. Checklista wdrożenia:
+  domena zawsze na klienta, licencja i klauzula wyjścia w umowie. `NOWY-PROJEKT.md` odsyła
+  do eksportu.
+
+### Budżet JS klienckiego
+
+Bez zmian — skrypt działa tylko w repo dewelopera.
+
+### Weryfikacja
+
+- `lint`, `format:check`, `tsc --strict` na skrypcie (typy Node pożyczone ze `studio/`) — czysto.
+- **Bez CMS-u** — `pnpm eksport-klienta` na gabinet-demo: wszystkie kroki ✓ (SEO 2/2, 69 linków,
+  0 martwych), 81 plików, zip ok. 200 kB, repo źródłowe nietknięte. Wcześniejszy ręczny
+  eksport tego samego stanu dał `dist/` identyczny bajt w bajt z buildem repo.
+- **Panel** — klon startera z remote `starter` i jego `web/.env` (prawdziwy dataset): wszystkie
+  kroki ✓ z `studio check` (SEO 4/4, 117 linków), 121 plików; `studio/` bez `scripts/`,
+  bez `@sanity/client` i `sharp`, `.env.example` z project ID.
+- Zabezpieczenia: repo startera, nieczyste drzewo, istniejący katalog — odmowa z komunikatem.
+
+### Niezweryfikowane
+
+- CI z eksportu nie było uruchomione na GitHubie.
+- Przeniesienie projektu Sanity między organizacjami i eksport strefy w Cloudflare —
+  opisane z dokumentacji/panelu, nieprzećwiczone.
+- Eksport na Linuksie/macOS (pisany i testowany na Windows; ścieżki przez `path`).
+
+### Następne kroki
+
+1. `git push` startera — od `8778eab` do tego wpisu wszystko tylko lokalnie.
+2. Zapisy licencji i klauzuli wyjścia do sprawdzenia przez prawnika, potem do wzoru umowy.
