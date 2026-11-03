@@ -35,19 +35,35 @@ export function privacyNoticeParagraphs(settings: SiteSettings): string[] {
 			.map((paragraph) => paragraph.trim())
 			.filter(Boolean);
 	}
+	const parts = defaultNoticeParts(settings);
+	return [
+		parts.administrator,
+		parts.purpose,
+		parts.retention,
+		parts.recipients,
+		parts.rights,
+		parts.voluntary,
+	];
+}
 
+/** Wzór klauzuli w nazwanych częściach — polityka prywatności (`privacy-policy.ts`) bierze tylko część z nich. */
+export function defaultNoticeParts(settings: SiteSettings) {
 	const address = formatAddress(settings.address);
 	const administrator = [settings.companyName, address, settings.nip ? `NIP ${settings.nip}` : null]
 		.filter(Boolean)
 		.join(', ');
 	const contact = settings.email ? ` W sprawach danych osobowych napisz na ${settings.email}.` : '';
 
-	return [
-		`Administratorem Twoich danych osobowych jest ${administrator}.${contact}`,
-		'Dane podane w formularzu (imię, e-mail, telefon, treść wiadomości) przetwarzamy wyłącznie po to, żeby odpowiedzieć na Twoją wiadomość — na podstawie Twojej zgody (art. 6 ust. 1 lit. a RODO).',
-		'Dane przechowujemy przez czas potrzebny do obsługi zapytania, nie dłużej niż 12 miesięcy od ostatniej wiadomości.',
-		'Odbiorcami danych są dostawcy usług technicznych: Cloudflare (hosting strony) i Resend (dostarczenie wiadomości e-mail). Mogą przetwarzać dane poza Europejskim Obszarem Gospodarczym na podstawie standardowych klauzul umownych zatwierdzonych przez Komisję Europejską.',
-		'Masz prawo dostępu do swoich danych, ich sprostowania, usunięcia, ograniczenia przetwarzania i przenoszenia, a także prawo cofnięcia zgody w dowolnym momencie — bez wpływu na zgodność z prawem przetwarzania przed jej cofnięciem. Możesz też złożyć skargę do Prezesa Urzędu Ochrony Danych Osobowych.',
-		'Podanie danych jest dobrowolne, ale bez nich nie będziemy mogli odpowiedzieć.',
-	];
+	return {
+		administrator: `Administratorem Twoich danych osobowych jest ${administrator}.${contact}`,
+		purpose:
+			'Dane podane w formularzu (imię, e-mail, telefon, treść wiadomości) przetwarzamy wyłącznie po to, żeby odpowiedzieć na Twoją wiadomość — na podstawie Twojej zgody (art. 6 ust. 1 lit. a RODO).',
+		retention:
+			'Dane przechowujemy przez czas potrzebny do obsługi zapytania, nie dłużej niż 12 miesięcy od ostatniej wiadomości.',
+		recipients:
+			'Odbiorcami danych są dostawcy usług technicznych: Cloudflare (hosting strony) i Resend (dostarczenie wiadomości e-mail). Mogą przetwarzać dane poza Europejskim Obszarem Gospodarczym na podstawie standardowych klauzul umownych zatwierdzonych przez Komisję Europejską.',
+		rights:
+			'Masz prawo dostępu do swoich danych, ich sprostowania, usunięcia, ograniczenia przetwarzania i przenoszenia, a także prawo cofnięcia zgody w dowolnym momencie — bez wpływu na zgodność z prawem przetwarzania przed jej cofnięciem. Możesz też złożyć skargę do Prezesa Urzędu Ochrony Danych Osobowych.',
+		voluntary: 'Podanie danych jest dobrowolne, ale bez nich nie będziemy mogli odpowiedzieć.',
+	};
 }

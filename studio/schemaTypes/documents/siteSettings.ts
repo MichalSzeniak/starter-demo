@@ -282,7 +282,8 @@ export const siteSettings = defineType({
 					title: 'Polityka prywatności',
 					type: 'reference',
 					to: [{ type: 'page' }],
-					description: 'Podstrona z pełną polityką prywatności — pod klauzulą pojawi się link.',
+					description:
+						'Własna podstrona z polityką prywatności. Puste = polityka złożona automatycznie z danych firmy pod adresem /polityka-prywatnosci. Link pojawia się pod klauzulą i w stopce.',
 				}),
 				defineField({
 					name: 'successMessage',

@@ -1,0 +1,54 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Heading from '~/components/Heading.astro';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { getSiteSettings } from '~/lib/content';
+import {
+	privacyPolicyMeta,
+	privacyPolicySections,
+	privacyPolicyTarget,
+} from '~/lib/privacy-policy';
+import { generatedOgImage, ogIdForSlug, requireSite } from '~/lib/seo/og-image';
+
+/**
+ * Polityka prywatności generowana z Ustawień (`lib/privacy-policy.ts`).
+ * Trasa z jednym parametrem, ale getStaticPaths zwraca co najwyżej jedną ścieżkę —
+ * i żadnej, gdy klient ma własną podstronę z polityką (wtedy renderuje ją `[...slug]`).
+ */
+export const getStaticPaths = (async () => {
+	const target = await privacyPolicyTarget();
+	return target.generated ? [{ params: { politykaPrywatnosci: target.slug } }] : [];
+}) satisfies GetStaticPaths;
+
+const site = requireSite(Astro.site);
+const settings = await getSiteSettings();
+const { title, description } = privacyPolicyMeta(settings);
+const sections = privacyPolicySections(settings);
+const slug = Astro.params.politykaPrywatnosci ?? '';
+---
+
+<BaseLayout
+	title={title}
+	description={description}
+	ogImage={generatedOgImage(ogIdForSlug(slug), site, 'Polityka prywatności')}
+>
+	<article class="content-container py-section">
+		<div class="max-w-2xl">
+			<Heading level={1} variant="section" class="text-ink">
+				Polityka prywatności
+			</Heading>
+			{sections.map((section) => (
+				<section class="mt-10">
+					<Heading level={2} class="text-xl font-bold text-ink sm:text-2xl">
+						{section.heading}
+					</Heading>
+					<div class="mt-3 space-y-3 text-muted">
+						{section.paragraphs.map((paragraph) => (
+							<p>{paragraph}</p>
+						))}
+					</div>
+				</section>
+			))}
+		</div>
+	</article>
+</BaseLayout>

@@ -3,6 +3,7 @@ import type { SiteSettings } from '~/lib/content';
 import { CONTACT_ENDPOINT, FIELD, LIMIT, type ContactStatus } from '~/lib/contact-form';
 import { telHref } from '~/lib/format';
 import { consentLabel, privacyNoticeParagraphs, successMessage } from '~/lib/privacy';
+import { privacyPolicyTarget } from '~/lib/privacy-policy';
 
 /**
  * Formularz kontaktowy → Worker `/api/kontakt` → e-mail przez Resend.
@@ -27,7 +28,8 @@ interface Props {
 const { settings, anchor } = Astro.props;
 const consent = consentLabel(settings);
 const notice = privacyNoticeParagraphs(settings);
-const policySlug = settings.contactForm?.privacyPolicySlug;
+// Własna podstrona z Ustawień albo generowana /polityka-prywatnosci — link jest zawsze.
+const policySlug = (await privacyPolicyTarget()).slug;
 const id = (suffix: string) => `${anchor}-${suffix}`;
 const phone = telHref(settings.phone);
 

@@ -1,7 +1,8 @@
 ---
 import type { Navigation, SiteSettings } from '~/lib/content';
 import { formatAddress, formatOpeningHours, socialLabel, telHref } from '~/lib/format';
-import { anchorAttributes, resolveLink, type ResolvedLink } from '~/lib/links';
+import { anchorAttributes, hrefForSlug, resolveLink, type ResolvedLink } from '~/lib/links';
+import { privacyPolicyTarget } from '~/lib/privacy-policy';
 
 interface Props {
 	settings: SiteSettings;
@@ -21,6 +22,12 @@ const footerItems = (navigation.footerMenu ?? [])
 	.filter((item): item is { label: string; link: ResolvedLink } =>
 		Boolean(item.label && item.link),
 	);
+
+// Link do polityki prywatności na dole stopki — chyba że klient ma go już w menu stopki.
+const policyHref = hrefForSlug((await privacyPolicyTarget()).slug);
+const policyInMenu = footerItems.some(
+	(item) => !item.link.external && item.link.href === policyHref,
+);
 ---
 
 <footer class="mt-section border-t border-border bg-surface-alt">
@@ -97,7 +104,14 @@ const footerItems = (navigation.footerMenu ?? [])
 		</div>
 	</div>
 
-	<div class="content-container border-t border-border py-4 text-xs text-muted">
-		&copy; {year} {settings.companyName}
+	<div class="content-container flex flex-wrap justify-between gap-x-6 gap-y-2 border-t border-border py-4 text-xs text-muted">
+		<span>
+			&copy; {year} {settings.companyName}
+		</span>
+		{!policyInMenu && (
+			<a href={policyHref} class="underline-offset-2 hover:text-ink hover:underline">
+				Polityka prywatności
+			</a>
+		)}
 	</div>
 </footer>
