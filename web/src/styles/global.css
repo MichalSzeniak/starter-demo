@@ -30,9 +30,17 @@
 	html {
 		scroll-behavior: smooth;
 		/* Nagłówek jest sticky: kotwice, „Przejdź do treści” i fokus z klawiatury
-		   nie mogą lądować pod nim. Zapas ponad jego wysokość (~65 px). */
-		scroll-padding-top: 5rem;
+		   nie mogą lądować pod nim. Zapas ponad jego wysokość: na telefonie długa
+		   nazwa firmy łamie się do 4 linii (~113 px przy 360 px), od `lg` jedna linia (~61 px). */
+		scroll-padding-top: 7.5rem;
 		-webkit-text-size-adjust: 100%;
+	}
+
+	/* = breakpoint `lg` Tailwinda */
+	@media (width >= 64rem) {
+		html {
+			scroll-padding-top: 5rem;
+		}
 	}
 
 	/* Szanujemy ustawienie systemowe „ogranicz animacje". */

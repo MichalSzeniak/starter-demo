@@ -16,6 +16,10 @@ import { anchorAttributes, resolveLink, type ResolvedLink } from '~/lib/links';
  * Bieżąca podstrona jest wyróżniona w menu i oznaczona `aria-current="page"` —
  * liczone przy buildzie z adresu strony, bez JS.
  *
+ * Nagłówek musi zmieścić się w `scroll-padding-top` (global.css), inaczej zasłania
+ * początek sekcji po skoku do kotwicy. Dlatego poniżej `lg` „Zadzwoń" zamiast numeru,
+ * a na telefonie mniejsza nazwa firmy — długa łamie się do 4 linii, nie jest obcinana.
+ *
  * Strona jednostronicowa (linki do kotwic `/#o-mnie`):
  * - sekcja widoczna na ekranie podświetla swój link czystym CSS-em
  *   (`scroll-target-group` + `:target-current`). Przeglądarki bez wsparcia po prostu
@@ -53,7 +57,7 @@ const phone = telHref(settings.phone);
 	<div class="content-container flex items-center justify-between gap-4 py-3">
 		<a
 			href="/"
-			class="flex items-center gap-2 text-lg font-semibold text-ink"
+			class="flex items-center gap-2 text-base/snug font-semibold text-ink sm:text-lg"
 			aria-label={`${settings.companyName} — strona główna`}
 		>
 			{hasLogo ? (
@@ -79,7 +83,7 @@ const phone = telHref(settings.phone);
 								{...anchorAttributes(item.link)}
 								aria-current={isCurrent(item.link) ? 'page' : undefined}
 								class:list={[
-									'text-sm font-medium underline-offset-8',
+									'text-sm font-medium whitespace-nowrap underline-offset-8',
 									isCurrent(item.link)
 										? 'text-ink underline decoration-brand decoration-2'
 										: 'text-muted hover:text-ink [&:target-current]:text-ink [&:target-current]:underline [&:target-current]:decoration-brand [&:target-current]:decoration-2',
@@ -97,9 +101,10 @@ const phone = telHref(settings.phone);
 			{phone && (
 				<a
 					href={phone}
-					class="rounded-md bg-brand px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-dark"
+					class="rounded-md bg-brand px-4 py-2 text-sm font-medium whitespace-nowrap text-white transition-colors hover:bg-brand-dark"
 				>
-					{settings.phone}
+					<span class="lg:hidden">Zadzwoń</span>
+					<span class="hidden lg:inline">{settings.phone}</span>
 				</a>
 			)}
 			{items.length > 0 && (
