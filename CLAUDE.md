@@ -28,8 +28,9 @@ pnpm lh                      # Lighthouse CI lokalnie
   React nie ma prawa trafić do `web/`.
 - Cel Lighthouse: mobile performance ≥ 90, pozostałe kategorie 100.
   Wygląd ma pierwszeństwo przed ostatnimi punktami wydajności.
-- Menu mobilne i FAQ działają na `<details>`, bez JS. Uzgodnione skrypty: karuzela
-  i formularz kontaktowy (tylko na stronach, które je renderują). Każdy nowy
+- Menu mobilne i FAQ działają na `<details>`, bez JS. Uzgodnione skrypty: karuzela,
+  formularz kontaktowy i zamykanie menu mobilnego po kliknięciu kotwicy (165 B, tylko
+  gdy w menu są kotwice) — każdy tylko na stronach, które go potrzebują. Każdy nowy
   skrypt albo wyspa = pytanie do mnie.
 - **Obrazy lokalnie.** `astro:assets` pobiera z `cdn.sanity.io` przy buildzie.
   Nie linkuj do CDN Sanity w wyjściowym HTML.
