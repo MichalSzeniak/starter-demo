@@ -15,6 +15,7 @@ Wariant: panel Sanity / bez CMS-u
 ## 0. Warunki startu
 
 - [ ] Brief (`docs/BRIEF.md`) wrócił kompletny — wszystkie pozycje z sekcji „Bez tego nie startuję".
+- [ ] Domena zarejestrowana na klienta (abonent = klient, nie Ty) — `docs/PRZEKAZANIE.md`.
 - [ ] Mam dostęp do domeny: login do rejestratora albo osoba po stronie klienta, która
       zmieni serwery DNS w ustalonym dniu.
 - [ ] Wiem, gdzie klient ma pocztę (Google Workspace, home.pl, OVH…) — od tego zależy,
@@ -158,8 +159,10 @@ Całą sekcję pomijasz w wariancie **[bez CMS]** — treści i obrazy są w rep
       i za ile — jeśli zmiany są poza abonamentem).
 - [ ] **[panel]** **Test klienta**: bez podpowiedzi zmienia numer telefonu w stopce (kryterium:
       < 60 s) i widzi zmianę na stronie po kilku minutach. Jeśli nie — zapisz, gdzie utknął.
-- [ ] Klient ma dostęp do: Cloudflare (albo wie, że domenę trzymasz Ty), Search Console
-      (użytkownik), wizytówki Google (właściciel), panelu analityki.
+- [ ] Klient ma dostęp do: Search Console (użytkownik), wizytówki Google (właściciel),
+      panelu analityki; wie, że hosting i DNS są na Twoim koncie Cloudflare.
+- [ ] Umowa ma licencję na kod i klauzulę wyjścia — co klient dostaje po rozstaniu
+      (`docs/PRZEKAZANIE.md`).
 
 ## 11. Po starcie
 

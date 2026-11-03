@@ -93,6 +93,12 @@ git cherry-pick <hash>                              # pojedyncze poprawki
 - **Kierunek:** błąd znaleziony u klienta poprawiasz najpierw w starterze, potem cherry-pick
   do klientów. Starter zostaje źródłem prawdy.
 
+## Rozstanie z klientem
+
+`pnpm eksport-klienta` w repo klienta — kod bez historii i bez narzędzi startera, sprawdzony
+buildem, jako repo z jednym commitem i `.zip`. Reszta (domena, DNS, konta, sprzątanie):
+`docs/PRZEKAZANIE.md`.
+
 ## Czego unikać
 
 - Pracy nad klientem w folderze startera.
