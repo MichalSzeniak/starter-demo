@@ -78,6 +78,8 @@ Dlaczego tak:
   Uprzedź klienta: jedna strona to jeden tytuł i opis w Google zamiast kilku podstron.
   Przykład: `D:\dev\gabinet-demo`.
 - **Animacje:** `motion` w `brand.ts` — `'subtelny'` (domyślnie) albo `'brak'`.
+- **Telefon w nagłówku:** `headerPhone` w `brand.ts`, domyślnie `false`. Włącz, gdy klienci
+  głównie dzwonią (awarie, rezerwacje, taksówka). Telefon w hero i kontakcie jest niezależnie.
 
 ## Poprawki ze startera u klienta
 

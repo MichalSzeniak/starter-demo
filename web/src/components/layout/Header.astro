@@ -1,5 +1,6 @@
 ---
 import SanityImage from '~/components/SanityImage.astro';
+import { brand } from '~/config/brand';
 import type { Navigation, SiteSettings } from '~/lib/content';
 import { telHref } from '~/lib/format';
 import { anchorAttributes, resolveLink, type ResolvedLink } from '~/lib/links';
@@ -15,6 +16,8 @@ import { anchorAttributes, resolveLink, type ResolvedLink } from '~/lib/links';
  *
  * Bieżąca podstrona jest wyróżniona w menu i oznaczona `aria-current="page"` —
  * liczone przy buildzie z adresu strony, bez JS.
+ *
+ * Przycisk telefonu tylko przy `brand.headerPhone` (domyślnie wyłączony).
  *
  * Nagłówek musi zmieścić się w `scroll-padding-top` (global.css), inaczej zasłania
  * początek sekcji po skoku do kotwicy. Dlatego poniżej `lg` „Zadzwoń" zamiast numeru,
@@ -47,7 +50,7 @@ const isCurrent = (link: ResolvedLink) => !link.external && link.href === curren
 const hasAnchorLinks = items.some((item) => !item.link.external && item.link.href.includes('#'));
 
 const hasLogo = Boolean(settings.logo?.asset?.url);
-const phone = telHref(settings.phone);
+const phone = brand.headerPhone ? telHref(settings.phone) : null;
 ---
 
 <header

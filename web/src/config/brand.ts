@@ -83,6 +83,11 @@ export interface Brand {
 	 *  zdjęć, cień nagłówka i pasek postępu przy przewijaniu, uniesienie przycisków;
 	 *  „brak" — strona bez ruchu. Ustawienie systemowe „ogranicz animacje" i tak wyłącza ruch. */
 	motion: 'subtelny' | 'brak';
+
+	/** Przycisk telefonu w przyklejonym nagłówku („Zadzwoń" na telefonie, numer od `lg`).
+	 *  Włączaj tam, gdzie telefon jest głównym kanałem: awarie, rezerwacje, taksówka,
+	 *  mechanik. Telefon w hero, kontakcie i danych strukturalnych zostaje niezależnie. */
+	headerPhone: boolean;
 }
 
 export const brand: Brand = {
@@ -131,6 +136,8 @@ export const brand: Brand = {
 	},
 
 	motion: 'subtelny',
+
+	headerPhone: false,
 };
 
 /* ------------------------------------------------------------------ */
