@@ -317,7 +317,7 @@ if (dangling.length > 0) {
 	for (const { at, line } of dangling) console.log(`  ${at}  ${line.trim().slice(0, 90)}`);
 	console.log('');
 }
-console.log('Dalej: docs/PRZEKAZANIE.md — DNS, domena, konta, sprzątanie po Twojej stronie.\n');
+console.log('Dalej: docs/PRZEKAZANIE.md w repo startera — DNS, domena, konta, sprzątanie.\n');
 
 // ---------------------------------------------------------------------------
 // Pliki dla następnego wykonawcy
