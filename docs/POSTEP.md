@@ -1781,3 +1781,15 @@ Bez zmian — skrypt działa tylko w repo dewelopera.
 
 1. `git push` startera — od `8778eab` do tego wpisu wszystko tylko lokalnie.
 2. Zapisy licencji i klauzuli wyjścia do sprawdzenia przez prawnika, potem do wzoru umowy.
+
+## Oferta — pakiety, dodatki, abonament — 2026-11-03
+
+`docs/OFERTA.md`: pakiety „Wizytówka" (jedna strona, bez panelu) i „Firma" (do 5 podstron,
+panel), wspólny standard (wszystko, co starter robi sam — poza cennikiem), dodatki
+z biblioteki i budowane na zamówienie (szacunki godzin z „Odłożonych"), abonament, lista
+„czego nie obiecywać". Ceny i terminy jako pola do uzupełnienia — brak pomiarów czasu
+wdrożenia. Decyzja zgodna z wcześniejszą notatką „Konfigurator zakresu": nie cennik modułowy.
+Konsekwencja: wycinanie niekupionych modułów przy eksporcie niepotrzebne — formularz jest
+w każdym pakiecie.
+
+Do rozwiązania przed sprzedażą: podstrona „Polityka prywatności" bez zdjęcia (luka 3).
