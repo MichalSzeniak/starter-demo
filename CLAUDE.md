@@ -44,10 +44,21 @@ pnpm lh                      # Lighthouse CI lokalnie
 
 ## Plan projektu
 
-Projekt realizujemy fazami opisanymi w `docs/PLAN.md`.
-Przed rozpoczęciem pracy przeczytaj `docs/PLAN.md` oraz `docs/POSTEP.md`.
-Wykonuj wyłącznie fazę, którą wskażę. Po jej zakończeniu dopisz wpis
+Projekt realizujemy fazami opisanymi w `docs/PLAN.md` (fazy 0–7 zamknięte).
+Wykonuj wyłącznie zadanie, które wskażę. Po jego zakończeniu dopisz wpis
 do `docs/POSTEP.md` i zatrzymaj się.
+
+## Sesje
+
+- **Początek: `/start`** (albo przeczytaj `docs/STAN.md`). Całego `docs/POSTEP.md`
+  nie czytaj — tylko wpisy, do których odsyła STAN.md albo które są potrzebne.
+- **Koniec: `/koniec`** — wpis w POSTEP, nadpisany STAN.md, osobny commit dokumentów.
+- `docs/STAN.md` = stan bieżący (nadpisywany, krótki); `docs/POSTEP.md` = historia
+  (tylko dopisywanie). Decyzje zapisuj w STAN.md od razu, nie na koniec.
+- Jedna sesja = jeden temat; pomysły poboczne → STAN.md, „Propozycje odłożone”.
+- Dane i korespondencja klientów nigdy do tego repo (jest publiczne) —
+  `D:\dev\zlecenia\…` albo prywatne repo klienta.
+- Szczegóły: `docs/SESJE.md`.
 
 ## Wiedza o Sanity
 

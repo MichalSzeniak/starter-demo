@@ -1992,3 +1992,25 @@ Blokuje start: cena, termin i liczba rund poprawek (OFERTA.md), warunki umowy (p
 rozstaniu — „Do decyzji” 1 we wpisie „Stan na koniec dnia”), `git push` startera przed klonem,
 domena klienta (potrzebna do wysyłki z formularza przez Resend). To pierwsze wdrożenie —
 zmierzyć czas (start i uruchomienie w checkliście).
+
+## Praca w sesjach: STAN.md, /start, /koniec — 2026-11-03
+
+Ciągłość między sesjami bez ręcznego prompta startowego (poprzedni prompt był nieaktualny —
+zlecał zrobione już luki 1–2 — i miał nierozstrzygnięte decyzje w nawiasach).
+
+- **`docs/STAN.md`** — stan bieżący (repo, aktywne zlecenia, „Do decyzji” 1–6, kolejka,
+  odłożone, niezweryfikowane), nadpisywany; POSTEP zostaje historią.
+- **`.claude/commands/start.md`** (`/start [temat]`) — czyta STAN.md i aktywne zlecenia,
+  porównuje z `git status` we wszystkich repo, pyta o decyzje, nie koduje przed odpowiedzią.
+- **`.claude/commands/koniec.md`** (`/koniec [temat]`) — wpis w POSTEP, nadpisany STAN.md,
+  dziennik zlecenia, pamięć, commit dokumentów osobno, bez pusha.
+- **`CLAUDE.md`** — sekcja „Sesje”; „Plan projektu” nie każe już czytać całego POSTEP.
+- **`docs/SESJE.md`** — instrukcja dla właściciela + przeniesienie metody do innych projektów
+  (szablony STAN.md, POSTEP, sekcji CLAUDE.md, komend).
+
+Eksport do klienta pomija `docs/` i `.claude/` (bez zmian w `eksport-klienta`). Do gabinet-demo
+nie przenoszone — repo klienta nie ma STAN.md; dopisek w CLAUDE.md repo klienta jest w kolejce (7).
+
+Niezweryfikowane: komendy nie były uruchomione w nowej sesji (format pliku wg dokumentacji
+Claude Code: Markdown w `.claude/commands/`, frontmatter `description` i `argument-hint`) —
+pierwsze `/start` jutro jest testem.
