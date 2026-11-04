@@ -24,8 +24,8 @@ pnpm lh                      # Lighthouse CI lokalnie
 ## Twarde reguły
 
 - `output: 'static'`. Nie przełączaj na SSR bez wyraźnej zgody.
-- Budżet JS klienckiego: 10 kB nieskompresowane, waniliowy, bez frameworków.
-  React nie ma prawa trafić do `web/`.
+- JS kliencki: bez limitu w kB — pilnują go próg Lighthouse (mobile perf ≥ 90) i zgoda
+  na każdy skrypt. Waniliowy, bez frameworków. React nie ma prawa trafić do `web/`.
 - Cel Lighthouse: mobile performance ≥ 90, pozostałe kategorie 100.
   Wygląd ma pierwszeństwo przed ostatnimi punktami wydajności.
 - Menu mobilne i FAQ działają na `<details>`, bez JS. Uzgodnione skrypty: karuzela,
@@ -106,10 +106,10 @@ Build ma **failować**, gdy któregokolwiek z tych elementów brakuje.
 - Studio żyje w `studio/`, strona w `web/`. React nie ma prawa
   pojawić się w zależnościach `web/` inaczej niż jako świadoma wyspa.
 
-- Budżet JS klienckiego: 10 kB nieskompresowane, waniliowy, bez frameworków.
+- JS kliencki: bez limitu w kB (decyzja 2026-11-04), waniliowy, bez frameworków.
   React nie ma prawa trafić do `web/` w żadnej formie.
-- Każdy dodatek do budżetu wymaga uzasadnienia: czego CSS nie potrafi.
-  Aktualne wykorzystanie raportuj w POSTEP.md.
+- Każdy nowy skrypt wymaga uzasadnienia: czego CSS nie potrafi.
+  Wagę JS na stronach raportuj w POSTEP.md — żeby było widać, czy przyrasta.
 - Cel Lighthouse: mobile performance ≥ 90, pozostałe kategorie 100.
   Wygląd ma pierwszeństwo przed ostatnimi punktami wydajności.
 
