@@ -2137,3 +2137,91 @@ Bez zmian — starter 0 B, gabinet-demo 1339 B.
 - Eksport przy rozstaniu (wariant B) — „do przemyślenia”; po niej poprawić PRZEKAZANIE.md
   (licencja, „kod strony”) i zdanie „stronę do przeniesienia” w OFERTA.md.
 - OFERTA.md: ceny pakietów, rundy poprawek, pozostałe punkty listy.
+
+## Różnorodność stron — blok `style`, kształt zdjęć, opinie w karuzeli, menu — 2026-11-04
+
+Temat od właściciela: kilku klientów z jednej branży (np. psychologowie) nie może dostać tej samej
+strony z innymi zdjęciami. Sesja zaczęła od koncepcji, skończyła na dwóch osiach i trzech
+poprawkach zgłoszonych po drodze.
+
+### Ustalenia
+
+- **Kierunek:** zamiast 3 pełnych presetów — niezależne ustawienia („osie”) z kilkoma gotowymi
+  wartościami; Spokojny / Rzeczowy / Wyrazisty to gotowe wypełnienia bloku `style` w `brand.ts`
+  (w kodzie, nie w Studio). Kolejność sekcji jest dowolna już dziś (`sections`) — brakuje układów
+  dla branż (do ankiety treści).
+- **Bez rejestru wdrożeń i bez losowania** — osie dobiera właściciel ręcznie.
+- **Formularz zapytania bez konfiguratora szczegółów** (strona tekstu, kolejność sekcji): klient
+  nie jest projektantem, każde pytanie obniża konwersję, więcej wyborów = więcej rund poprawek.
+  Propozycja (niezatwierdzona): 2 pytania w języku klienta — „Jakie masz zdjęcia?” → hero
+  i kształt zdjęć, „Co odwiedzający ma zobaczyć najpierw?” → układ sekcji.
+- **Nazwy w kodzie po angielsku** (klucze, typy, wartości); komentarze, Studio, commity po polsku.
+- **Kształt zdjęć per sekcja, nie globalnie** — właściciel nie chce jednym ustawieniem okrągłych
+  zdjęć w całej stronie.
+- **Pionowy pasek postępu — odrzucony** po dwóch iteracjach (długa linia: wyglądała jak błąd
+  układu i znikała na sekcji w kolorze marki; pastylka z odstępem od krawędzi). Commit cofnięty.
+
+### Co powstało (starter, lokalnie)
+
+- `79d505a` — `style.shape` (sharp/soft/round) i `style.spacing` (compact/normal/airy) zastępują
+  wolne pola `radius` i `spacing.sectionY*`; wartości domyślne = poprzednie. Przyciski mają osobne
+  zaokrąglenie `rounded-button` (przy `round` — pigułka). `contentMax` wyjęty na poziom `brand`.
+- `9cdc01f` — pole `imageShape` (rect/arch/circle, fabryka `imageShapeField` jak `layoutField`)
+  w hero i textImage; `coalesce(…, "rect")` w zapytaniu. `SanityImage` przyjmuje `shape` →
+  `data-shape` + `object-position` z hotspotu (`focalPoint()` w `image.ts`, przeliczony na kadr).
+  Przycinanie CSS-em: `aspect-ratio` + `object-fit: cover`, koło maks. 24 rem, łuk 4:5 maks. 28 rem.
+  Prostokąt — HTML bez zmian.
+- `dd69cdd` — menu: link bieżącej podstrony ma `href="#"` (przewija na górę, bez przeładowania);
+  link-guard przepuszcza pusty fragment, `#top` by nie przeszedł.
+- `5781635` + `54ffb34` (revert) — `style.progress` z pionowym paskiem; wycofane w całości.
+- `07ea8d4` — opinie klientów: `layoutField()` (siatka/karuzela, domyślnie siatka), karta
+  wydzielona do `TestimonialCard.astro`, podgląd w Studio pokazuje układ. **Poprawka seeda:**
+  przy opiniach gubił `layout`.
+- `1c44a71` — treści demo: 6 opinii w karuzeli (4 nowe bez zdjęcia — pole opcjonalne), galeria
+  „Nasze realizacje” 8 zdjęć; `galeria-5…8` z picsum.photos (id 1015, 1018, 1039, 1043, licencja
+  Unsplash; pierwsza pula odrzucona — logotypy Apple/LG), WebP 852 kB razem; placeholdery SVG.
+
+### Weryfikacja
+
+- `pnpm check` (web) i `tsc` (studio): 0 błędów po każdym kroku. Build: SEO 5 stron OK, linki
+  140 (Sanity) / 145–149 (demo), 0 martwych.
+- Lighthouse na demo z łukiem w hero i kołem w „O nas”: mobile perf 0,98–0,99, A11y 1, SEO 1,
+  CLS 0, `image-aspect-ratio` OK; desktop perf 1. To samo z karuzelą opinii.
+  **Best Practices 0,81–0,82 na każdej stronie — wyłącznie `is-on-https`: AdGuard wstrzykuje
+  skrypty z `http://local.adguard.org`.** Nie skutek zmian (polityka prywatności bez nowych
+  elementów ma ten sam wynik).
+- Menu sprawdzone w Chrome (puppeteer): po kliknięciu znacznik w `window` przetrwał, scrollY 0.
+- Zrzuty: łuk i koło (1440), karuzela opinii (1440, 390).
+
+### Budżet JS klienckiego
+
+Bez nowego skryptu. Karuzela opinii używa istniejącego `Carousel` — ładowany tylko na stronach
+z karuzelą (w demo: strona główna i „O nas”). Starter bez karuzeli 0 B, gabinet-demo 1339 B.
+
+### Dataset Sanity — znalezisko
+
+Dokumenty demo w Sanity są z seeda 2026-09-12 i nikt ich nie edytował (ten sam `_updatedAt`).
+Galeria ma tam stare pole `images` zamiast `items` (zmiana w `3725a2f`) — strona z Sanity pokazuje
+nagłówek galerii bez zdjęć. Naprawia to ponowny `pnpm --filter studio seed`; Claude nie uruchomił
+(blokada auto mode — zapis do zasobu zewnętrznego). Jest też szkic `drafts.13328575…` („1”) spoza
+seeda — seed go nie dotyka.
+
+### Niezweryfikowane
+
+- Kształty zdjęć na prawdziwym telefonie (headless Chrome nie schodzi poniżej 500 px; zrzut 390 px
+  ucięty) i w Safari/Firefox.
+- `imageShape` ze zdjęciem z hotspotem ze Studio (demo nie ma hotspotów — tylko środek).
+- Wartości `sharp`/`round`, `compact`/`airy` — wybrane „na oko”, nieoglądane obok siebie.
+- Seed z nowymi treściami (nieuruchomiony).
+
+### Do decyzji
+
+- Dwa pytania w formularzu zapytania (zdjęcia → hero/kształt, „co najpierw” → układ).
+- Czy kierunek z osiami (krój, hero, dekor, warianty sekcji, układy branżowe) zatwierdzony
+  w całości — dziś wprost przyjęte tylko `shape`, `spacing`, `imageShape`.
+
+### Następne kroki
+
+- Landing z ofertą w `D:\dev\landing-oferta` (decyzje w STAN.md) — praca autonomiczna.
+- Krój nagłówków (para krojów, pomiar mobile) — następny krok różnorodności.
+- gabinet-demo przy pobraniu startera: konflikt w `brand.ts` (`radius`/`spacing` → `style`).
