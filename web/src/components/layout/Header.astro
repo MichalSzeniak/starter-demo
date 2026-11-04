@@ -15,7 +15,8 @@ import { anchorAttributes, resolveLink, type ResolvedLink } from '~/lib/links';
  * to zmiana w jednym pliku.
  *
  * Bieżąca podstrona jest wyróżniona w menu i oznaczona `aria-current="page"` —
- * liczone przy buildzie z adresu strony, bez JS.
+ * liczone przy buildzie z adresu strony, bez JS. Jej link to `#`: klik przewija na górę
+ * zamiast przeładowywać stronę, na której już jesteśmy.
  *
  * Przycisk telefonu tylko przy `brand.headerPhone` (domyślnie wyłączony).
  *
@@ -46,6 +47,8 @@ const items = (navigation.mainMenu ?? [])
 // Ta sama normalizacja co canonical w BaseLayout: bez ukośnika na końcu, korzeń to `/`.
 const currentPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
 const isCurrent = (link: ResolvedLink) => !link.external && link.href === currentPath;
+const menuLinkAttributes = (link: ResolvedLink) =>
+	isCurrent(link) ? { href: '#' } : anchorAttributes(link);
 
 const hasAnchorLinks = items.some((item) => !item.link.external && item.link.href.includes('#'));
 
@@ -83,7 +86,7 @@ const phone = brand.headerPhone ? telHref(settings.phone) : null;
 					{items.map((item) => (
 						<li>
 							<a
-								{...anchorAttributes(item.link)}
+								{...menuLinkAttributes(item.link)}
 								aria-current={isCurrent(item.link) ? 'page' : undefined}
 								class:list={[
 									'text-sm font-medium whitespace-nowrap underline-offset-8',
@@ -123,7 +126,7 @@ const phone = brand.headerPhone ? telHref(settings.phone) : null;
 							{items.map((item) => (
 								<li>
 									<a
-										{...anchorAttributes(item.link)}
+										{...menuLinkAttributes(item.link)}
 										aria-current={isCurrent(item.link) ? 'page' : undefined}
 										class:list={[
 											'block rounded-sm px-3 py-2 text-sm text-ink hover:bg-surface-alt',
