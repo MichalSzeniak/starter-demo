@@ -159,7 +159,7 @@ Całą sekcję pomijasz w wariancie **[bez CMS]** — treści i obrazy są w rep
 - [ ] **[panel]** Klient zaproszony do Sanity (Members → Invite) z rolą **Editor**, nie Administrator.
 - [ ] **[panel]** `docs/DLA-KLIENTA.md` — uzupełniony adres Studio i kontakt; wysłany jako PDF.
 - [ ] **[bez CMS]** Klient wie, jak zgłaszać zmiany treści (komu, którędy, w jakim czasie
-      i za ile — jeśli zmiany są poza abonamentem).
+      i za ile — 30 dni po uruchomieniu za darmo, potem godzinowo; OFERTA.md, „Utrzymanie roczne”).
 - [ ] **[panel]** **Test klienta**: bez podpowiedzi zmienia numer telefonu w stopce (kryterium:
       < 60 s) i widzi zmianę na stronie po kilku minutach. Jeśli nie — zapisz, gdzie utknął.
 - [ ] Klient ma dostęp do: Search Console (użytkownik), wizytówki Google (właściciel),

@@ -12,7 +12,7 @@ Przykład gotowego projektu: `D:\dev\gabinet-demo` — gabinet psychoterapii w w
 | Kto zmienia treści | klient, w Studio | Ty, w `web/src/tresci/` |
 | Zmienna builda | `SANITY_PROJECT_ID` (+ `SANITY_DATASET`) | `LOCAL_CONTENT=true` |
 | Studio, webhook, backup | tak | nie — treści są w repo, commit uruchamia build |
-| Dla kogo | klient zmienia coś częściej niż kilka razy w roku | zmiany rzadkie, robione w ramach abonamentu |
+| Dla kogo | klient zmienia coś częściej niż kilka razy w roku | zmiany rzadkie, robione przez Ciebie godzinowo |
 
 Obie naraz (`LOCAL_CONTENT=true` i `SANITY_PROJECT_ID`) przerywają build. Przejście klienta
 bez CMS-u na panel wymaga importu treści do Sanity — na razie odłożone (`docs/POSTEP.md`).

@@ -8,10 +8,10 @@ przekazać, żeby strona i poczta działały bez przerwy. Kod do przekazania rob
 
 | Element | Czyje | Dlaczego |
 | --- | --- | --- |
-| Domena (abonent u rejestratora) | **klienta, zawsze** | Domena na Ciebie zamienia rozstanie w spór o adres. |
+| Domena (abonent u rejestratora) | **klienta, zawsze** — rejestrujesz i opłacasz Ty (na swoim koncie u rejestratora), w ramach utrzymania rocznego | Domena na Ciebie zamienia rozstanie w spór o adres. |
 | Search Console, wizytówka Google, analityka | klienta (właściciel), Ty jako użytkownik | Historia i opinie należą do firmy. |
 | Projekt Sanity (panel) | Twoja organizacja, klient jako Editor | Przy rozstaniu przenosisz projekt albo eksport. |
-| Cloudflare (Worker, DNS), GitHub, Resend | Twoje konta | Abonament: utrzymujesz i odpowiadasz za działanie. |
+| Cloudflare (Worker, DNS), GitHub, Resend | Twoje konta | Utrzymanie roczne: utrzymujesz i odpowiadasz za działanie. Resend: jedna Twoja domena nadawcy dla wszystkich klientów. |
 
 ## Umowa — co ustalić przed startem
 

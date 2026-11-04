@@ -2073,3 +2073,67 @@ Bez zmian w kodzie stron — starter 0 B, gabinet-demo 1339 B.
 - CLAUDE.md przeczy sam sobie o React: „świadoma wyspa” (w. 106) vs „w żadnej formie” (w. 110).
 - Zapisać prompt landingu do pliku (poza repo startera — będą tam dane firmy).
 - Stack landingu: Astro bez Reacta (rekomendacja) — formalne potwierdzenie.
+
+## Model rozliczeń: utrzymanie roczne zamiast abonamentu — 2026-11-04
+
+Sesja bez kodu stron: decyzje z listy „Do decyzji”, rozeznanie rynku, przepisanie oferty.
+
+### Decyzje właściciela
+
+- **Abonament wycofany** — właściciel nie widział, jak miałby działać. Zamiast niego
+  **utrzymanie roczne 300 zł/rok** na kontach wykonawcy; w kwocie tylko utrzymanie (domena,
+  hosting, formularz, kopie, poprawki techniczne). Zmiany osobno: **150 zł/h**, od 30 min
+  (jednostka z rekomendacji, właściciel nie zakwestionował); 30 dni po uruchomieniu zmiany
+  za darmo do 2 h; błąd ≠ zmiana; brak opłaty → wyłączenie po 30 dniach.
+  Po drodze odrzucony „Model C” (jednorazowo, hosting i domena na kliencie).
+- **Domena** rejestrowana przez wykonawcę na swoim koncie u rejestratora, **abonentem jest
+  klient** — klient nie dotyka niczego technicznego, a przy rozstaniu dostaje kod AuthInfo.
+- **Resend:** formularze wszystkich klientów wysyłają z jednej domeny wykonawcy
+  (`CONTACT_FROM`); Reply-To = osoba z formularza już jest w workerze — bez zmian w kodzie.
+- **React w `web/` zakazany bez wyjątków** — CLAUDE.md (`82e435f`).
+- Bez pola „Pokaż formularz” w sekcji „Kontakt”. Landing na Astro bez Reacta. Promptu
+  landingu nie zapisujemy.
+- Do kolejki: podgląd własnego koloru w prototypie, `scroll-padding-top` (jeśli pomiar pokaże,
+  że warto), etykiety stylów w Studio („Śródtytuł”). Odpada „zgłoś zmianę” dla abonamentu.
+
+### Rozeznanie (blogi firm i platform — widełki orientacyjne)
+
+- Domena + hosting wizytówki ok. 150–800 zł/rok; „opieka” freelancera 100–500 zł/mies.
+  (głównie WordPress — nieporównywalne ze stroną statyczną).
+- Stawki freelancera web: mid ok. 80–250 zł/h, „minimum opłacalne” 120–150 zł/h.
+- Darmowe plany: Cloudflare Workers 100 tys. wywołań/dzień **na konto** (assety statyczne bez
+  limitu); Sanity — projekty bez limitu, limity per projekt (20 miejsc, 10 tys. dokumentów);
+  Resend — 100 maili/dzień i 3000/mies. **na konto**, 1 albo 3 domeny (źródła sprzeczne).
+- Praktyka z domenami: klient jako właściciel (abonent); rejestratorzy przewidują
+  rejestrację przez pośrednika na dane klienta.
+
+### Co powstało
+
+- Starter `82e435f` — CLAUDE.md: usunięte „świadoma wyspa”, zostaje „w żadnej formie”.
+- Dokumenty (commit tego wpisu): `OFERTA.md` — sekcja „Utrzymanie roczne” zamiast „Abonament”,
+  „Wizytówka”: zmiany godzinowo; `PRZEKAZANIE.md` — domena przez wykonawcę na dane klienta,
+  jedna domena nadawcy w Resend; `CHECKLIST-WDROZENIE.md` (sekcja 10) i `NOWY-PROJEKT.md` —
+  bez „abonamentu”.
+- Pytanie o obrazy demo: `nowy-klient` usuwa `web/public/demo/` i `studio/scripts/demo-images/`
+  (zawsze) oraz `web/src/tresci/obrazy/` (przy panelu) dopiero po „Zapisać?”. Z kodu
+  (`client.ts`) wynika, że to nie powinno dawać błędów — placeholdery demo są używane tylko bez
+  projektu i bez `LOCAL_CONTENT`, a `nowy-klient` zawsze ustawia jedno z nich.
+
+### Budżet JS klienckiego
+
+Bez zmian — starter 0 B, gabinet-demo 1339 B.
+
+### Niezweryfikowane
+
+- Limit domen na darmowym planie Resend (1 czy 3); limity planów zmieniają się bez zapowiedzi.
+- Ceny odnowienia domeny .pl u rejestratorów (koszt po stronie wykonawcy w 300 zł).
+- `nowy-klient` na świeżym klonie — czy rzeczywiście nie ma błędów na starcie (nie uruchamiano;
+  właściciel nie podał treści błędu).
+- Procedura .pl: rejestracja przez pośrednika na dane abonenta i wydanie AuthInfo — z regulaminów
+  rejestratorów, nie z dokumentacji NASK.
+
+### Do decyzji
+
+- Eksport przy rozstaniu (wariant B) — „do przemyślenia”; po niej poprawić PRZEKAZANIE.md
+  (licencja, „kod strony”) i zdanie „stronę do przeniesienia” w OFERTA.md.
+- OFERTA.md: ceny pakietów, rundy poprawek, pozostałe punkty listy.

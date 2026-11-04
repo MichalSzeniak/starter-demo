@@ -1,4 +1,4 @@
-# Oferta — pakiety, dodatki, abonament
+# Oferta — pakiety, dodatki, utrzymanie roczne
 
 Baza do oferty i strony ofertowej, zgodna z tym, co starter umie **dziś**. Zmienia się razem
 ze starterem: nowa możliwość albo dodatek z „Odłożonych" wdrożony u klienta → popraw ten plik.
@@ -35,7 +35,7 @@ Uwagi wewnętrzne są oznaczone „Dla Ciebie".
 
 > Dla Ciebie: to wszystko wynika ze startera i checklisty — koszt dla Ciebie to minuty.
 > Dlatego nie ma tego w cenniku. Analityka Plausible/Umami ma własny koszt subskrypcji
-> (albo darmowy plan) — ustal, czy wliczasz go w abonament.
+> (albo darmowy plan) — ustal, czy wliczasz go w utrzymanie roczne.
 
 ---
 
@@ -47,7 +47,7 @@ Dla firm, którym wystarczy jedna przewijana strona: kto, co, za ile, jak się s
 | --- | --- |
 | Cena | `____ zł` |
 | Zakres | jedna strona z sekcjami z biblioteki (zwykle 5–8), menu przewijające do sekcji |
-| Treści zmienia | wykonawca, w ramach abonamentu (bez panelu) |
+| Treści zmienia | wykonawca, płatnie za godzinę (bez panelu); 30 dni po uruchomieniu — za darmo |
 | Termin | `__` dni roboczych od kompletu materiałów |
 
 Klient dostarcza (brief): dane firmy (A), domena i poczta (B), logo i kolor (C), treść
@@ -109,18 +109,42 @@ w starter (zasada z POSTEP, „Odłożone").
 
 ---
 
-## Abonament
+## Utrzymanie roczne
+
+Strona działa, a Ty nie zajmujesz się niczym technicznym — jedna opłata raz w roku.
 
 | | |
 | --- | --- |
-| Cena | `____ zł` / mies. |
-| Hosting | Cloudflare — strona i formularz |
-| Utrzymanie | poprawki i ulepszenia wdrażane we wszystkich stronach (cherry-pick ze startera) |
-| Kopie zapasowe | nocne, treści i zdjęcia („Firma") |
-| Zmiany treści | „Wizytówka": `__` zmian w miesiącu; „Firma": pomoc przy panelu |
-| Domena | pozostaje na kliencie i jest opłacana przez klienta u rejestratora |
+| Cena | 300 zł / rok |
+| Domena | rejestrujemy na Twoją firmę (to Ty jesteś jej właścicielem), opłacamy i odnawiamy — w cenie |
+| Hosting | strona i formularz kontaktowy — w cenie |
+| Kopie zapasowe | nocne, treści i zdjęcia („Firma") — w cenie |
+| Poprawki techniczne | ulepszenia i poprawki bezpieczeństwa — w cenie |
+| Na start | przez 30 dni od uruchomienia zmiany za darmo, do 2 godzin pracy |
+| Później zmiany | płatne osobno: 150 zł / godz., rozliczane od 30 min |
 
-Po rozwiązaniu umowy klient dostaje kod strony, treści i dostępy — `docs/PRZEKAZANIE.md`.
+- **Błąd to nie zmiana.** Gdy coś na stronie nie działa tak, jak zostało oddane, poprawiamy
+  to bez opłat — zawsze. Zmiana to coś nowego albo coś inaczej.
+- **Brak opłaty** — przypomnienie; 30 dni po terminie strona zostaje wyłączona. Domena
+  pozostaje Twoja.
+- **Koniec współpracy** — dostajesz kod przeniesienia domeny i stronę do przeniesienia
+  (szczegóły: `docs/PRZEKAZANIE.md`).
+
+> Dla Ciebie:
+> - Koszt po Twojej stronie to praktycznie samo odnowienie domeny — wybierz rejestratora
+>   ze stałą ceną odnowienia (nie promocyjną za pierwszy rok). Hosting 0 zł: Cloudflare
+>   Workers Free, Sanity Free, Resend Free; limity liczą się **na Twoje konto**, nie na
+>   klienta (STAN.md, rozeznanie 2026-11-04).
+> - Domena: rejestrujesz na swoim koncie u rejestratora, **abonentem jest klient** (jego dane).
+>   Przy rozstaniu klient dostaje kod AuthInfo.
+> - Formularze wszystkich klientów wysyłają z jednej Twojej domeny (`CONTACT_FROM`);
+>   „Odpowiedz" trafia do osoby z formularza (Reply-To w workerze).
+> - 300 zł to dolny pułap rynku za samą domenę i hosting (ok. 150–800 zł/rok) — przewaga
+>   cenowa, ale marża jest mała, więc każda praca poza utrzymaniem idzie godzinowo.
+>   Netto czy brutto — zależnie od VAT.
+> - Bez gwarancji terminu realizacji zmian (bez SLA) — nie obiecuj „w 24 h".
+> - Co dokładnie dostaje klient przy rozstaniu (`dist/`, źródła?) — decyzja 1 w STAN.md;
+>   `PRZEKAZANIE.md` popraw po niej.
 
 ---
 
