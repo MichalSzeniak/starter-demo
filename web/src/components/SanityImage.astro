@@ -1,7 +1,7 @@
 ---
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
-import { resolveImage, type ImageLike } from '~/lib/sanity/image';
+import { focalPoint, resolveImage, type ImageLike } from '~/lib/sanity/image';
 
 /**
  * Jedyny sposób renderowania obrazów z Sanity.
@@ -21,6 +21,8 @@ import { resolveImage, type ImageLike } from '~/lib/sanity/image';
  * - Treści demo (pliki z web/public/demo) renderują się jako zwykły <img>.
  * - Wariant bez CMS-u (pliki z src/tresci/obrazy): rastry przez <Image> jak z Sanity,
  *   wektory jako <img> z pliku, który Astro i tak kopiuje do dist/_astro.
+ * - `shape` (łuk, koło) przycina CSS-em: `aspect-ratio` + `object-fit: cover` w global.css,
+ *   punkt ostrości z hotspotu ze Studio. Proporcje znane przed załadowaniem — zero CLS.
  */
 interface Props {
 	image: ImageLike | null | undefined;
@@ -33,6 +35,8 @@ interface Props {
 	priority?: boolean;
 	eager?: boolean;
 	class?: string;
+	/** Kształt zdjęcia z pola `imageShape` sekcji. `rect` = bez przycinania. */
+	shape?: 'rect' | 'arch' | 'circle';
 }
 
 const {
@@ -43,8 +47,13 @@ const {
 	priority = false,
 	eager = false,
 	class: className,
+	shape = 'rect',
 } = Astro.props;
 const resolved = resolveImage(image, width);
+
+// Atrybuty kształtu — tylko gdy zdjęcie jest przycinane, żeby nie zmieniać HTML-a prostokątów.
+const shapeAttrs =
+	shape === 'rect' ? {} : { 'data-shape': shape, style: `object-position:${focalPoint(image)}` };
 
 // Wariant szerszy niż źródło przycinamy do źródła, zamiast go wyrzucać — inaczej
 // pionowe zdjęcie (np. 1068 px przy widths [600, 1200]) zostałoby z samym 600w.
@@ -88,6 +97,7 @@ const optimized: { src: string } | { src: ImageMetadata } | null =
 			decoding={priority ? 'sync' : 'async'}
 			fetchpriority={priority ? 'high' : undefined}
 			class={className}
+			{...shapeAttrs}
 		/>
 	) : !optimized ? null : resolved.vector ? (
 		<Image
@@ -99,6 +109,7 @@ const optimized: { src: string } | { src: ImageMetadata } | null =
 			priority={priority}
 			loading={loading}
 			class={className}
+			{...shapeAttrs}
 		/>
 	) : (
 		<Image
@@ -111,5 +122,6 @@ const optimized: { src: string } | { src: ImageMetadata } | null =
 			priority={priority}
 			loading={loading}
 			class={className}
+			{...shapeAttrs}
 		/>
 	))}

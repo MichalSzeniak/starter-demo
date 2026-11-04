@@ -141,6 +141,7 @@ const home: Page = {
 			heading: 'Naprawimy to szybciej, niż zdążysz się zdenerwować',
 			lead: 'Serwis dla domu i małych firm w Przykładowie i okolicy. Wycena przez telefon, dojazd w 24 godziny, gwarancja na każdą usługę.',
 			image: image('hero', 'Technik przy pracy w warsztacie (placeholder)', 1200, 800),
+			imageShape: 'rect',
 			buttons: [
 				{ _key: key(), label: 'Zobacz cennik', link: internal('cennik') },
 				{ _key: key(), label: 'Poznaj nas', link: internal('o-nas') },
@@ -282,6 +283,7 @@ const about: Page = {
 			],
 			image: image('o-nas', 'Zespół Firmy Demo przed warsztatem (placeholder)', 1000, 750),
 			imagePosition: 'right',
+			imageShape: 'rect',
 		},
 		{
 			_key: key(),

@@ -128,6 +128,26 @@ export function resolveImage(
 }
 
 /**
+ * Punkt ostrości (hotspot ze Studio) jako wartość `object-position`.
+ *
+ * Do zdjęć przycinanych CSS-em (`object-fit: cover` przy kształcie łuku i koła).
+ * Hotspot jest zapisany we współrzędnych całego zdjęcia, a CDN wydaje już kadr
+ * (crop) — przeliczamy go na współrzędne kadru. Brak hotspotu (wariant bez CMS-u,
+ * treści demo) = środek.
+ */
+export function focalPoint(image: ImageLike | null | undefined): string {
+	const hotspot = image?.hotspot;
+	if (!hotspot) return '50% 50%';
+	const crop = image?.crop ?? {};
+	const left = crop.left ?? 0;
+	const top = crop.top ?? 0;
+	const cropW = 1 - left - (crop.right ?? 0);
+	const cropH = 1 - top - (crop.bottom ?? 0);
+	const clamp = (v: number) => Math.min(100, Math.max(0, Math.round(v * 1000) / 10));
+	return `${clamp((hotspot.x - left) / cropW)}% ${clamp((hotspot.y - top) / cropH)}%`;
+}
+
+/**
  * Adres RASTROWY z CDN Sanity o zadanych wymiarach.
  *
  * Do obrazów OG i danych strukturalnych, czyli tam, gdzie odbiorca nie renderuje

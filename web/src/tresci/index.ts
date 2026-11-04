@@ -100,6 +100,7 @@ const home: Page = {
 			heading: 'Nagłówek strony głównej — jedno zdanie o tym, co dostaje klient',
 			lead: 'Rozwinięcie w dwóch zdaniach: dla kogo, gdzie i dlaczego warto. Treść przykładowa.',
 			image: await obraz('zdjecie-2.webp', 'Zdjęcie przykładowe (do podmiany)'),
+			imageShape: 'rect',
 			buttons: [{ _key: key(), label: 'Skontaktuj się', link: internal('kontakt') }],
 		},
 		{
@@ -129,6 +130,7 @@ const home: Page = {
 			],
 			image: await obraz('zdjecie-1.webp', 'Drugie zdjęcie przykładowe (do podmiany)'),
 			imagePosition: 'right',
+			imageShape: 'rect',
 		},
 		{
 			_key: key(),

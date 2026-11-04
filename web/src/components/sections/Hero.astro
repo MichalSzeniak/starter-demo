@@ -41,6 +41,7 @@ const hasImage = Boolean(section.image?.asset?.url);
 				widths={[640, 960, 1200]}
 				sizes="(min-width: 1024px) 50vw, 100vw"
 				priority={ctx.priorityImage}
+				shape={section.imageShape}
 				class="h-auto w-full rounded-lg"
 			/>
 		)}

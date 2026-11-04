@@ -55,13 +55,15 @@ const SECTIONS = /* groq */ `sections[]{
 		heading,
 		lead,
 		image ${IMAGE},
+		"imageShape": coalesce(imageShape, "rect"),
 		buttons[] ${LABELED_LINK}
 	},
 	_type == "textImage" => {
 		heading,
 		body ${RICH_TEXT},
 		image ${IMAGE},
-		imagePosition
+		imagePosition,
+		"imageShape": coalesce(imageShape, "rect")
 	},
 	_type == "features" => {
 		heading,

@@ -2,6 +2,7 @@ import { BlockContentIcon } from '@sanity/icons/BlockContent';
 import { defineField, defineType } from 'sanity';
 import { anchorField } from '../fields/anchor';
 import { backgroundField } from '../fields/background';
+import { imageShapeField } from '../fields/imageShape';
 
 export const textImage = defineType({
 	name: 'textImage',
@@ -36,6 +37,7 @@ export const textImage = defineType({
 			},
 			initialValue: 'right',
 		}),
+		imageShapeField(),
 		backgroundField(),
 		anchorField(),
 	],

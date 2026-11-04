@@ -2,6 +2,7 @@ import { RocketIcon } from '@sanity/icons/Rocket';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 import { anchorField } from '../fields/anchor';
 import { backgroundField } from '../fields/background';
+import { imageShapeField } from '../fields/imageShape';
 
 export const hero = defineType({
 	name: 'hero',
@@ -25,6 +26,7 @@ export const hero = defineType({
 			validation: (rule) => rule.max(260),
 		}),
 		defineField({ name: 'image', title: 'Obraz', type: 'imageWithAlt' }),
+		imageShapeField(),
 		defineField({
 			name: 'buttons',
 			title: 'Przyciski',

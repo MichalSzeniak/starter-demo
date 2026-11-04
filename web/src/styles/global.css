@@ -80,6 +80,37 @@
 }
 
 /**
+ * KSZTAŁT ZDJĘCIA — pole `imageShape` w hero i „tekście z obrazem" → <img data-shape>.
+ *
+ * Przycinanie CSS-em: `aspect-ratio` nadpisuje proporcje z width/height, `object-fit: cover`
+ * kadruje, `object-position` (inline, z hotspotu) trzyma ważną część kadru. Proporcje są
+ * znane przed pobraniem pliku, więc nie ma przesunięć układu.
+ *
+ * Poza warstwami (@layer) celowo: muszą wygrać z `rounded-lg` z klas komponentu.
+ * Szerokość ograniczona — koło albo łuk na pół ekranu byłby wyższy niż sam ekran.
+ */
+img[data-shape] {
+	width: 100%;
+	height: auto;
+	margin-inline: auto;
+	object-fit: cover;
+}
+
+img[data-shape='circle'] {
+	max-width: 24rem;
+	aspect-ratio: 1;
+	border-radius: 9999px;
+}
+
+/* Łuk: przy proporcji 4:5 promień 50% szerokości = 40% wysokości, czyli równe półkole. */
+img[data-shape='arch'] {
+	max-width: 28rem;
+	aspect-ratio: 4 / 5;
+	border-radius: 50% 50% var(--radius-lg) var(--radius-lg) / 40% 40% var(--radius-lg)
+		var(--radius-lg);
+}
+
+/**
  * ANIMACJE — `brand.motion` ("subtelny" | "brak") trafia do <html data-motion>.
  * Czysty CSS, 0 kB JS. Przy „ogranicz animacje" w systemie nic tu nie działa.
  *
