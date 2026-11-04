@@ -12,7 +12,7 @@ const { item, variant = 'primary', class: className } = Astro.props;
 const resolved = resolveLink(item?.link);
 
 const base =
-	'inline-flex items-center justify-center rounded-md px-5 py-3 text-sm font-medium transition-colors';
+	'inline-flex items-center justify-center rounded-button px-5 py-3 text-sm font-medium transition-colors';
 const variants = {
 	primary: 'bg-brand text-white hover:bg-brand-dark',
 	secondary: 'border border-border bg-surface text-ink hover:bg-surface-alt',

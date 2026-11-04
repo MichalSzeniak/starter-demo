@@ -19,6 +19,8 @@
 	--radius-sm: var(--brand-radius-sm);
 	--radius-md: var(--brand-radius-md);
 	--radius-lg: var(--brand-radius-lg);
+	/* Przyciski osobno: przy `style.shape: 'round'` są pigułką, karty nie. */
+	--radius-button: var(--brand-radius-button);
 
 	--spacing-section: var(--brand-section-y);
 	--spacing-section-lg: var(--brand-section-y-lg);

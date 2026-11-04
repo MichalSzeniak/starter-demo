@@ -6,6 +6,9 @@
  * przelicza to na zmienne CSS i nie wymaga zmian.
  */
 
+export type Shape = 'sharp' | 'soft' | 'round';
+export type Spacing = 'compact' | 'normal' | 'airy';
+
 export interface Brand {
 	/** Adres produkcyjny — bez ukośnika na końcu. Z niego budujemy canonical, OG i sitemapę. */
 	siteUrl: string;
@@ -65,19 +68,19 @@ export interface Brand {
 		fallback: string;
 	};
 
-	/** Zaokrąglenia rogów (dowolna jednostka CSS). */
-	radius: {
-		sm: string;
-		md: string;
-		lg: string;
+	/** Wygląd strony — każda linijka to wybór z kilku gotowych, sprawdzonych opcji.
+	 *  Zmieniasz słowo, strona zmienia charakter; wartości CSS są niżej, w tabelach. */
+	style: {
+		/** Rogi przycisków, kart, zdjęć i pól formularza.
+		 *  „sharp" — prawie kanciaste; „soft" — umiarkowanie zaokrąglone;
+		 *  „round" — mocno zaokrąglone, przyciski w kształcie pigułki. */
+		shape: Shape;
+		/** Ile miejsca między sekcjami: „compact" — gęsto; „normal"; „airy" — dużo powietrza. */
+		spacing: Spacing;
 	};
 
-	/** Pionowe odstępy między sekcjami strony. */
-	spacing: {
-		sectionY: string;
-		sectionYLg: string;
-		contentMax: string;
-	};
+	/** Maksymalna szerokość treści (dowolna jednostka CSS). */
+	contentMax: string;
 
 	/** Animacje (czysty CSS, 0 kB JS): „subtelny" — wejście hero i sekcji, odsłanianie
 	 *  zdjęć, cień nagłówka i pasek postępu przy przewijaniu, uniesienie przycisków;
@@ -123,17 +126,12 @@ export const brand: Brand = {
 		fallback: 'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
 	},
 
-	radius: {
-		sm: '0.375rem',
-		md: '0.75rem',
-		lg: '1.25rem',
+	style: {
+		shape: 'soft',
+		spacing: 'normal',
 	},
 
-	spacing: {
-		sectionY: '4rem',
-		sectionYLg: '6rem',
-		contentMax: '72rem',
-	},
+	contentMax: '72rem',
 
 	motion: 'subtelny',
 
@@ -150,6 +148,23 @@ export const fullAddress = `${brand.company.street}, ${brand.company.postalCode}
 /** Telefon w formacie akceptowanym przez `href="tel:"`. */
 export const phoneHref = `tel:${brand.company.phone.replace(/[^+\d]/g, '')}`;
 
+/** Zaokrąglenia dla `style.shape`. `soft` = wartości sprzed wprowadzenia stylów. */
+const SHAPES: Record<Shape, { sm: string; md: string; lg: string; button: string }> = {
+	sharp: { sm: '0.125rem', md: '0.25rem', lg: '0.375rem', button: '0.25rem' },
+	soft: { sm: '0.375rem', md: '0.75rem', lg: '1.25rem', button: '0.75rem' },
+	round: { sm: '0.5rem', md: '1rem', lg: '2rem', button: '9999px' },
+};
+
+/** Pionowy odstęp sekcji dla `style.spacing`: telefon / od `lg`. `normal` = wartości sprzed stylów. */
+const SPACINGS: Record<Spacing, { y: string; yLg: string }> = {
+	compact: { y: '3rem', yLg: '4.5rem' },
+	normal: { y: '4rem', yLg: '6rem' },
+	airy: { y: '5rem', yLg: '8rem' },
+};
+
+const radius = SHAPES[brand.style.shape];
+const spacing = SPACINGS[brand.style.spacing];
+
 /** Zmienne CSS wstrzykiwane do `:root` w `BaseLayout.astro`.
  *  Tailwind czyta je przez `@theme inline` w `src/styles/global.css`. */
 export const themeCss: string = [
@@ -161,12 +176,13 @@ export const themeCss: string = [
 	`--brand-color-surface:${brand.colors.surface};`,
 	`--brand-color-surface-alt:${brand.colors.surfaceAlt};`,
 	`--brand-color-border:${brand.colors.border};`,
-	`--brand-radius-sm:${brand.radius.sm};`,
-	`--brand-radius-md:${brand.radius.md};`,
-	`--brand-radius-lg:${brand.radius.lg};`,
-	`--brand-section-y:${brand.spacing.sectionY};`,
-	`--brand-section-y-lg:${brand.spacing.sectionYLg};`,
-	`--brand-content-max:${brand.spacing.contentMax};`,
+	`--brand-radius-sm:${radius.sm};`,
+	`--brand-radius-md:${radius.md};`,
+	`--brand-radius-lg:${radius.lg};`,
+	`--brand-radius-button:${radius.button};`,
+	`--brand-section-y:${spacing.y};`,
+	`--brand-section-y-lg:${spacing.yLg};`,
+	`--brand-content-max:${brand.contentMax};`,
 	`--brand-font-fallback:${brand.font.fallback};`,
 	'}',
 ].join('');
