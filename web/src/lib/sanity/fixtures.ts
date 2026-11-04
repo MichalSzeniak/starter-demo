@@ -179,6 +179,7 @@ const home: Page = {
 			anchor: null,
 			background: 'default',
 			heading: 'Co mówią klienci',
+			layout: 'grid',
 			items: [
 				{
 					_key: key(),

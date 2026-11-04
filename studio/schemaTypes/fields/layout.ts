@@ -6,9 +6,7 @@ import { defineField } from 'sanity';
  * Fabryka pola, nie osobny typ schemy — wartość to zwykły string, więc lista
  * typów sekcji się nie zmienia, a TypeGen daje `'grid' | 'carousel'`.
  *
- * Używa: galeria. Przygotowane dla opinii klientów — włączenie to dopisanie
- * `layoutField()` do `fields` w testimonials.ts, pola `layout` w zapytaniu
- * i gałęzi z <Carousel> w Testimonials.astro. Na razie świadomie wyłączone.
+ * Używa: galeria, opinie klientów.
  *
  * Pole NIE jest wymagane: sekcje zapisane przed jego dodaniem nie mają wartości
  * i wymóg zablokowałby publikację całej strony. Brak wartości = siatka

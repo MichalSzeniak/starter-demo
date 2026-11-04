@@ -1,0 +1,28 @@
+---
+import SanityImage from '~/components/SanityImage.astro';
+import type { SectionOf } from '~/lib/sanity/sections';
+
+/** Jedna opinia klienta — wspólna dla siatki i karuzeli w sekcji opinii. */
+interface Props {
+	item: NonNullable<SectionOf<'testimonials'>['items']>[number];
+}
+
+const { item } = Astro.props;
+---
+
+<figure class="flex h-full flex-col border-l-2 border-brand py-1 pl-5">
+	<blockquote class="flex-1 text-muted">„{item.quote}”</blockquote>
+	<figcaption class="mt-6 flex items-center gap-3">
+		<SanityImage
+			image={item.avatar}
+			width={96}
+			widths={[48, 96]}
+			sizes="48px"
+			class="size-12 rounded-full object-cover"
+		/>
+		<div>
+			<p class="font-semibold text-ink">{item.author}</p>
+			{item.role && <p class="text-sm text-muted">{item.role}</p>}
+		</div>
+	</figcaption>
+</figure>

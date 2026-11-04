@@ -86,6 +86,7 @@ const SECTIONS = /* groq */ `sections[]{
 	},
 	_type == "testimonials" => {
 		heading,
+		"layout": coalesce(layout, "grid"),
 		items[]{ _key, quote, author, role, avatar ${IMAGE} }
 	},
 	_type == "faq" => {

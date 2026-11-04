@@ -399,6 +399,7 @@ async function section(value: Section) {
 			return {
 				...base,
 				heading: value.heading,
+				layout: value.layout,
 				items: await Promise.all(
 					value.items.map(async (item) => ({ ...item, avatar: await image(item.avatar) })),
 				),

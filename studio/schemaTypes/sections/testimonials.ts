@@ -2,6 +2,7 @@ import { CommentIcon } from '@sanity/icons/Comment';
 import { defineArrayMember, defineField, defineType } from 'sanity';
 import { anchorField } from '../fields/anchor';
 import { backgroundField } from '../fields/background';
+import { layoutField } from '../fields/layout';
 
 export const testimonials = defineType({
 	name: 'testimonials',
@@ -57,16 +58,19 @@ export const testimonials = defineType({
 				}),
 			],
 		}),
+		layoutField(
+			'Siatka pokazuje wszystkie opinie naraz. Karuzela mieści je w jednym rzędzie przewijanym w bok — lepsza przy wielu opiniach.',
+		),
 		backgroundField(),
 		anchorField(),
 	],
 	preview: {
-		select: { title: 'heading', items: 'items' },
-		prepare({ title, items }) {
+		select: { title: 'heading', items: 'items', layout: 'layout' },
+		prepare({ title, items, layout }) {
 			const count = Array.isArray(items) ? items.length : 0;
 			return {
 				title: title || 'Opinie klientów',
-				subtitle: `Opinie — ${count}`,
+				subtitle: `Opinie — ${count} · ${layout === 'carousel' ? 'karuzela' : 'siatka'}`,
 				media: CommentIcon,
 			};
 		},
