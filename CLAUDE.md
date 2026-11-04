@@ -103,8 +103,7 @@ Build ma **failować**, gdy któregokolwiek z tych elementów brakuje.
 - Komunikaty commitów po polsku, konwencja `feat:` / `fix:` / `chore:`.
 - Gdy coś jest złym pomysłem — powiedz to wprost, zanim zaczniesz kodować.
 
-- Studio żyje w `studio/`, strona w `web/`. React nie ma prawa
-  pojawić się w zależnościach `web/` inaczej niż jako świadoma wyspa.
+- Studio żyje w `studio/` (React tylko tam), strona w `web/`.
 
 - JS kliencki: bez limitu w kB (decyzja 2026-11-04), waniliowy, bez frameworków.
   React nie ma prawa trafić do `web/` w żadnej formie.
