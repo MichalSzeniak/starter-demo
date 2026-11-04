@@ -2014,3 +2014,62 @@ nie przenoszone — repo klienta nie ma STAN.md; dopisek w CLAUDE.md repo klient
 Niezweryfikowane: komendy nie były uruchomione w nowej sesji (format pliku wg dokumentacji
 Claude Code: Markdown w `.claude/commands/`, frontmatter `description` i `argument-hint`) —
 pierwsze `/start` jutro jest testem.
+
+## Landing z ofertą — rama treści, formularz „tylko mailowo”, JS bez limitu w kB — 2026-11-04
+
+Temat od właściciela: własny landing z ofertą tworzenia stron + formularz zamówienia
+jak w `zapytanie-ofertowe`. Sesja koncepcyjna — landing jeszcze nie powstał.
+
+### Ustalenia
+
+- **Rama treści landingu:** sprzedajemy wynik i wygodę (strona dobra na telefonie, gotowa pod
+  Google, stała cena i termin, „pilnuję strony w abonamencie”), nie technologię ani
+  „nie-WordPressa”. Technika jako dowód w jednej sekcji / jednym pytaniu FAQ.
+  Uczciwy wniosek z porównania z WP: większość przewag stacku to przewagi **dla wykonawcy**
+  (koszt wdrożenia, utrzymanie bez łatania wtyczek, hosting) — dla klienta realne tylko,
+  jeśli przełożą się na cenę albo termin. Stąd pomiar czasu wdrożeń (kolejka 6) przed landingiem.
+- **Nie pisać „bez spotkań”** — zamiast tego: szczegóły ustalasz w formularzu, dalej mailowo.
+- **Czego nie obiecywać na landingu:** „zgodna z WCAG”, polityka „sprawdzona przez prawnika”,
+  Best Practices 100 (lokalnie 81/82 przez AdGuarda, CI nieuruchomione), formularz na hostingu
+  klienta, „najbezpieczniejsza strona” (brak CSP/HSTS), oddanie kodu przy rozstaniu
+  (OFERTA.md, „Abonament”, wciąż tak mówi — sprzeczne z „Do decyzji” 1).
+- **Stack landingu (rekomendacja, nieprzyjęta formalnie):** klon startera, wariant bez CMS-u,
+  `/` + `/zapytanie`; formularz na CSS jak w prototypie, endpoint w Workerze (Resend,
+  `CONTACT_TO`); jeden moduł TS z opcjami dla strony i Workera (usuwa dublowanie reguły
+  pakietu i listy materiałów). React + react-hook-form odradzone: formularz nie potrzebuje JS,
+  a landing jest dowodem obietnic o szybkości. Prompt dla nowej sesji przygotowany w rozmowie,
+  **niezapisany w pliku**.
+- **Decyzja: limit 10 kB JS zniesiony** (wariant 3 z trzech). Zostaje: Lighthouse mobile ≥ 90,
+  zgoda na każdy skrypt, uzasadnienie „czego CSS nie potrafi”, bez frameworków, raport wagi
+  JS w POSTEP. Uzasadnienie: limit nic dziś nie wiązał (starter 0 B, gabinet-demo 1,3 kB),
+  blokował tylko dodatek „dane na bieżąco” (10–15 kB); zasada ważniejsza od liczby.
+
+### Co powstało
+
+- `zapytanie-ofertowe` `1b6424f` — pole `ustalenia` (dziś zawsze `email`, słownik
+  `L.ustalenia` + ukryte pole w kroku 4, opis „Szczegóły ustalimy mailowo…”), wiersz
+  „Ustalenia” w mailu i podsumowaniu; **pole telefonu klienta usunięte** (z HTML i z danych),
+  e-mail na pełną szerokość. Telefon / rozmowa online wrócą jako kolejne opcje `ustalenia`.
+- Starter: `CLAUDE.md` — reguła JS bez limitu w kB (obie wzmianki).
+
+### Budżet JS klienckiego
+
+Bez zmian w kodzie stron — starter 0 B, gabinet-demo 1339 B.
+
+### Weryfikacja
+
+- Prototyp na porcie 4499, `curl` POST: „Ustalenia: Mailowo” w podsumowaniu, mailu i JSON-ie;
+  wartość spoza słownika → `email`; dopisany `telefon=123` nie trafia nigdzie; strona bez
+  `name="telefon"`. Pliki testowe usunięte.
+- `/start` z poprzedniej sesji zadziałał (test z wpisu 2026-11-03 zaliczony).
+
+### Niezweryfikowane
+
+- Wygląd kroku 4 po zmianie (tylko HTML/curl, bez przeglądarki).
+- Astro Docs MCP i Context7 — wspomniane jako pomoc dla Claude, adresów nie sprawdzano.
+
+### Do decyzji
+
+- CLAUDE.md przeczy sam sobie o React: „świadoma wyspa” (w. 106) vs „w żadnej formie” (w. 110).
+- Zapisać prompt landingu do pliku (poza repo startera — będą tam dane firmy).
+- Stack landingu: Astro bez Reacta (rekomendacja) — formalne potwierdzenie.

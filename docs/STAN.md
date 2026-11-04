@@ -1,6 +1,6 @@
 # Stan projektu
 
-**Aktualizacja: 2026-11-03.** Ten plik się **nadpisuje** na koniec każdej sesji (`/koniec`).
+**Aktualizacja: 2026-11-04.** Ten plik się **nadpisuje** na koniec każdej sesji (`/koniec`).
 Historia i uzasadnienia: `docs/POSTEP.md` (tylko dopisywanie). Jak pracować z sesjami: `docs/SESJE.md`.
 
 ## Repozytoria
@@ -9,9 +9,9 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 
 | Repo | Rola | Stan |
 | --- | --- | --- |
-| `D:\dev\sanity` | starter, źródło prawdy | GitHub do `a021291`; lokalnie commity od `8c6e85f` (telefon w nagłówku, polityka prywatności, dokumenty) |
-| `D:\dev\gabinet-demo` | projekt przykładowy (bez CMS-u, jedna strona) | lokalnie, ostatni `7deccf1`; remote `starter` |
-| `D:\dev\zapytanie-ofertowe` | prototyp formularza zapytania (`node server.mjs` → :4400) | lokalne repo bez remote, ostatni `835beac`, tag `v1-przed-stylami` |
+| `D:\dev\sanity` | starter, źródło prawdy | GitHub do `a021291`; lokalnie 9 commitów od `8c6e85f` (telefon w nagłówku, polityka prywatności, sesje, CLAUDE.md — JS bez limitu, dokumenty) |
+| `D:\dev\gabinet-demo` | projekt przykładowy (bez CMS-u, jedna strona) | lokalnie, ostatni `7deccf1`; 13 przed `starter/main` (bo starter niewypchnięty) |
+| `D:\dev\zapytanie-ofertowe` | prototyp formularza zapytania (`node server.mjs` → :4400) | lokalne repo bez remote, ostatni `1b6424f`, tag `v1-przed-stylami` na `22f6872` |
 | `D:\dev\zlecenia\` | dokumenty zleceń (poza repo — dane klientów) | jedno aktywne zlecenie, niżej |
 
 ## Aktywne zlecenia
@@ -19,19 +19,34 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 - **Gabinet psychoterapii (Kraków)** — `D:\dev\zlecenia\gabinet-psychoterapii-krakow\ZLECENIE.md`.
   Jedna strona z kotwicami, wariant bez CMS-u. Status: mail z pytaniami gotowy, **niewysłany**;
   oferta bez ceny. Blokuje: cena/termin/rundy poprawek, umowa, `git push` startera, domena klienta.
+  Bez zmian w sesji 2026-11-04.
+
+## Landing z ofertą (temat w toku, POSTEP 2026-11-04)
+
+- Rama: sprzedaje wynik i wygodę, nie technologię; technika jako dowód w jednej sekcji / FAQ.
+- Nie pisać „bez spotkań” — „szczegóły ustalasz w formularzu, dalej mailowo”.
+- Formularz: ustalenia **tylko mailowo** (pole `ustalenia`, telefon klienta usunięty) — gotowe w prototypie.
+- Rekomendowany stack: klon startera bez CMS-u, `/` + `/zapytanie`, formularz na CSS, endpoint
+  w Workerze, jeden moduł TS z opcjami. Prompt dla nowej sesji jest w rozmowie z 2026-11-04 —
+  niezapisany w pliku.
+- Przed landingiem warto mieć pomiar czasu wdrożenia (kolejka 6) — od niego zależą obietnice.
 
 ## Do decyzji (właściciel)
 
 1. **Eksport przy rozstaniu — wariant B:** `dist/` bez formularza + treści i oryginały zdjęć +
    `_redirects`/`.htaccess` + README; źródła tylko przy wykupie (`--zrodla`). Oddawać zbudowany
-   Worker formularza? (rekomendacja: nie). Pociąga zmiany w PRZEKAZANIE.md i OFERTA.md.
+   Worker formularza? (rekomendacja: nie). Pociąga zmiany w PRZEKAZANIE.md i OFERTA.md
+   (dziś w „Abonament”: „klient dostaje kod strony”).
 2. **Pole „Pokaż formularz” w sekcji „Kontakt”** — realizuje „klient ma wybór” i eksport bez formularza.
 3. **OFERTA.md:** ceny; limit adresów w przenoszeniu; abonament „Wizytówki” obowiązkowy?; liczba
    rund poprawek; Lighthouse „przy oddaniu”; bez „zgodna z WCAG”; copywriting nie „za podstronę”;
-   „dane na bieżąco” > budżet JS; szkolenie → nagranie; zmiany w abonamencie przez formularz z limitem.
+   szkolenie → nagranie; zmiany w abonamencie przez formularz z limitem.
 4. Podgląd własnego koloru w prototypie — jedna linia JS (~80 B).
 5. `scroll-padding-top` przy `headerPhone: false` — zmniejszyć po pomiarze długiej nazwy (~55 zn.).
 6. Etykiety stylów w Studio „Nagłówek 2/3” → „Śródtytuł” / „Śródtytuł niższego rzędu”.
+7. **CLAUDE.md o React:** „świadoma wyspa” (w. 106) czy „w żadnej formie” (w. 110)?
+8. **Stack landingu:** Astro bez Reacta (rekomendacja) — potwierdzić.
+9. Zapisać prompt landingu do pliku — gdzie (poza repo startera, bo trafią tam dane firmy)?
 
 ## Kolejka (uzgodniona kolejność)
 
@@ -49,9 +64,12 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 
 - ComfyUI jako lokalny skrypt do poprawy zdjęć klienta / grafik dekoracyjnych (nie w buildzie,
   nie „prawdziwe” zdjęcia firmy, sprawdzić licencje modeli). Niski priorytet.
+- Opcje „Telefonicznie” / „Rozmowa online” w polu `ustalenia` formularza zapytania (wraca wtedy
+  pole telefonu).
 
 ## Niezweryfikowane
 
 - Treść wzoru polityki prywatności, licencja i klauzula wyjścia — do prawnika.
 - CI na GitHubie (nowe kroki, Lighthouse bez AdGuarda) — nieuruchomione.
 - Firefox/Safari: `:target-current` (podświetlanie menu), wysokość nagłówka.
+- Krok 4 prototypu po usunięciu telefonu — sprawdzony tylko curl-em, nie w przeglądarce.
