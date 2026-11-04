@@ -41,7 +41,7 @@ export async function privacyPolicyTarget(): Promise<PrivacyPolicyTarget> {
 /** Tytuł ≤ 60 znaków i opis ≤ 155 (seo-guard) — przy długiej nazwie firmy bez nazwy. */
 export function privacyPolicyMeta(settings: SiteSettings): { title: string; description: string } {
 	const base = 'Polityka prywatności';
-	const withName = `${base} — ${settings.companyName}`;
+	const withName = `${base} | ${settings.companyName}`;
 	const description = `Kto przetwarza dane osobowe na stronie ${settings.companyName}, w jakim celu i jakie prawa Ci przysługują.`;
 	return {
 		title: withName.length <= 60 ? withName : base,
@@ -84,9 +84,9 @@ export function privacyPolicySections(settings: SiteSettings): PolicySection[] {
 		{
 			heading: 'Odwiedziny strony',
 			paragraphs: [
-				'Stronę dostarcza Cloudflare. Przy każdym wejściu przeglądarka przekazuje dane techniczne, takie jak adres IP, rodzaj przeglądarki i adres odwiedzanej podstrony. Cloudflare przetwarza je, żeby dostarczyć stronę i chronić ją przed atakami — na podstawie naszego prawnie uzasadnionego interesu (art. 6 ust. 1 lit. f RODO).',
+				'Stronę dostarcza Cloudflare. Przy każdym wejściu przeglądarka przekazuje dane techniczne, takie jak adres IP, rodzaj przeglądarki i adres odwiedzanej podstrony. Cloudflare przetwarza je, żeby dostarczyć stronę i chronić ją przed atakami - na podstawie naszego prawnie uzasadnionego interesu (art. 6 ust. 1 lit. f RODO).',
 				analyticsName
-					? `Liczymy odwiedziny narzędziem ${analyticsName}, które nie używa plików cookies i nie identyfikuje osób — widzimy tylko zbiorcze statystyki, np. liczbę odwiedzin i najczęściej czytane podstrony. Podstawą jest nasz prawnie uzasadniony interes w ulepszaniu strony (art. 6 ust. 1 lit. f RODO).`
+					? `Liczymy odwiedziny narzędziem ${analyticsName}, które nie używa plików cookies i nie identyfikuje osób - widzimy tylko zbiorcze statystyki, np. liczbę odwiedzin i najczęściej czytane podstrony. Podstawą jest nasz prawnie uzasadniony interes w ulepszaniu strony (art. 6 ust. 1 lit. f RODO).`
 					: 'Nie używamy narzędzi do statystyk odwiedzin.',
 				'Strona nie zapisuje w Twojej przeglądarce plików cookies do statystyk ani reklam i nie korzysta z narzędzi reklamowych.',
 			],
@@ -94,13 +94,13 @@ export function privacyPolicySections(settings: SiteSettings): PolicySection[] {
 		{
 			heading: 'Linki do innych serwisów',
 			paragraphs: [
-				'Strona nie osadza map, filmów ani wtyczek serwisów społecznościowych. Przycisk „Jak dojechać” i odnośniki do profili społecznościowych otwierają zewnętrzne serwisy — po przejściu obowiązują ich zasady prywatności.',
+				'Strona nie osadza map, filmów ani wtyczek serwisów społecznościowych. Przycisk „Jak dojechać” i odnośniki do profili społecznościowych otwierają zewnętrzne serwisy - po przejściu obowiązują ich zasady prywatności.',
 			],
 		},
 		{
 			heading: 'Twoje prawa',
 			paragraphs: [
-				'Masz prawo dostępu do swoich danych, ich sprostowania, usunięcia, ograniczenia przetwarzania i przenoszenia oraz prawo sprzeciwu wobec przetwarzania opartego na prawnie uzasadnionym interesie. Zgodę możesz cofnąć w dowolnym momencie — bez wpływu na zgodność z prawem przetwarzania przed jej cofnięciem.',
+				'Masz prawo dostępu do swoich danych, ich sprostowania, usunięcia, ograniczenia przetwarzania i przenoszenia oraz prawo sprzeciwu wobec przetwarzania opartego na prawnie uzasadnionym interesie. Zgodę możesz cofnąć w dowolnym momencie - bez wpływu na zgodność z prawem przetwarzania przed jej cofnięciem.',
 				'Możesz też złożyć skargę do Prezesa Urzędu Ochrony Danych Osobowych (ul. Stawki 2, 00-193 Warszawa).',
 			],
 		},
