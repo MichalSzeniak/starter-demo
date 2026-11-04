@@ -12,7 +12,8 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 | `D:\dev\sanity` | starter, źródło prawdy | GitHub do `d2838b6`; lokalnie 8 commitów ponad `origin/main` (7 z sesji 3, ostatni kodu `54ffb34`, potem commit dokumentów) |
 | `D:\dev\gabinet-demo` | projekt przykładowy (bez CMS-u, jedna strona) | lokalnie, ostatni `7deccf1`; `starter/main` nieodświeżony (fetch); przy pobraniu startera konflikt w `brand.ts` |
 | `D:\dev\zapytanie-ofertowe` | prototyp formularza zapytania (`node server.mjs` → :4400) | lokalne repo bez remote, ostatni `1b6424f`, tag `v1-przed-stylami` na `22f6872` |
-| `D:\dev\landing-oferta` | landing z ofertą (do założenia) | jeszcze nie istnieje |
+| `D:\dev\landing-oferta` | landing z ofertą (własny design) | lokalne, bez GitHuba; ostatni `cf58bab`; `starter` = `D:\dev\sanity` (push wyłączony) |
+| `D:\dev\landing` | wcześniejsza próba landingu (sesja `landing-35`) | niezacommitowane zmiany; **`origin` = GitHub `starter-demo`** — nie pushować stamtąd |
 | `D:\dev\zlecenia\` | dokumenty zleceń (poza repo — dane klientów) | jedno aktywne zlecenie, niżej |
 
 ## Aktywne zlecenia
@@ -27,17 +28,14 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 - Zmiany: 30 dni po uruchomieniu za darmo (do 2 h), potem **150 zł/h od 30 min**; błąd ≠ zmiana.
 - Domena przez wykonawcę, abonentem klient. Formularze z jednej domeny wykonawcy (`CONTACT_FROM`).
 
-## Landing z ofertą — następny temat (praca autonomiczna)
+## Landing z ofertą — zrobiony (praca autonomiczna 2026-11-04), do przeglądu
 
-- Repo `D:\dev\landing-oferta`: klon startera według `NOWY-PROJEKT.md`, wariant bez CMS-u,
-  remote `starter`, **bez GitHuba i bez wdrożenia**.
-- Zakres: `/` z ofertą (sekcje startera) + `/zapytanie` przeniesione z prototypu (CSS, 0 B JS),
-  endpoint w Workerze (Resend, `CONTACT_TO` tylko w sekrecie), test lokalny bez wysyłki maili.
-  Jeden moduł TS z opcjami dla strony i Workera (reguła pakietu, lista materiałów).
-- Treść: wynik i wygoda, nie technologia; nie „bez spotkań” — „szczegóły w formularzu, dalej
-  mailowo”. Czego nie obiecywać: POSTEP 2026-11-04 „Landing z ofertą”.
-- **Ceny:** Claude analizuje rynek i wpisuje rozsądne — właściciel zmieni.
-- Bez danych osobowych właściciela w kodzie — placeholdery.
+- `D:\dev\landing-oferta`, opis i lista „przed publikacją”: `docs/LANDING.md` w tym repo.
+- Strona główna z własnym designem (kobalt tylko w hero, żółty zakreślacz, atrament; Bricolage
+  Grotesque + Instrument Sans), sekcje: co dostajesz, **realizacje (TYMCZASOWE — zrzuty demo)**,
+  jak to wygląda, ceny, pytania, formularz wiadomości, CTA. `/zapytanie` z prototypu + Worker.
+- Ceny (propozycja z rynku 2026): Wizytówka od 1 900 zł, Firma od 3 900 zł — `lib/zapytanie.ts`.
+- Marka i domena z wcześniejszej próby: „emes”, `oferta.emes.dev`.
 
 ## Różnorodność stron (w toku)
 
@@ -56,10 +54,13 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 3. Minimalna jednostka zmian 30 min — wpisana z rekomendacji, nie potwierdzona wprost.
 4. Formularz zapytania: 2 pytania „Jakie masz zdjęcia?” i „Co odwiedzający ma zobaczyć najpierw?”.
 5. Kierunek z osiami w całości (krój, hero, dekor, warianty sekcji, układy branżowe).
+6. Landing: która wersja zostaje (`landing-oferta` czy `landing`); ceny i VAT; realizacje
+   (prawdziwe czy ukryć); polityka prywatności pod dane z zapytania; GitHub i wdrożenie.
+7. `git push` startera (8 commitów lokalnie).
 
 ## Kolejka (uzgodniona kolejność)
 
-1. **Landing z ofertą** (wyżej).
+1. **Przegląd landingu** (wyżej, `docs/LANDING.md`).
 2. **Krój nagłówków** — Fraunces 70 kB, Instrument Serif 33 kB, Bricolage Grotesque 60 kB; pomiar.
 3. **Ankieta treści** z JSON-a zapytania → `web/src/tresci/index.ts` (+ `nowy-klient --z-zapytania`).
 4. Prawdziwy szkic strony z JSON-a pod adresem podglądu (wymaga 3).

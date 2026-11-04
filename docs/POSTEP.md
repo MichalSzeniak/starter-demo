@@ -2225,3 +2225,41 @@ seeda — seed go nie dotyka.
 - Landing z ofertą w `D:\dev\landing-oferta` (decyzje w STAN.md) — praca autonomiczna.
 - Krój nagłówków (para krojów, pomiar mobile) — następny krok różnorodności.
 - gabinet-demo przy pobraniu startera: konflikt w `brand.ts` (`radius`/`spacing` → `style`).
+
+## Landing z ofertą — oferta.emes.dev (praca autonomiczna) — 2026-11-04
+
+Właściciel poza komputerem; zadanie: landing z ofertą tworzenia stron. Decyzje przed startem:
+nowe lokalne repo, strona + formularz, ceny z analizy rynku; w trakcie (wiadomości od właściciela):
+design kompletnie inny niż gabinet-demo, bez zaznaczania tekstu w makietach, więcej animacji,
+sekcja realizacji z wygenerowanymi obrazami (później ukryć), mniej niebieskiego, formularz
+zwykłej wiadomości.
+
+### Co powstało (`D:\dev\landing-oferta`, lokalnie)
+
+- `b542fa9` konfiguracja (`nowy-klient`, bez CMS-u), `cfe3809` strona główna + `/zapytanie`
+  + Worker, `36d2079` uwagi właściciela, `cf58bab` `docs/LANDING.md` (szczegóły, ceny ze źródłami,
+  lista przed publikacją).
+- Strona główna: własne komponenty (`components/landing`), treść w `tresci/index.ts` (SEO, FAQ
+  JSON-LD i sitemapa działają jak w starterze). `/zapytanie` przeniesione z prototypu; opcje,
+  ceny, reguła pakietu i lista materiałów w jednym module `lib/zapytanie.ts` (strona + Worker).
+- `POST /api/zapytanie`: Resend, załącznik `zapytanie.json`, strony po wysłaniu z assetów
+  uzupełniane przez Worker (`<template data-z>`), te same sekrety i limity co `/api/kontakt`.
+- Realizacje: zrzuty gabinet-demo, demo startera (Sanity) i wariantu startera (śliwka, round,
+  airy, łuk) — **nie są realizacjami klientów**.
+
+### Weryfikacja
+
+- check 0 błędów; build SEO 6 stron, 179 linków, 0 martwych.
+- Lighthouse: mobile perf 0,98–0,99, desktop 1, A11y 1, SEO 1, CLS 0; BP 0,81–0,82 (AdGuard).
+- Worker: 21 sprawdzeń w Node (esbuild + atrapy) — wszystkie OK. Bez `wrangler dev` (brak w projekcie).
+- JS: strona główna 1403 B inline (formularz kontaktowy + menu), `/zapytanie` 197 B (menu).
+
+### Znalezisko
+
+- `D:\dev\landing` — wcześniejsza próba (sesja `landing-35`, sekcje startera), niezacommitowana;
+  jej `origin` to GitHub `starter-demo` — push stamtąd trafiłby do publicznego startera.
+
+### Niezweryfikowane
+
+- Worker na Cloudflare / `wrangler dev`; prawdziwa wysyłka Resend z załącznikiem.
+- Polityka prywatności vs dane z zapytania; brutto/netto; Safari/Firefox (`:has()`, scroll-driven).
