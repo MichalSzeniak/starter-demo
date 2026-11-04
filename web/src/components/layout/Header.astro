@@ -16,7 +16,7 @@ import { anchorAttributes, resolveLink, type ResolvedLink } from '~/lib/links';
  *
  * Bieżąca podstrona jest wyróżniona w menu i oznaczona `aria-current="page"` —
  * liczone przy buildzie z adresu strony, bez JS. Jej link to `#`: klik przewija na górę
- * zamiast przeładowywać stronę, na której już jesteśmy.
+ * zamiast przeładowywać stronę, na której już jesteśmy. Tak samo logo na stronie głównej.
  *
  * Przycisk telefonu tylko przy `brand.headerPhone` (domyślnie wyłączony).
  *
@@ -62,7 +62,7 @@ const phone = brand.headerPhone ? telHref(settings.phone) : null;
 >
 	<div class="content-container flex items-center justify-between gap-4 py-3">
 		<a
-			href="/"
+			href={currentPath === '/' ? '#' : '/'}
 			class="flex items-center gap-2 text-base/snug font-semibold text-ink sm:text-lg"
 			aria-label={`${settings.companyName} — strona główna`}
 		>
