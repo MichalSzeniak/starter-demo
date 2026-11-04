@@ -8,6 +8,7 @@
 
 export type Shape = 'sharp' | 'soft' | 'round';
 export type Spacing = 'compact' | 'normal' | 'airy';
+export type Progress = 'top' | 'left' | 'right' | 'none';
 
 export interface Brand {
 	/** Adres produkcyjny — bez ukośnika na końcu. Z niego budujemy canonical, OG i sitemapę. */
@@ -77,6 +78,10 @@ export interface Brand {
 		shape: Shape;
 		/** Ile miejsca między sekcjami: „compact" — gęsto; „normal"; „airy" — dużo powietrza. */
 		spacing: Spacing;
+		/** Pasek postępu przewijania (tylko przy `motion: 'subtelny'`): „top" — poziomy pod
+		 *  nagłówkiem; „left"/„right" — pionowy z boku treści, tylko na szerokim ekranie
+		 *  (od 1280 px), węższe dostają poziomy; „none" — bez paska. */
+		progress: Progress;
 	};
 
 	/** Maksymalna szerokość treści (dowolna jednostka CSS). */
@@ -129,6 +134,7 @@ export const brand: Brand = {
 	style: {
 		shape: 'soft',
 		spacing: 'normal',
+		progress: 'top',
 	},
 
 	contentMax: '72rem',

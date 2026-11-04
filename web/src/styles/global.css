@@ -178,7 +178,12 @@ img[data-shape='arch'] {
 	}
 
 	@supports (animation-timeline: scroll()) {
-		/* Nagłówek: cień pojawia się dopiero po przewinięciu, pod nim pasek postępu. */
+		/*
+		 * Nagłówek: cień pojawia się dopiero po przewinięciu.
+		 * Pasek postępu (`brand.style.progress` → <html data-progress>): poziomy pod nagłówkiem
+		 * dla „top", a dla „left"/„right" poniżej 80 rem — na telefonie pionowy pasek myli się
+		 * z paskiem przewijania przeglądarki, a na wąskim laptopie nie ma na niego miejsca.
+		 */
 		[data-motion='subtelny'] [data-site-header] {
 			animation-name: header-lift;
 			animation-timing-function: linear;
@@ -186,7 +191,9 @@ img[data-shape='arch'] {
 			animation-timeline: scroll(root);
 			animation-range: 0 8rem;
 		}
-		[data-motion='subtelny'] [data-site-header]::after {
+		[data-motion='subtelny'][data-progress='top'] [data-site-header]::after,
+		[data-motion='subtelny']:is([data-progress='left'], [data-progress='right'])
+			[data-site-header]::after {
 			content: '';
 			position: absolute;
 			inset-inline: 0;
@@ -198,6 +205,51 @@ img[data-shape='arch'] {
 			animation-timing-function: linear;
 			animation-fill-mode: both;
 			animation-timeline: scroll(root);
+		}
+
+		/*
+		 * Od 80 rem (1280 px): pionowy pasek zamiast poziomego. Dopiero tam obok treści (72 rem)
+		 * jest wolny margines — węższy ekran wciskałby pasek w zdjęcia przy krawędzi treści.
+		 * Na <body>, nie w nagłówku — `backdrop-filter` nagłówka robi z niego blok zawierający
+		 * dla `position: fixed`. ::before to tor (cały zakres), ::after — wypełnienie.
+		 * Od góry pod nagłówkiem, od dołu 2 rem odstępu, od krawędzi — środek marginesu.
+		 */
+		@media (width >= 80rem) {
+			[data-motion='subtelny']:is([data-progress='left'], [data-progress='right'])
+				[data-site-header]::after {
+				content: none;
+			}
+			[data-motion='subtelny']:is([data-progress='left'], [data-progress='right']) body::before,
+			[data-motion='subtelny']:is([data-progress='left'], [data-progress='right']) body::after {
+				--progress-inset: max(0.75rem, (100vw - var(--brand-content-max)) / 4);
+				content: '';
+				position: fixed;
+				top: 6rem;
+				bottom: 2rem;
+				z-index: 50;
+				width: 3px;
+				border-radius: 9999px;
+				pointer-events: none;
+			}
+			[data-motion='subtelny']:is([data-progress='left'], [data-progress='right']) body::before {
+				background-color: var(--color-border);
+			}
+			[data-motion='subtelny']:is([data-progress='left'], [data-progress='right']) body::after {
+				background-color: var(--color-brand);
+				transform-origin: top;
+				animation-name: scroll-progress-y;
+				animation-timing-function: linear;
+				animation-fill-mode: both;
+				animation-timeline: scroll(root);
+			}
+			[data-motion='subtelny'][data-progress='left'] body::before,
+			[data-motion='subtelny'][data-progress='left'] body::after {
+				left: var(--progress-inset);
+			}
+			[data-motion='subtelny'][data-progress='right'] body::before,
+			[data-motion='subtelny'][data-progress='right'] body::after {
+				right: var(--progress-inset);
+			}
 		}
 	}
 }
@@ -235,5 +287,14 @@ img[data-shape='arch'] {
 	}
 	to {
 		transform: scaleX(1);
+	}
+}
+
+@keyframes scroll-progress-y {
+	from {
+		transform: scaleY(0);
+	}
+	to {
+		transform: scaleY(1);
 	}
 }
