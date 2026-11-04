@@ -179,7 +179,8 @@ const home: Page = {
 			anchor: null,
 			background: 'default',
 			heading: 'Co mówią klienci',
-			layout: 'grid',
+			// Karuzela: sześć opinii, na komputerze widać trzy — realnie się przewija.
+			layout: 'carousel',
 			items: [
 				{
 					_key: key(),
@@ -196,6 +197,39 @@ const home: Page = {
 					author: 'Marek N.',
 					role: 'właściciel restauracji',
 					avatar: image('avatar-2', 'Marek N. (placeholder)', 200, 200),
+				},
+				// Kolejne bez zdjęcia — pokazują, że zdjęcie w opinii jest opcjonalne.
+				{
+					_key: key(),
+					quote:
+						'Zadzwoniłam w sobotę z cieknącym bojlerem. Pan przyjechał w niedzielę rano i wszystko wytłumaczył, zamiast tylko wystawić rachunek.',
+					author: 'Katarzyna W.',
+					role: 'klientka indywidualna',
+					avatar: null,
+				},
+				{
+					_key: key(),
+					quote:
+						'Wymiana całej instalacji w biurze bez przerwy w pracy — ekipa przychodziła po godzinach. Termin dotrzymany co do dnia.',
+					author: 'Tomasz R.',
+					role: 'biuro rachunkowe',
+					avatar: null,
+				},
+				{
+					_key: key(),
+					quote:
+						'Konkretna wycena przez telefon, potem żadnych dopłat. Rzadkość.',
+					author: 'Ewa S.',
+					role: 'zarządczyni wspólnoty',
+					avatar: null,
+				},
+				{
+					_key: key(),
+					quote:
+						'Druga pompa ciepła montowana przez tę firmę, tym razem u rodziców. Polecam ze spokojnym sumieniem.',
+					author: 'Paweł D.',
+					role: 'klient indywidualny',
+					avatar: null,
 				},
 			],
 		},
@@ -231,6 +265,20 @@ const home: Page = {
 					'Awaria w biurze',
 					'Zgłoszenie o 8:00, sprawna instalacja przed południem.',
 				),
+				galleryItem(
+					'galeria-5',
+					'Realizacja 5 (placeholder)',
+					'Ogrzewanie domu nad fiordem',
+					'Pompa ciepła i ogrzewanie podłogowe w domu letniskowym.',
+				),
+				galleryItem('galeria-6', 'Realizacja 6 (placeholder)', 'Schronisko górskie'),
+				galleryItem(
+					'galeria-7',
+					'Realizacja 7 (placeholder)',
+					'Mała elektrownia wodna',
+					'Przegląd turbiny i rozdzielni przed sezonem.',
+				),
+				galleryItem('galeria-8', 'Realizacja 8 (placeholder)', 'Ośrodek w dolinie'),
 			],
 		},
 		{

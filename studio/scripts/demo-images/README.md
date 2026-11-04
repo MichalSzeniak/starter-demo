@@ -13,7 +13,7 @@ wchodzą wyłącznie pod flagą `--allow-placeholders` (do testów).
 | ----------------------------- | --------------------------------- | --------------------------------- |
 | `hero.*`                      | sekcja hero na stronie głównej    | ok. 3:2, poziome                  |
 | `o-nas.*`                     | sekcja tekst z obrazem (2×)       | ok. 4:3                           |
-| `galeria-1.*` … `galeria-4.*` | galeria                           | 4:3, kadrowane do siatki          |
+| `galeria-1.*` … `galeria-8.*` | galeria                           | 4:3, kadrowane do siatki          |
 | `avatar-1.*`, `avatar-2.*`    | opinie klientów                   | kwadrat, twarz na środku          |
 | `logo.*`                      | nagłówek, JSON-LD, obraz OG       | SVG lub PNG z przezroczystym tłem |
 | `og.*`                        | domyślny obraz przy udostępnianiu | dokładnie 1200×630                |
@@ -23,3 +23,5 @@ wchodzą wyłącznie pod flagą `--allow-placeholders` (do testów).
 fontem marki — wszystko z `web/src/config/brand.ts`). Wynik jest deterministyczny:
 ten sam `brand.ts` daje bajt w bajt te same pliki. Generator mieszka w `web/scripts/`,
 bo tam jest satori.
+
+`galeria-5` … `galeria-8` to zdjęcia z picsum.photos (id 1015, 1018, 1039, 1043; licencja Unsplash).
