@@ -66,6 +66,16 @@ export interface Brand {
 		weights: string;
 		/** Stos zapasowy na czas ładowania. */
 		fallback: string;
+		/** Osobny krój tytułów sekcji (h1 i h2) albo `null` — tytuły krojem treści.
+		 *  Jedna grubość = jeden mały plik (latin + latin-ext); ma istnieć w Google Fonts
+		 *  dla tej rodziny, inaczej przeglądarka podrobi pogrubienie. */
+		heading: {
+			family: string;
+			/** Np. 600. Instrument Serif ma tylko 400. */
+			weight: number;
+			/** Rodzina zapasowa na czas ładowania — według charakteru kroju. */
+			fallback: 'serif' | 'sans-serif';
+		} | null;
 	};
 
 	/** Wygląd strony — każda linijka to wybór z kilku gotowych, sprawdzonych opcji.
@@ -124,6 +134,7 @@ export const brand: Brand = {
 		family: 'Inter',
 		weights: '100 900',
 		fallback: 'ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif',
+		heading: null,
 	},
 
 	style: {
@@ -184,5 +195,7 @@ export const themeCss: string = [
 	`--brand-section-y-lg:${spacing.yLg};`,
 	`--brand-content-max:${brand.contentMax};`,
 	`--brand-font-fallback:${brand.font.fallback};`,
+	// Bez osobnego kroju tytuły zostają przy grubościach z `Heading.astro` (800 / 700).
+	...(brand.font.heading ? [`--brand-heading-weight:${brand.font.heading.weight};`] : []),
 	'}',
 ].join('');

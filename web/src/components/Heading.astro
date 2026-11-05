@@ -9,6 +9,8 @@
  * postawi na górze strony. Skala żyje tylko tutaj.
  * Bez wariantu (tytuły kart, pytania FAQ) rozmiar podaje wywołujący w `class`.
  */
+import { brand } from '~/config/brand';
+
 interface Props {
 	level: 1 | 2 | 3;
 	variant?: 'section';
@@ -22,11 +24,25 @@ const Tag = `h${level}` as 'h1' | 'h2' | 'h3';
 // Desktop: 60 px vs 30 px (2:1). Telefon: 36 px vs 24 px (1,5:1) — więcej się
 // nie zmieści bez łamania polskich słów w wąskiej kolumnie.
 const scale = {
-	1: 'text-4xl leading-[1.1] font-extrabold tracking-tight sm:text-5xl lg:text-6xl',
-	2: 'text-2xl leading-tight font-bold tracking-tight sm:text-3xl',
+	1: 'text-4xl leading-[1.1] sm:text-5xl lg:text-6xl',
+	2: 'text-2xl leading-tight sm:text-3xl',
 } as const;
+
+// Osobny krój (`brand.font.heading`) ma jedną grubość — h1 i h2 dostają ją obie,
+// żeby przeglądarka nie podrabiała pogrubienia — i własne odstępy liter: zwężenie,
+// dobre dla Intera, skleja litery w krojach nagłówkowych (Instrument Serif).
+// Bez osobnego kroju: 800 / 700 i `tracking-tight` jak dotąd.
+const face = brand.font.heading
+	? { 1: 'font-(--brand-heading-weight)', 2: 'font-(--brand-heading-weight)' }
+	: { 1: 'font-extrabold tracking-tight', 2: 'font-bold tracking-tight' };
 ---
 
-<Tag class:list={[variant === 'section' && level !== 3 && scale[level], className]} id={id}>
+<Tag
+	class:list={[
+		variant === 'section' && level !== 3 && ['font-heading', scale[level], face[level]],
+		className,
+	]}
+	id={id}
+>
 	<slot />
 </Tag>

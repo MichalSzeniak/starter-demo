@@ -1,5 +1,5 @@
 ---
-import { Font } from 'astro:assets';
+import { Font, type CssVariable } from 'astro:assets';
 import Footer from '~/components/layout/Footer.astro';
 import Header from '~/components/layout/Header.astro';
 import Analytics from '~/components/seo/Analytics.astro';
@@ -49,13 +49,18 @@ const ogImage =
 const canonicalPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
 const canonical = new URL(canonicalPath, site).href;
 
+// Typ `CssVariable` Astro generuje z bieżącej konfiguracji: bez `brand.font.heading` nie zna
+// tej zmiennej, choć wtedy `<Font>` dla niej i tak się nie renderuje.
+const headingFontVariable = '--font-brand-heading' as string as CssVariable;
+
 // Uwaga na kolejność w <head>:
 // 1. `themeCss` — zmienne z brand.ts, muszą poprzedzać arkusz Tailwinda.
 // 2. `<Font>` — generuje @font-face i <link rel="preload"> dla obu podzbiorów
 //    (latin i latin-ext). Pliki są hostowane lokalnie, pobrane przy buildzie,
 //    więc w wyjściowym HTML nie ma ani jednego requestu do Google.
 //    Preload obejmuje oba podzbiory, bo polski tekst sięga po latin-ext
-//    już w pierwszym nagłówku.
+//    już w pierwszym nagłówku. Osobny krój tytułów (`brand.font.heading`) — tak samo,
+//    bo h1 to zwykle największy element na ekranie (LCP).
 ---
 
 <!doctype html>
@@ -75,6 +80,7 @@ const canonical = new URL(canonicalPath, site).href;
 
 		<style is:inline set:html={themeCss}></style>
 		<Font cssVariable="--font-brand-sans" preload />
+		{brand.font.heading && <Font cssVariable={headingFontVariable} preload />}
 
 		<link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 		<JsonLd data={jsonLdGraph([...siteGraph, ...jsonLd])} />

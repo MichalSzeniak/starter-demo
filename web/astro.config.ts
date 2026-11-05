@@ -4,6 +4,9 @@ import { brand } from './src/config/brand.ts';
 import { linkGuard } from './src/integrations/link-guard.ts';
 import { seoGuard } from './src/integrations/seo-guard.ts';
 
+/** Wpis z `fonts` — warunkowy element tablicy traci typ kontekstowy, stąd jawny typ. */
+type FontFamilyConfig = NonNullable<Parameters<typeof defineConfig>[0]['fonts']>[number];
+
 // https://astro.build/config
 export default defineConfig({
 	site: brand.siteUrl,
@@ -40,6 +43,21 @@ export default defineConfig({
 			display: 'swap',
 			fallbacks: ['ui-sans-serif', 'system-ui', 'sans-serif'],
 		},
+		// Opcjonalny krój tytułów sekcji (`brand.font.heading`) — jedna grubość, te same zasady.
+		...(brand.font.heading
+			? [
+					{
+						name: brand.font.heading.family,
+						cssVariable: '--font-brand-heading',
+						provider: fontProviders.google(),
+						weights: [brand.font.heading.weight],
+						styles: ['normal'],
+						subsets: ['latin', 'latin-ext'],
+						display: 'swap',
+						fallbacks: [brand.font.heading.fallback],
+					} satisfies FontFamilyConfig,
+				]
+			: []),
 	],
 
 	image: {

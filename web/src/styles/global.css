@@ -26,6 +26,8 @@
 	--spacing-section-lg: var(--brand-section-y-lg);
 
 	--font-sans: var(--font-brand-sans), var(--brand-font-fallback);
+	/* Krój tytułów sekcji; bez `brand.font.heading` zmienna nie istnieje → krój treści. */
+	--font-heading: var(--font-brand-heading, var(--font-sans));
 }
 
 @layer base {
