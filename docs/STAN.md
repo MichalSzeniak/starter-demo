@@ -12,7 +12,7 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 | --- | --- | --- |
 | `D:\dev\sanity` | starter, źródło prawdy | GitHub = `86c1959`; lokalnie commity ponad `origin/main`: dokumenty (OFERTA, checklista, POSTEP/STAN) i **kod `db60e0e`** (limit rozmiaru formularza) — **niewypchnięte** |
 | `D:\dev\landing-oferta` | landing z ofertą (własny design) | lokalne, bez GitHuba; ostatni `58d8110`; `starter` = `D:\dev\sanity` (push wyłączony), pobrany do `a929d60` |
-| `D:\dev\gabinet-demo` | projekt przykładowy (bez CMS-u, jedna strona) | lokalnie, ostatni `7deccf1`; `starter/main` nieodświeżony; przy pobraniu startera konflikt w `brand.ts` |
+| `D:\dev\gabinet-demo` | **projekt podglądowy, do usunięcia** (decyzja 2026-11-05) — nie synchronizować ze starterem | ostatni `7deccf1`; cały jego kod jest w historii startera (sprawdzone 2026-11-05), usunięcie nic nie traci |
 | `D:\dev\zapytanie-ofertowe` | prototyp formularza zapytania (`node server.mjs` → :4400) | lokalne repo bez remote, ostatni `1b6424f`, tag `v1-przed-stylami` na `22f6872` |
 | `D:\dev\zlecenia\` | dokumenty zleceń (poza repo — dane klientów) | jedno aktywne zlecenie, niżej |
 
@@ -84,13 +84,12 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 2. **Krój nagłówków** — Fraunces 70 kB, Instrument Serif 33 kB, Bricolage Grotesque 60 kB; pomiar.
 3. **Ankieta treści** z JSON-a zapytania → `web/src/tresci/index.ts` (+ `nowy-klient --z-zapytania`).
 4. Prawdziwy szkic strony z JSON-a pod adresem podglądu (wymaga 3).
-5. gabinet-demo pod publicznym adresem (wymaga zgody — wdrożenie).
-6. Mierzenie czasu wdrożeń w checkliście (+ czas pisania tekstów u 2 pierwszych klientów).
-7. `nowy-klient`: dopisek na górze CLAUDE.md w repo klienta.
-8. Prototyp zapytania: podgląd własnego koloru (~80 B JS) — zgoda 2026-11-04.
-9. `scroll-padding-top` przy `headerPhone: false` — pomiar długiej nazwy.
-10. Studio: etykiety „Nagłówek 2/3” → „Śródtytuł” / „Śródtytuł niższego rzędu” — zgoda 2026-11-04.
-11. `pnpm seed --z-tresci` — import `tresci/` do Sanity; ~2–3 h. Odłożone.
+5. Mierzenie czasu wdrożeń w checkliście (+ czas pisania tekstów u 2 pierwszych klientów).
+6. `nowy-klient`: dopisek na górze CLAUDE.md w repo klienta.
+7. Prototyp zapytania: podgląd własnego koloru (~80 B JS) — zgoda 2026-11-04.
+8. `scroll-padding-top` przy `headerPhone: false` — pomiar długiej nazwy.
+9. Studio: etykiety „Nagłówek 2/3” → „Śródtytuł” / „Śródtytuł niższego rzędu” — zgoda 2026-11-04.
+10. `pnpm seed --z-tresci` — import `tresci/` do Sanity; ~2–3 h. Odłożone.
 
 **Na zamówienie** (buduje pierwszy płacący klient): blog w starterze 6–10 h (tylko z panelem);
 druga wersja językowa 15–25 h; opinie Google przy buildzie z Places API; „Mapy Google i katalogi”.
@@ -104,6 +103,8 @@ druga wersja językowa 15–25 h; opinie Google przy buildzie z Places API; „M
 
 ## Propozycje odłożone
 
+- Przy usuwaniu gabinet-demo: odwołania „Przykład: `D:\dev\gabinet-demo`” w `NOWY-PROJEKT.md` (2×) i `OFERTA.md`
+  (wariant bez CMS-u, jedna strona) — zastąpić opisem albo innym przykładem.
 - Cennik na telefonie: przy Witrynie „jednorazowo” spada pod kwotę (przy Wizytówce mieści się obok).
 - `landing-oferta/docs/STAN.md` — stara kopia STAN-u startera z klonu (m.in. „Firma od 3 900 zł”);
   usunąć albo zastąpić odsyłaczem do STAN-u startera.
