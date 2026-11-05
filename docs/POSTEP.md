@@ -2712,3 +2712,38 @@ Pytanie właściciela: czy pola mają walidację, czy da się wkleić olbrzymi t
 
 - `wrangler dev` i Cloudflare — zachowanie strumienia na prawdziwym Workerze (API standardowe).
 - gabinet-demo nie ma jeszcze poprawki (pobranie startera ma konflikt w `brand.ts` — STAN).
+
+## „Czym to się różni” przed cenami; domena w utrzymaniu — 2026-11-05 (sesja 8, ciąg dalszy)
+
+Prośba właściciela: analiza sekcji porównania z kreatorem i WordPressem (zmienić? przenieść?).
+Pytanie w trakcie: „a co jeśli ktoś chce jakąś drogą domenę?”.
+
+### Analiza
+
+- Sekcja stała druga, zaraz po „Co dostajesz” — technika („nie-WordPress”) na starcie, wbrew
+  ramie „sprzedajemy wynik”. Najmocniejszy argument (koszty) działa przy cenach.
+- „Wczytuje się od razu” powtarzało „Szybka” z sąsiedniej sekcji (to samo „mierzę szybkość”).
+- „bez bazy danych” — nieprawda przy panelu; „nie ma czego łatać” — ukryta obietnica bezpieczeństwa.
+- „Bez opłat co miesiąc” — a utrzymanie to też opłata; „kreatory rozliczają się co miesiąc” — nie
+  wszystkie.
+- Domena: „opłatę zawiera utrzymanie” bez limitu — droga końcówka zjadłaby marżę; klient z własną
+  domeną płaciłby niby dwa razy.
+
+### Decyzje właściciela
+
+1. W utrzymaniu domena .pl, .com.pl albo .com. 2. Droższa — różnica w odnowieniu doliczana do
+utrzymania, zakup z rynku wtórnego płaci klient. 3. Własna domena klienta — przeniesienie, 300 zł
+bez zmian, także gdy zostaje u swojego rejestratora (bez zniżki). 4. Poprawki sekcji — tak.
+
+### Zrobione
+
+- `landing-oferta` `0b27253`: sekcja przed „Ceny” (kolejność: co dostajesz → realizacje → o mnie →
+  jak to wygląda → czym to się różni → ceny); nagłówek „…kreatora stron albo WordPressa”; wstęp
+  bez potrójnego „pilnować”; „Nie trzeba jej aktualizować” — „gotowe pliki bez wtyczek, więc nie
+  musisz o tym pamiętać”; **„Ktoś za nią odpowiada”** zamiast „Wczytuje się od razu”; **„Jedna
+  opłata na rok”** („Kreatory zwykle mają abonament…, razem z domeną .pl lub .com”). Domena też
+  w FAQ „Czy domena będzie moja?” (pełna zasada), w wierszu „Utrzymanie” i FAQ o utrzymaniu.
+- `98cf025` LANDING.md; `sanity`: OFERTA.md (wiersz „Domena”), STAN (decyzja o domenie od razu).
+- Weryfikacja: `check` 0 błędów, build SEO 6/6, 179 linków; kolejność sekcji w HTML sprawdzona;
+  zrzuty sekcji 390 i 1280 px. Lighthouse nieuruchamiany (zmiana tekstów i kolejności sekcji).
+- Niezweryfikowane: realne ceny odnowienia .pl/.com u rejestratora (próg „droższej” domeny).

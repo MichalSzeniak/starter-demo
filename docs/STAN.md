@@ -11,7 +11,7 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 | Repo | Rola | Stan |
 | --- | --- | --- |
 | `D:\dev\sanity` | starter, źródło prawdy | GitHub = `86c1959`; lokalnie commity ponad `origin/main`: dokumenty (OFERTA, checklista, POSTEP/STAN) i **kod `db60e0e`** (limit rozmiaru formularza) — **niewypchnięte** |
-| `D:\dev\landing-oferta` | landing z ofertą (własny design) | lokalne, bez GitHuba; ostatni `58d8110`; `starter` = `D:\dev\sanity` (push wyłączony), pobrany do `a929d60` |
+| `D:\dev\landing-oferta` | landing z ofertą (własny design) | lokalne, bez GitHuba; ostatni `98cf025`; `starter` = `D:\dev\sanity` (push wyłączony), pobrany do `a929d60` |
 | `D:\dev\gabinet-demo` | **projekt podglądowy, do usunięcia** (decyzja 2026-11-05) — nie synchronizować ze starterem | ostatni `7deccf1`; cały jego kod jest w historii startera (sprawdzone 2026-11-05), usunięcie nic nie traci |
 | `D:\dev\zapytanie-ofertowe` | prototyp formularza zapytania (`node server.mjs` → :4400) | lokalne repo bez remote, ostatni `1b6424f`, tag `v1-przed-stylami` na `22f6872` |
 | `D:\dev\zlecenia\` | dokumenty zleceń (poza repo — dane klientów) | jedno aktywne zlecenie, niżej |
@@ -37,6 +37,9 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 - Płatność 50% po akceptacji oferty, 50% przed publikacją (+ 1. rok utrzymania); 2 rundy poprawek;
   termin „zwykle 1–2 tygodnie od akceptacji oferty, 1. raty i materiałów”.
 - „Mapy Google i katalogi” (~350 zł) — poza cennikiem, najpierw u 1–2 klientów.
+- **Domena (decyzja 2026-11-05):** w utrzymaniu .pl, .com.pl albo .com; droższa — różnica w odnowieniu
+  doliczana do utrzymania, zakup z rynku wtórnego płaci klient; własna domena klienta — przeniesienie,
+  300 zł bez zmian (także gdy zostaje u swojego rejestratora, bez zniżki).
 
 ## Landing `oferta.emes.dev` (szczegóły: `docs/LANDING.md` w repo landingu)
 
@@ -45,6 +48,8 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
   + 165 B zamykania menu.
 - Cennik (sesja 8): karty = tylko różnice pakietów; „W obu pakietach”; wiersze w grupach „Dodatki
   do wyboru” / „Po uruchomieniu”. Ptaszek = w cenie, dopłata nigdy na liście z ptaszkami.
+- Kolejność sekcji (sesja 8): „Czym to się różni od kreatora stron albo WordPressa” tuż przed „Ceny”;
+  punkty: aktualizacje, „Ktoś za nią odpowiada”, „Nie budujesz jej sam”, „Jedna opłata na rok”.
 - Formularze (sesja 8): limit 32 kB liczony z odczytanych bajtów (`worker/body.ts`, starter `db60e0e`,
   w landingu przez cherry-pick); limity znaków w `FIELD_LIMITS` i widoczne przy długich polach.
 - Kreator (sesja 8): „Razem od X zł + 300 zł rocznie” liczone w CSS regułą `totalPrice()` (ta sama

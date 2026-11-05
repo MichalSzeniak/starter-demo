@@ -140,7 +140,7 @@ Strona działa, a Ty nie zajmujesz się niczym technicznym — jedna opłata raz
 | | |
 | --- | --- |
 | Cena | 300 zł / rok |
-| Domena | rejestrujemy na Twoją firmę (to Ty jesteś jej właścicielem), opłacamy i odnawiamy — w cenie |
+| Domena | .pl, .com.pl albo .com — rejestrujemy na Twoją firmę (to Ty jesteś jej właścicielem), opłacamy i odnawiamy — w cenie. Droższa końcówka: różnicę w cenie odnowienia doliczamy do utrzymania (kwota w ofercie); adres odkupiony od kogoś opłacasz sam. Masz już domenę — przenosimy ją, a odnowienie wchodzi w utrzymanie (kwota bez zmian, także gdy zostaje u Twojego rejestratora) |
 | Hosting | strona i formularz kontaktowy — w cenie |
 | Kopie zapasowe | nocne, treści i zdjęcia (strony z panelem) — w cenie |
 | Poprawki techniczne | ulepszenia i poprawki bezpieczeństwa — w cenie |
