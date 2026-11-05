@@ -39,6 +39,9 @@ Uwagi wewnętrzne są oznaczone „Dla Ciebie".
 
 ---
 
+Dwa niezależne pytania (decyzja 2026-11-05): **ile stron** wybiera pakiet, **kto zmienia
+treści** — panel za dopłatą 800 zł, w każdym pakiecie. Panel jest też warunkiem bloga.
+
 ## Pakiet „Wizytówka" — jedna strona
 
 Dla firm, którym wystarczy jedna przewijana strona: kto, co, za ile, jak się skontaktować.
@@ -56,20 +59,33 @@ strony (D), minimum 3 zdjęcia (E), adres do formularza (H), osoba do kontaktu (
 > Dla Ciebie: wariant bez CMS-u + strona jednostronicowa (`NOWY-PROJEKT.md`). Przykład:
 > `D:\dev\gabinet-demo`. Uprzedź klienta: jedna strona = jeden tytuł i opis w Google.
 
-## Pakiet „Firma" — do 5 podstron z panelem
+## Pakiet „Strona z podstronami" — do 5 stron
 
-Dla firm, które chcą same zmieniać telefon, godziny, cennik czy zdjęcia.
+Dla firm i specjalistów, którzy chcą rozdzielić treść na osobne strony, np. Oferta, Cennik,
+O nas. Każda strona ma własny tytuł i opis w Google, więc każda usługa może pojawiać się
+w wynikach osobno. (Do 2026-11-05: „Firma" — nazwa myliła osoby spoza firm.)
 
 | | |
 | --- | --- |
 | Cena | `____ zł` |
-| Zakres | do 5 podstron (np. Główna, O nas, Oferta, Cennik, Kontakt) z sekcji z biblioteki |
-| Treści zmienia | klient, w panelu; zmiana na stronie po ok. 5 minutach |
-| W cenie dodatkowo | panel w przeglądarce, instrukcja PDF, krótkie szkolenie, nocna kopia zapasowa treści |
+| Zakres | do 5 stron razem z główną (np. Główna, O nas, Oferta, Cennik, Kontakt) z sekcji z biblioteki |
+| Treści zmienia | wykonawca, jak w „Wizytówce". Panel do samodzielnych zmian za dopłatą 800 zł |
 | Termin | `__` dni roboczych od kompletu materiałów |
 
-Klient dostarcza: jak w „Wizytówce" plus treści i zdjęcia dla każdej podstrony (D, E),
-osoba, która będzie edytować treści (J).
+Klient dostarcza: jak w „Wizytówce" (treści i zdjęcia rozłożone na strony).
+
+> Dla Ciebie: bez panelu — wariant bez CMS-u z kilkoma stronami (`pages` w `tresci/index.ts`);
+> z panelem — wariant Sanity. Sekcje te same co w „Wizytówce", tylko rozdzielone, więc teksty
+> liczone tak samo (80 zł / sekcja).
+
+## Panel do samodzielnych zmian — dopłata 800 zł (każdy pakiet)
+
+| | |
+| --- | --- |
+| Treści zmienia | klient, w panelu w przeglądarce; zmiana na stronie po ok. 5 minutach |
+| W cenie | instrukcja PDF, krótkie szkolenie, nocna kopia zapasowa treści i zdjęć |
+
+Klient dostarcza dodatkowo: osobę, która będzie edytować treści (J).
 
 > Dla Ciebie: wariant z panelem Sanity. Szkolenie = „Test klienta" z checklisty (zmiana
 > telefonu w < 60 s). Panel nie ma podglądu wersji roboczej — zmiany widać po publikacji.
@@ -88,10 +104,10 @@ Galeria (siatka albo przewijana) · Kontakt · Wezwanie do działania.
 | Dodatek | Cena | Dla Ciebie |
 | --- | --- | --- |
 | Kolejna podstrona | `____ zł` | treść, zdjęcia i SEO każdej podstrony — realna praca |
-| Panel do edycji w „Wizytówce" | 800 zł | przejście na wariant z panelem; najprościej od startu. W „Firmie" panel jest w cenie (decyzja 2026-11-05) |
+| Panel do edycji | 800 zł | w każdym pakiecie; przejście na wariant z panelem, najprościej od startu (decyzja 2026-11-05) |
 | Projekt graficzny indywidualny | `____ zł` | starter daje motyw (kolor, font, zaokrąglenia); układ poza biblioteką = projekt |
 | Teksty na stronę (copywriting) | 80 zł / sekcja | nagłówek się liczy, „Kontakt" nie (same dane). Z ankiety: szkic AI + Twoja redakcja, jedna runda poprawek w cenie; klient odpowiada za fakty. Ok. 50 zł kosztu na sekcję — zmierz u 2 pierwszych klientów |
-| Blog / aktualności | 600 zł „na początek" | **tylko z panelem** — w „Wizytówce" doliczasz panel. Pierwsze zamówienie = budowa w starterze 6–10 h (dłuższy termin), potem 1,5–2 h na wdrożenie. Uprzedź klienta: przy wielu wpisach i zdjęciach koszt utrzymania może wzrosnąć (limity planu Free Sanity) |
+| Blog / aktualności | 600 zł „na początek" | **tylko z panelem** — bez panelu doliczasz go (+800 zł). Pierwsze zamówienie = budowa w starterze 6–10 h (dłuższy termin), potem 1,5–2 h na wdrożenie. Uprzedź klienta: przy wielu wpisach i zdjęciach koszt utrzymania może wzrosnąć (limity planu Free Sanity) |
 
 ### Budowane na zamówienie — wycena indywidualna
 
@@ -119,7 +135,7 @@ Strona działa, a Ty nie zajmujesz się niczym technicznym — jedna opłata raz
 | Cena | 300 zł / rok |
 | Domena | rejestrujemy na Twoją firmę (to Ty jesteś jej właścicielem), opłacamy i odnawiamy — w cenie |
 | Hosting | strona i formularz kontaktowy — w cenie |
-| Kopie zapasowe | nocne, treści i zdjęcia („Firma") — w cenie |
+| Kopie zapasowe | nocne, treści i zdjęcia (strony z panelem) — w cenie |
 | Poprawki techniczne | ulepszenia i poprawki bezpieczeństwa — w cenie |
 | Na start | przez 30 dni od uruchomienia zmiany za darmo, do 2 godzin pracy |
 | Później zmiany | płatne osobno: 150 zł / godz., rozliczane od 30 min |
