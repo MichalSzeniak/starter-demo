@@ -2263,3 +2263,69 @@ zwykłej wiadomości.
 
 - Worker na Cloudflare / `wrangler dev`; prawdziwa wysyłka Resend z załącznikiem.
 - Polityka prywatności vs dane z zapytania; brutto/netto; Safari/Firefox (`:has()`, scroll-driven).
+
+## Przegląd landingu — żółta góra, „o mnie”, telefon z trzema stronami — 2026-11-04
+
+Sesja 4. Przegląd `D:\dev\landing-oferta` z właścicielem, poprawki na bieżąco.
+
+### Decyzje
+
+- Zostaje `landing-oferta`; `D:\dev\landing` (origin = publiczne `starter-demo`) usunięty.
+- Ceny zostają (1 900 / 3 900 zł); kwoty na stronie = cały koszt klienta (nic nie dochodzi).
+- Realizacje (zrzuty demo) na razie zostają. Sekcja „dlaczego” bez pozycji w menu.
+- Góra strony: **żółty zakreślacz** (wybrany z 7 wariantów: kobalt, atrament, śliwka, cegła, krem…).
+  Kobalt usunięty w całości (`brand` = atrament) — niebieski hover „źle wygląda”.
+- Żółty tylko tam, gdzie znaczy: góra, kwoty, numery kroków, hover na jasnym tle, pas CTA.
+  Odrzucone: zakreślacz pod każdym nagłówkiem (za dużo), „cień” przycisku w hero (kobaltowy i biały).
+- Bez pauzy „—” w tekstach widocznych: „ - ” w zdaniach, „ | ” w tytułach (zapisane w pamięci).
+- „O mnie” z CV właściciela: bez nazw pracodawców, technologii i branży („kilkaset osób w kilku
+  krajach”); podpis zdjęcia „Michał Szeniak” (zgoda właściciela).
+- Skrypt „ponowny klik logo odtwarza animację telefonu” — zgoda na próbę, sprawdzony, **odrzucony**
+  (po przewinięciu gotowy telefon znika i składa się od nowa).
+- Telefon w hero zmienia stronę: wariant 1 z 3 — jedno okrążenie i stop (WCAG 2.2.2: ruch > 5 s
+  powinno się dać zatrzymać). Wjazd całej strony od dołu odrzucony jako mało subtelny.
+
+### Co powstało
+
+Starter (`D:\dev\sanity`):
+- `9c89abf` logo na stronie głównej → `#` (przewija na górę, bez przeładowania).
+- `a929d60` „—” → „ - ” w klauzuli formularza i polityce prywatności, tytuł polityki z „ | ”.
+
+Landing (`D:\dev\landing-oferta`, merge startera `fbe72f4`, `3ca8814`):
+- `9d02547` żółta góra, znak „emes_” (plakietka z kursorem terminala — pionowy czytał się jak „l”),
+  favicon „e_”; sekcja „Czym to się różni od kreatora albo WordPressa”; „cały koszt” w cenach;
+  FAQ „Najczęściej zadawane pytania” + pytania o koszt i Google; płynne rozwijanie FAQ
+  (`::details-content` + `interpolate-size`, 0 B JS); polityka prywatności z sekcją
+  „Zapytanie o stronę” (`INQUIRY_PRIVACY` w `lib/zapytanie.ts`).
+- `103370a` marka atramentowa, hover żółty na jasnym tle, żółte numery kroków, myślniki
+  (strona, `/zapytanie`, strony po wysłaniu, mail).
+- `987a471` sekcja „Kto zrobi Twoją stronę” (`#o-mnie`); tła sekcji na zmianę automatycznie
+  (`.lp > .lp-section:nth-of-type(odd)`), więc ukrycie sekcji nie psuje rytmu.
+- `d73a587` miejsce na zdjęcie (`author` w `tresci/index.ts`; bez zdjęcia inicjały „MS”).
+- `ffa301c` tekst bez branży pracodawcy.
+- `dc1ce64` skrypt logo (326 B) → `dbfab3c` revert.
+- `219de15` telefon: serwis rowerowy → gabinet fizjoterapii (szeryfy, okrągły portret) →
+  kawiarnia (kanciasta, „zdjęcie” z gradientów); kolejna strona „przeciera się” od góry,
+  sekcje dokładają się po kolei, ok. 13 s i powrót do pierwszej. Czysty CSS.
+- Dokumenty: `3714d36`, `a74ad9b`, `1268c2d` (`docs/LANDING.md`: paleta, znak, lista przed publikacją).
+
+### Weryfikacja
+
+- `pnpm check` 0 błędów (starter i landing); build landingu: SEO 6 stron OK, 179 linków, 0 martwych.
+- Lighthouse landingu (mobile, 3 strony × 3 przebiegi, po ostatniej zmianie): perf 0,99, A11y 1,
+  SEO 1, CLS 0; BP 0,82 wyłącznie `is-on-https` (lokalny AdGuard).
+- JS strony głównej landingu: 1339 B inline (formularz 1174 + menu 165) — bez zmian netto.
+- Kontrasty nowych par policzone (tekst ≥ 5,5:1). Animacja telefonu sprawdzona na stopklatkach
+  (ujemne `animation-delay` + pauza) — headless Chrome nie przesuwa animacji w czasie.
+
+### Niezweryfikowane
+
+- Animacja telefonu i rozwijanie FAQ na żywo, na prawdziwym telefonie, w Safari/Firefox.
+- Wersja mobilna nagłówka z plakietką „emes_” (zrzut headless nie zwęża okna poniżej ~500 px).
+- Treść sekcji polityki o zapytaniu — wzór, do prawnika.
+
+### Do decyzji
+
+- Zamiennik „dla małych firm” (tagline, metaTitle, „o mnie”) — propozycja: „dla lokalnych firm”.
+- Czwarta przykładowa strona w telefonie (okrążenie ~17 s) — rekomendacja: zostać przy trzech.
+- Plik zdjęcia do „o mnie”; obraz OG (dziś atramentowy z tytułu).
