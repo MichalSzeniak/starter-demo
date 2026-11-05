@@ -1,6 +1,6 @@
 # Stan projektu
 
-**Aktualizacja: 2026-11-05 (sesja 8 — cennik na landingu, Witryna 2 900 zł).** Ten plik się
+**Aktualizacja: 2026-11-05 (sesja 8 — cennik na landingu, Witryna 2 900 zł, OFERTA.md, kreator (c)).** Ten plik się
 **nadpisuje** na koniec każdej sesji (`/koniec`). Historia: `docs/POSTEP.md` (tylko dopisywanie).
 Sesje: `docs/SESJE.md`.
 
@@ -10,8 +10,8 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 
 | Repo | Rola | Stan |
 | --- | --- | --- |
-| `D:\dev\sanity` | starter, źródło prawdy | GitHub = `86c1959`; lokalnie 8 commitów dokumentów ponad `origin/main` (OFERTA, checklista, POSTEP/STAN) — **niewypchnięte** |
-| `D:\dev\landing-oferta` | landing z ofertą (własny design) | lokalne, bez GitHuba; ostatni `7b7cd4a`; `starter` = `D:\dev\sanity` (push wyłączony), pobrany do `a929d60` |
+| `D:\dev\sanity` | starter, źródło prawdy | GitHub = `86c1959`; lokalnie 10 commitów dokumentów ponad `origin/main` (OFERTA, checklista, POSTEP/STAN) — **niewypchnięte** |
+| `D:\dev\landing-oferta` | landing z ofertą (własny design) | lokalne, bez GitHuba; ostatni `d472fb9`; `starter` = `D:\dev\sanity` (push wyłączony), pobrany do `a929d60` |
 | `D:\dev\gabinet-demo` | projekt przykładowy (bez CMS-u, jedna strona) | lokalnie, ostatni `7deccf1`; `starter/main` nieodświeżony; przy pobraniu startera konflikt w `brand.ts` |
 | `D:\dev\zapytanie-ofertowe` | prototyp formularza zapytania (`node server.mjs` → :4400) | lokalne repo bez remote, ostatni `1b6424f`, tag `v1-przed-stylami` na `22f6872` |
 | `D:\dev\zlecenia\` | dokumenty zleceń (poza repo — dane klientów) | jedno aktywne zlecenie, niżej |
@@ -45,6 +45,9 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
   + 165 B zamykania menu.
 - Cennik (sesja 8): karty = tylko różnice pakietów; „W obu pakietach”; wiersze w grupach „Dodatki
   do wyboru” / „Po uruchomieniu”. Ptaszek = w cenie, dopłata nigdy na liście z ptaszkami.
+- Kreator (sesja 8): „Razem od X zł + 300 zł rocznie” liczone w CSS regułą `totalPrice()` (ta sama
+  suma w mailu i na stronie po wysłaniu); kroki Zakres / Zawartość / Wygląd i dodatki / Twoje dane;
+  „fragment strony” zamiast „sekcji”. **Kwoty tylko w `PRICES`** — w CSS jako zmienne `--cena-*`.
 - Teksty pisane dla osoby nietechnicznej, bez obietnic bez pokrycia (statystyki zdjęte do czasu
   Umami; „Gotowa pod Google” bez „formatu dla AI”). „Realizacje” = demo bez podpisu — świadomie,
   do zmiany po pierwszych projektach.
@@ -59,34 +62,31 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 
 1. **Eksport przy rozstaniu — wariant B**: `dist/` bez formularza + treści i oryginały zdjęć +
    README; źródła tylko przy wykupie. Oddawać zbudowany Worker? (rek.: nie).
-2. **OFERTA.md:** ceny pakietów (dziś `____`; przenieść 1 900 / 2 900 + panel 800?); limit adresów
-   w przenoszeniu; Lighthouse „przy oddaniu”; bez „zgodna z WCAG”; szkolenie → nagranie;
-   realne odnowienie .pl przed ruszaniem 300 zł/rok.
+2. ~~OFERTA.md~~ — **zamknięte 2026-11-05 (sesja 8):** ceny 1 900 / 2 900 (+800 panel), termin jak
+   na landingu, Lighthouse przy oddaniu z raportem, do 20 adresów w przenoszeniu, nagranie 3–5 min
+   zamiast szkolenia, „zgodna z WCAG” w „Czego nie obiecywać”, odnowienie .pl — sprawdzić przed
+   pierwszą fakturą za utrzymanie.
 3. Minimalna jednostka zmian 30 min — wpisana z rekomendacji, nie potwierdzona wprost.
 4. Formularz zapytania: „Co odwiedzający ma zobaczyć najpierw?” — dodać?
 5. Kierunek z osiami w całości (krój, hero, dekor, warianty sekcji, układy branżowe).
 6. Landing, telefon: pusty ekran ~0,35 s przy przejściach; czwarta strona (rek.: nie) — po obejrzeniu.
 7. Landing: obraz OG (dziś atramentowy z tytułu); GitHub (prywatne) i wdrożenie.
 8. Blog (przy budowie): sekcja „Najnowsze wpisy” jako 10. typ sekcji? RSS ręcznie czy `@astrojs/rss`?
-9. Push startera (8 commitów dokumentów) — wypchnąć?
+9. Push startera (10 commitów dokumentów) — wypchnąć?
 
 ## Kolejka (uzgodniona kolejność)
 
-1. **Kreator (c):** suma „Razem od X zł + 300 zł rocznie” (liczniki CSS), dopisek „wymaga panelu,
-   +800 zł” przy blogu, kroki „Wygląd i dodatki” / „Twoje dane”, ceny w kafelkach w jednym miejscu,
-   „sekcja” → „fragment strony”. Kwoty tylko z `PRICES` (muszą się zgadzać z cennikiem — wymóg
-   właściciela 2026-11-05). Potem pokazać cennik osobie nietechnicznej.
-2. **Landing — domknięcie:** decyzje 6–7, zdjęcie autora, potem publikacja (wymaga zgody).
-3. **Krój nagłówków** — Fraunces 70 kB, Instrument Serif 33 kB, Bricolage Grotesque 60 kB; pomiar.
-4. **Ankieta treści** z JSON-a zapytania → `web/src/tresci/index.ts` (+ `nowy-klient --z-zapytania`).
-5. Prawdziwy szkic strony z JSON-a pod adresem podglądu (wymaga 4).
-6. gabinet-demo pod publicznym adresem (wymaga zgody — wdrożenie).
-7. Mierzenie czasu wdrożeń w checkliście (+ czas pisania tekstów u 2 pierwszych klientów).
-8. `nowy-klient`: dopisek na górze CLAUDE.md w repo klienta.
-9. Prototyp zapytania: podgląd własnego koloru (~80 B JS) — zgoda 2026-11-04.
-10. `scroll-padding-top` przy `headerPhone: false` — pomiar długiej nazwy.
-11. Studio: etykiety „Nagłówek 2/3” → „Śródtytuł” / „Śródtytuł niższego rzędu” — zgoda 2026-11-04.
-12. `pnpm seed --z-tresci` — import `tresci/` do Sanity; ~2–3 h. Odłożone.
+1. **Landing — domknięcie:** decyzje 6–7, zdjęcie autora, potem publikacja (wymaga zgody).
+2. **Krój nagłówków** — Fraunces 70 kB, Instrument Serif 33 kB, Bricolage Grotesque 60 kB; pomiar.
+3. **Ankieta treści** z JSON-a zapytania → `web/src/tresci/index.ts` (+ `nowy-klient --z-zapytania`).
+4. Prawdziwy szkic strony z JSON-a pod adresem podglądu (wymaga 3).
+5. gabinet-demo pod publicznym adresem (wymaga zgody — wdrożenie).
+6. Mierzenie czasu wdrożeń w checkliście (+ czas pisania tekstów u 2 pierwszych klientów).
+7. `nowy-klient`: dopisek na górze CLAUDE.md w repo klienta.
+8. Prototyp zapytania: podgląd własnego koloru (~80 B JS) — zgoda 2026-11-04.
+9. `scroll-padding-top` przy `headerPhone: false` — pomiar długiej nazwy.
+10. Studio: etykiety „Nagłówek 2/3” → „Śródtytuł” / „Śródtytuł niższego rzędu” — zgoda 2026-11-04.
+11. `pnpm seed --z-tresci` — import `tresci/` do Sanity; ~2–3 h. Odłożone.
 
 **Na zamówienie** (buduje pierwszy płacący klient): blog w starterze 6–10 h (tylko z panelem);
 druga wersja językowa 15–25 h; opinie Google przy buildzie z Places API; „Mapy Google i katalogi”.

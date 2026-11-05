@@ -2574,3 +2574,59 @@ poza komputerem. W trakcie: Witryna 2 900 zł zamiast 3 100 zł (pytanie właśc
 - `landing-oferta/docs/STAN.md` to stara kopia STAN-u startera z klonu (sesja 3, „Firma od 3 900 zł”)
   — nie jest źródłem prawdy; nie ruszana.
 - OFERTA.md startera nadal ma `____` przy cenach pakietów (decyzja 2).
+
+## OFERTA.md uzupełniona, kreator (c) — 2026-11-05 (sesja 8, ciąg dalszy)
+
+Polecenie właściciela: „OFERTA.md — zaktualizuj”, „Kreator (c) — wykonaj”.
+
+### OFERTA.md (`sanity` `88b99ae`) — decyzja 2 zamknięta według rekomendacji
+
+- Ceny pakietów: Wizytówka **1 900 zł**, Witryna **2 900 zł** (z panelem 2 700 / 3 700 zł);
+  zasada na górze: kwoty muszą się zgadzać z landingiem, źródło `PRICES`.
+- Termin jak na landingu i w FAQ (1–2 tygodnie od akceptacji, 1. raty i materiałów) zamiast `__ dni`.
+- Lighthouse „mierzony przy oddaniu, raport dla klienta”; przeniesienie: do 20 adresów, więcej — wycena.
+- Panel: nagranie 3–5 min zamiast szkolenia (mniej kontaktu); „Test klienta” zostaje.
+- „Kolejna podstrona” → „Więcej niż 5 stron — wycena”, projekt indywidualny — wycena (jak „Na miarę”).
+- Utrzymanie: kwota końcowa bez VAT; odnowienie .pl sprawdzić przed pierwszą fakturą.
+- „Czego nie obiecywać”: „zgodna z WCAG”, statystyki.
+
+### Kreator (c) (`landing-oferta` `1f2edc6`, dokumenty `d472fb9`)
+
+- **„Razem od X zł + 300 zł rocznie”** w podglądzie. Liczone w CSS (`--razem-*`): pakiet + panel
+  + blog + teksty — ta sama reguła co nowe `totalPrice()` w `lib/zapytanie.ts`. Kwoty z `PRICES`
+  idą do CSS jako zmienne `--cena-*` w stylu `.kreator` — w CSS nie ma już żadnej kwoty (wcześniej
+  `counter-increment: teksty 80`). Kwota ze spacją tysięcy („3 540 zł”) przez `round()`/`mod()`
+  i `@counter-style` z `pad`; przeglądarka bez `mod()` ukrywa wiersz, a karta pakietu pokazuje
+  „+ utrzymanie 300 zł rocznie”.
+- Wiersz **„Razem”** także w mailu i na stronie po wysłaniu (`summaryRows`).
+- Blog: **„Wymaga panelu: +800 zł”** w kafelku, tylko przy „Zlecam je wykonawcy”; w podsumowaniu
+  osobny wiersz „Blog lub aktualności: 600 zł”. Uwaga „kwotę podam w ofercie” tylko przy języku
+  i „Coś innego” (wcześniej przy każdym dodatku, także wycenionym).
+- Kroki: **Zakres / Zawartość / Wygląd i dodatki / Twoje dane** (legenda kroku 4 „Twoje dane”).
+  Na telefonie (< 30 rem) nazwa tylko przy bieżącym kroku, reszta to numery — pasek w jednej
+  linii; nazwy ukryte wizualnie, czytnik ekranu je czyta.
+- Cena w kafelku zawsze w osobnej linii pod nazwą (wcześniej w rogu albo pod nazwą — zależnie od
+  długości nazwy).
+- „Sekcja” → **„fragment strony”** w tekstach dla klienta (pomoc kroku 2, licznik w podglądzie,
+  Kontakt, „Co przygotować”, wiersz maila „Fragmenty strony”). „Pomoc z tekstami” → **„Napisanie
+  tekstów”**, „80 zł za fragment strony” — jak w cenniku na stronie głównej.
+
+### Weryfikacja
+
+- `pnpm --filter web check` 0 błędów; build: SEO 6/6, 179 linków, 0 martwych.
+- Headless Chrome, 7 kombinacji (zakres × panel × blog/teksty/język/inne × sekcje): suma z CSS =
+  `totalPrice()` w każdej (1 900, 2 700, 4 300, 2 140, 4 940, 2 980, 2 140); dopisek przy blogu
+  i wiersz bloga pokazują się tylko wtedy, kiedy trzeba. Zrzuty kreatora 390 i 1280 px.
+- Node: `summaryRows` dla Witryny z panelem, blogiem, tekstami (3 fragmenty) i językiem —
+  „Razem: od 4 540 zł + 300 zł rocznie”.
+- Lighthouse: desktop 1/1/0,81/1, mobile 0,98–0,99/1/0,82/1 (BP = AdGuard, znane).
+- JS bez zmian: strona główna 165 + 1174 B, `/zapytanie` 165 + 274 B.
+- ESLint: 2 błędy w `zapytanie.ts` sprzed sesji (twarda spacja w `zl()`, regex w `mailSubject`);
+  Prettier: zmienione pliki nie były sformatowane już przed sesją — nie przeformatowywane.
+
+### Niezweryfikowane
+
+- Suma w Safari i Firefoxie (`round()`/`mod()` w `counter-reset`, `@counter-style pad`) — przy
+  braku obsługi wiersz ma zniknąć, nie pokazać złej kwoty; nie sprawdzone na żywo.
+- Cennik i kreator niepokazane osobie nietechnicznej.
+- Worker `/api/zapytanie` z nowym wierszem „Razem” — tylko `summaryRows` w Node, nie `wrangler dev`.
