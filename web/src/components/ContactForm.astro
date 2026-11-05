@@ -144,7 +144,7 @@ const fieldError = 'mt-1 text-sm text-red-700 empty:hidden';
 
 	<div>
 		<label for={id('message')} class={label}>
-			Wiadomość
+			Wiadomość <span class="font-normal text-muted">(do {LIMIT.message} znaków)</span>
 		</label>
 		<textarea
 			id={id('message')}

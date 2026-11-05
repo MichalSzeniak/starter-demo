@@ -26,6 +26,7 @@ import {
 	type ContactStatus,
 	type FieldErrors,
 } from '../src/lib/contact-form';
+import { readFormData } from './body';
 import { handleRebuildWebhook, REBUILD_ENDPOINT, type RebuildEnv } from './rebuild';
 
 // Klasa Durable Object musi być eksportowana z głównego modułu Workera.
@@ -91,15 +92,10 @@ async function handleContact(request: Request, env: Env, url: URL): Promise<Resp
 	const origin = request.headers.get('Origin');
 	if (origin && origin !== url.origin) return respond('blad', 403);
 
-	const length = Number(request.headers.get('Content-Length') ?? 0);
-	if (length > MAX_BODY_BYTES) return respond('niepoprawne', 413);
-
-	let form: FormData;
-	try {
-		form = await request.formData();
-	} catch {
-		return respond('niepoprawne', 400);
-	}
+	// Limit liczony z faktycznie odczytanych bajtów, nie tylko z nagłówka (worker/body.ts).
+	const body = await readFormData(request, MAX_BODY_BYTES);
+	if (!body.ok) return respond('niepoprawne', body.status);
+	const form = body.form;
 	page = safeReturnPath(String(form.get(FIELD.page) ?? '/'));
 	anchor = safeAnchor(String(form.get(FIELD.anchor) ?? 'kontakt'));
 
