@@ -4,7 +4,11 @@ Baza do oferty i strony ofertowej, zgodna z tym, co starter umie **dziś**. Zmie
 ze starterem: nowa możliwość albo dodatek z „Odłożonych" wdrożony u klienta → popraw ten plik.
 
 Zasada: **pakiet sprzedaje wynik, dodatek — realną pracę.** Rzeczy, które starter robi sam,
-są w standardzie, nie w cenniku. Ceny (`____ zł`) ustalasz Ty.
+są w standardzie, nie w cenniku.
+
+**Kwoty muszą się zgadzać z landingiem.** Jedyne źródło: `PRICES` w
+`landing-oferta/web/src/lib/zapytanie.ts` (cennik, kreator i mail z zapytaniem). Zmiana kwoty
+= zmiana tam i tutaj. Ceny są końcowe — działalność nierejestrowana, bez VAT (niżej).
 
 Teksty w punktach są pisane do klienta — można je przenieść na stronę ofertową.
 Uwagi wewnętrzne są oznaczone „Dla Ciebie".
@@ -14,7 +18,7 @@ Uwagi wewnętrzne są oznaczone „Dla Ciebie".
 ## W każdym pakiecie
 
 - **Strona szybka na telefonie** — wynik Google Lighthouse: 100 na komputerze, co najmniej
-  90 na telefonie. Bez wtyczek i ciężkich skryptów.
+  90 na telefonie, mierzony przy oddaniu (raport dla klienta). Bez wtyczek i ciężkich skryptów.
 - **Gotowa pod Google** — każda podstrona ma tytuł, opis i adres kanoniczny; mapa strony
   (sitemap), dane firmy w formacie zrozumiałym dla Google (dane strukturalne firmy lokalnej),
   zgodne z wizytówką Google. Strona nie zostanie opublikowana, jeśli czegoś brakuje.
@@ -30,8 +34,8 @@ Uwagi wewnętrzne są oznaczone „Dla Ciebie".
 - **Statystyki odwiedzin bez cookies** (Plausible albo Umami) — bez baneru zgody.
   **Dziś nie obiecuj** (2026-11-05): brak narzędzia; wraca po postawieniu Umami na VPS.
 - **Subtelne animacje** albo wcale — do wyboru.
-- **Przeniesienie ze starej strony** — ważne adresy przekierowane, żeby nie stracić pozycji
-  w Google.
+- **Przeniesienie ze starej strony** — do 20 najważniejszych adresów przekierowanych, żeby
+  stare linki z Google i od klientów prowadziły na nową stronę. Więcej adresów — wycena.
 - **Podłączenie Google Search Console** i zgłoszenie mapy strony.
 
 > Dla Ciebie: to wszystko wynika ze startera i checklisty — koszt dla Ciebie to minuty.
@@ -49,10 +53,10 @@ Dla firm, którym wystarczy jedna przewijana strona: kto, co, za ile, jak się s
 
 | | |
 | --- | --- |
-| Cena | `____ zł` |
+| Cena | **1 900 zł**, z panelem 2 700 zł |
 | Zakres | jedna strona z sekcjami z biblioteki (zwykle 5–8), menu przewijające do sekcji |
 | Treści zmienia | wykonawca, płatnie za godzinę (bez panelu); 30 dni po uruchomieniu — za darmo. Panel do samodzielnych zmian za dopłatą 800 zł |
-| Termin | `__` dni roboczych od kompletu materiałów |
+| Termin | zwykle 1–2 tygodnie od akceptacji oferty, wpłaty 1. raty i kompletu materiałów |
 
 Klient dostarcza (brief): dane firmy (A), domena i poczta (B), logo i kolor (C), treść
 strony (D), minimum 3 zdjęcia (E), adres do formularza (H), osoba do kontaktu (K).
@@ -68,10 +72,10 @@ w wynikach osobno. Podpis w cenniku: „Osobne strony na ofertę, cennik i konta
 
 | | |
 | --- | --- |
-| Cena | `____ zł` |
+| Cena | **2 900 zł**, z panelem 3 700 zł (do 2026-11-05: 3 100 zł) |
 | Zakres | do 5 stron razem z główną (np. Główna, O nas, Oferta, Cennik, Kontakt) z sekcji z biblioteki |
 | Treści zmienia | wykonawca, jak w „Wizytówce". Panel do samodzielnych zmian za dopłatą 800 zł |
-| Termin | `__` dni roboczych od kompletu materiałów |
+| Termin | jak w „Wizytówce” |
 
 Klient dostarcza: jak w „Wizytówce" (treści i zdjęcia rozłożone na strony).
 
@@ -84,12 +88,13 @@ Klient dostarcza: jak w „Wizytówce" (treści i zdjęcia rozłożone na strony
 | | |
 | --- | --- |
 | Treści zmienia | klient, w panelu w przeglądarce; zmiana na stronie po ok. 5 minutach |
-| W cenie | instrukcja PDF, krótkie szkolenie, nocna kopia zapasowa treści i zdjęć |
+| W cenie | instrukcja krok po kroku (PDF), nagranie 3–5 min (zmiana telefonu, godzin, cen, zdjęcia), nocna kopia zapasowa treści i zdjęć |
 
 Klient dostarcza dodatkowo: osobę, która będzie edytować treści (J).
 
-> Dla Ciebie: wariant z panelem Sanity. Szkolenie = „Test klienta" z checklisty (zmiana
-> telefonu w < 60 s). Panel nie ma podglądu wersji roboczej — zmiany widać po publikacji.
+> Dla Ciebie: wariant z panelem Sanity. Nagranie zamiast szkolenia na żywo (mniej kontaktu;
+> jedno nagranie dla wszystkich klientów). „Test klienta" z checklisty (zmiana telefonu
+> w < 60 s) zostaje. Panel nie ma podglądu wersji roboczej — zmiany widać po publikacji.
 
 ### Biblioteka sekcji (oba pakiety)
 
@@ -104,9 +109,9 @@ Galeria (siatka albo przewijana) · Kontakt · Wezwanie do działania.
 
 | Dodatek | Cena | Dla Ciebie |
 | --- | --- | --- |
-| Kolejna podstrona | `____ zł` | treść, zdjęcia i SEO każdej podstrony — realna praca |
+| Więcej niż 5 stron | wycena („Na miarę” na landingu) | treść, zdjęcia i SEO każdej strony — realna praca |
 | Panel do edycji | 800 zł | w każdym pakiecie; przejście na wariant z panelem, najprościej od startu (decyzja 2026-11-05) |
-| Projekt graficzny indywidualny | `____ zł` | starter daje motyw (kolor, font, zaokrąglenia); układ poza biblioteką = projekt |
+| Projekt graficzny indywidualny | wycena („Na miarę”) | starter daje motyw (kolor, font, zaokrąglenia); układ poza biblioteką = projekt |
 | Teksty na stronę (copywriting) | 80 zł / sekcja | nagłówek się liczy, „Kontakt" nie (same dane). Z ankiety: szkic AI + Twoja redakcja, jedna runda poprawek w cenie; klient odpowiada za fakty. Ok. 50 zł kosztu na sekcję — zmierz u 2 pierwszych klientów |
 | Blog / aktualności | 600 zł „na początek" | **tylko z panelem** — bez panelu doliczasz go (+800 zł). Pierwsze zamówienie = budowa w starterze 6–10 h (dłuższy termin), potem 1,5–2 h na wdrożenie. Uprzedź klienta: przy wielu wpisach i zdjęciach koszt utrzymania może wzrosnąć (limity planu Free Sanity) |
 | Mapy Google i katalogi | ok. 350 zł — **nie w cenniku**, najpierw u 1–2 pierwszych klientów (zmierz czas, nagraj instrukcję weryfikacji) | założenie albo uporządkowanie Profilu Firmy w Google, Bing Places, 3–5 katalogów (np. Panorama Firm; branżowe: ZnanyLekarz, Booksy) z identycznymi danymi (NAP). Ok. 2–3 h. Weryfikację profilu robi klient (nagranie albo kartka) — daj mu nagraną instrukcję. Bez obietnic pozycji i cytowań w AI (decyzja 2026-11-05) |
@@ -160,7 +165,9 @@ Strona działa, a Ty nie zajmujesz się niczym technicznym — jedna opłata raz
 >   „Odpowiedz" trafia do osoby z formularza (Reply-To w workerze).
 > - 300 zł to dolny pułap rynku za samą domenę i hosting (ok. 150–800 zł/rok) — przewaga
 >   cenowa, ale marża jest mała, więc każda praca poza utrzymaniem idzie godzinowo.
->   Netto czy brutto — zależnie od VAT.
+>   Kwota końcowa — działalność nierejestrowana, bez VAT (decyzja 2026-11-05).
+> - Przed pierwszą fakturą za utrzymanie sprawdź realną cenę odnowienia .pl u wybranego
+>   rejestratora — 300 zł musi ją pokrywać z zapasem.
 > - Bez gwarancji terminu realizacji zmian (bez SLA) — nie obiecuj „w 24 h".
 > - W umowie/regulaminie: 300 zł obejmuje usługi w obecnych progach dostawców (Cloudflare,
 >   Sanity, Resend, odnowienie domeny). Duży ruch, dużo zgłoszeń z formularza, rosnący blog,
@@ -171,8 +178,11 @@ Strona działa, a Ty nie zajmujesz się niczym technicznym — jedna opłata raz
 
 ---
 
-## Czego nie obiecywać (stan na 2026-11-03)
+## Czego nie obiecywać (stan na 2026-11-05)
 
+- **„Strona zgodna z WCAG”** — sprawdzamy kontrast, klawiaturę i wynik Lighthouse, ale to nie
+  jest audyt dostępności. Pisz o konkretach, nie o zgodności ze standardem.
+- **Statystyk odwiedzin** — do czasu postawienia Umami (wyżej, „W każdym pakiecie”).
 - **Osadzonej mapy Google** — jest karta „Jak dojechać" z linkiem (decyzja z fazy 5: bez
   klucza API i bez ładowania czegokolwiek od Google).
 - **Polityki prywatności sprawdzonej przez prawnika** — to wzór z danych firmy. Gdy dane
@@ -195,8 +205,8 @@ Strona działa, a Ty nie zajmujesz się niczym technicznym — jedna opłata raz
 
 ## Terminy — do skalibrowania
 
-Na landingu: „zwykle 1–2 tygodnie od akceptacji oferty i otrzymania materiałów” (oba pakiety,
-decyzja 2026-11-05). Brak pomiarów — pola `__` wypełnij po pierwszych wdrożeniach. Licz od kompletu materiałów
+Na landingu: „zwykle 1–2 tygodnie od akceptacji oferty, wpłaty pierwszej raty i otrzymania
+materiałów” (oba pakiety, decyzja 2026-11-05). Brak pomiarów — skoryguj po pierwszych wdrożeniach. Licz od kompletu materiałów
 z sekcji „Bez tego nie startuję" w briefie. Dopisuj w checkliście datę startu i uruchomienia.
 
 Na termin wpływa zwykle nie praca, a oczekiwanie: odpowiedź klienta, zmiana DNS u
