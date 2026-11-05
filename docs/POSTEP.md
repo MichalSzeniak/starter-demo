@@ -2445,3 +2445,79 @@ model abonamentu z cudzej analizy), skończyła się poprawką kreatora i cennik
 
 - Landing: domknięcie (decyzje 6–7, zdjęcie autora, publikacja).
 - Blog w starterze (6–10 h) — przy pierwszym zamówieniu; sekcja „Najnowsze wpisy” = 10. typ (zgoda).
+
+## Oferta zrozumiała dla nietechnicznego klienta: kreator, cennik, pakiety — 2026-11-05 (sesja 7)
+
+Bodziec: właściciel uznał kreator za przytłaczający; test landingu na osobie nietechnicznej —
+„nie wiem, co zawiera oferta”, „Firma — a jak ktoś po prostu chce taką stronę?”. Po drodze
+porównanie z cennikiem agencji (4 pakiety, kalkulator) i przegląd całej treści pod kątem prawdy.
+
+### Decyzje właściciela
+
+- **Model dwóch pytań:** ile stron wybiera pakiet, panel to **+800 zł w każdym pakiecie**.
+  Wizytówka od 1 900 zł („Wszystko na jednej stronie”), **Witryna** od 3 100 zł (do 5 stron
+  z główną, „Osobne strony na ofertę, cennik i kontakt”), z panelem 2 700 / 3 900 zł.
+  Uzasadnienie właściciela: „kilka stron to nie więcej pracy, tylko sekcje rozdzielone na strony”
+  — teksty liczone tak samo (80 zł za sekcję), bez „podstrony doliczę w ofercie”.
+  Nazwy odrzucone: „Firma” (myli), „Strona z podstronami” (technicznie).
+- **Działalność nierejestrowana** na start → ceny końcowe, bez VAT. Limit 2026: 10 813,50 zł
+  przychodu należnego na kwartał (225% minimalnego), po przekroczeniu 7 dni na CEIDG (money.pl,
+  poradnikprzedsiebiorcy.pl).
+- **Płatność 50/50:** po akceptacji oferty / po akceptacji podglądu, przed publikacją; 1. rok
+  utrzymania z 2. ratą. **Dwie rundy poprawek** w cenie. Termin „zwykle 1–2 tygodnie od akceptacji
+  oferty, wpłaty 1. raty i materiałów” (oba pakiety).
+- Naprawa błędów bez opłat przez cały czas utrzymania — osobny wiersz w cenniku.
+- „Mapy Google i katalogi” (~350 zł) — **nie w cenniku**; najpierw u 1–2 klientów (czas, instrukcja
+  weryfikacji). W standardzie: Bing Webmaster Tools w checkliście.
+- Statystyki zdjęte z „Co dostajesz” do czasu Umami na VPS („może kiedyś”).
+- „Realizacje” zostają bez podpisu „przykład” — świadoma decyzja, zmiana po pierwszych projektach
+  (uwaga: to strony demo).
+- **Skrypt kreatora (zgoda):** zapamiętuje najdalszy krok.
+
+### Co powstało
+
+`landing-oferta`:
+- `77d7a6e`, `5dfbd19` — kreator: białe tło, krok bez ramki karty, mniejszy H1; na desktopie
+  pakiet i „Co przygotować” pod telefonem (wcześniej łamały się w kolumnie 30 rem).
+- `2f6953e` — model w `lib/zapytanie.ts`: `packageOf()` (nazwa, wariant z panelem, podpis, ceny,
+  opisy), `PANEL_SURCHARGE`, `needsPanel(edycja, dodatki)` bez pakietu; kreator: pytanie o panel
+  zawsze, 4 karty (pakiet × panel) przez `:has()`; mail: „zleca mailem; wpisy na blogu sam, w panelu”.
+- `ddb2769`, `94f0968` — cennik i FAQ prostym językiem: „ile w sumie” we wstępie, „dla kogo”,
+  termin, panel / teksty („za fragment strony”) / blog jako wiersze z ceną; twarda spacja w kwotach.
+- `54578ca` — płatność w FAQ i w „Jak to wygląda”, panel opisany konkretnie (pola, publikacja po
+  kilku minutach, „nie da się zepsuć wyglądu”), FAQ „Ile kosztuje utrzymanie strony?” z kwotą
+  w pierwszym zdaniu.
+- `95fea12` — „Witryna”, podpis pod nazwą (`tagline`, `<hgroup>` w `Home.astro`), bez „Map”.
+- `7240883` — treść bez przesady: „Gotowa pod Google” (bez „formatu dla AI”), FAQ o ChatGPT
+  uczciwie, przeprowadzka bez obietnicy pozycji, hero „wygodna na telefonie”, start po 1. racie.
+- `4fd450e`, `5f01dad` — pasek kroków: tylko wstecz i do najdalszego odwiedzonego kroku;
+  **skrypt 275 B** (inline, tylko `/zapytanie`) trzyma `data-max`; bez JS — kroki przed bieżącym.
+- Dokumenty: `2e73d46`, `cf28c2c`, `d6bba9c`, `62be43a` (`docs/LANDING.md`).
+
+`sanity` (dokumenty): `a89cf68`, `3193e6a`, `a87b8f9`, `c871dc4`, `05808a2` — OFERTA.md (model,
+„Witryna”, płatność i forma działalności, Mapy poza cennikiem, rundy poprawek, statystyki „dziś nie
+obiecuj”); CHECKLIST-WDROZENIE.md — Bing Webmaster Tools.
+
+### Weryfikacja
+
+- `pnpm --filter web check` 0 błędów po każdym kroku; build: SEO 6/6 stron.
+- Node (`parseZapytanie`/`summaryRows`/`mailSubject`/`materialsFor`): 4 kombinacje pakiet × panel
+  × blog/teksty — nazwy, kwoty (1 900 / 2 700 / 3 100 / 3 900), teksty 160 zł bez Kontaktu.
+- Headless Chrome: 7 kombinacji w kreatorze → jedna właściwa karta pakietu i uwagi; nawigacja
+  kroków (skok do przodu zablokowany, powrót i ponowny skok do odwiedzonego działa, `data-max`).
+- Lighthouse (`pnpm lh`) mobile: strona główna 98/100/82/100, `/zapytanie` 99/100/82/100,
+  polityka 99/100/82/100. BP 82 = AdGuard (znane). Wyników desktopu nie odczytano (raporty nadpisane).
+- JS: strona główna 1339 B (bez zmian), `/zapytanie` 275 B (było 0 B).
+
+### Niezweryfikowane
+
+- Lighthouse desktop po zmianach.
+- Kreator i cennik na prawdziwym telefonie, Safari/Firefox; Worker `/api/zapytanie` w `wrangler dev`.
+- Cennik niepokazany ponownie osobie nietechnicznej.
+- Plausible ~9 USD/mies. — z pamięci.
+
+### Następne kroki
+
+- Kreator (c): suma „Razem od X zł + 300 zł rocznie”, dopisek „wymaga panelu, +800 zł” przy blogu,
+  kroki „Wygląd i dodatki” / „Twoje dane”, ceny w kafelkach w jednym miejscu, „sekcja” → „fragment strony”.
+- Pokazać cennik tej samej osobie.
