@@ -47,7 +47,7 @@ Dla firm, którym wystarczy jedna przewijana strona: kto, co, za ile, jak się s
 | --- | --- |
 | Cena | `____ zł` |
 | Zakres | jedna strona z sekcjami z biblioteki (zwykle 5–8), menu przewijające do sekcji |
-| Treści zmienia | wykonawca, płatnie za godzinę (bez panelu); 30 dni po uruchomieniu — za darmo |
+| Treści zmienia | wykonawca, płatnie za godzinę (bez panelu); 30 dni po uruchomieniu — za darmo. Panel do samodzielnych zmian za dopłatą 800 zł |
 | Termin | `__` dni roboczych od kompletu materiałów |
 
 Klient dostarcza (brief): dane firmy (A), domena i poczta (B), logo i kolor (C), treść
@@ -88,9 +88,10 @@ Galeria (siatka albo przewijana) · Kontakt · Wezwanie do działania.
 | Dodatek | Cena | Dla Ciebie |
 | --- | --- | --- |
 | Kolejna podstrona | `____ zł` | treść, zdjęcia i SEO każdej podstrony — realna praca |
-| Panel do edycji w „Wizytówce" | `____ zł` | przejście na wariant z panelem; najprościej od startu |
+| Panel do edycji w „Wizytówce" | 800 zł | przejście na wariant z panelem; najprościej od startu. W „Firmie" panel jest w cenie (decyzja 2026-11-05) |
 | Projekt graficzny indywidualny | `____ zł` | starter daje motyw (kolor, font, zaokrąglenia); układ poza biblioteką = projekt |
-| Teksty na stronę (copywriting) | `____ zł` / podstrona | realny czas pisania |
+| Teksty na stronę (copywriting) | 80 zł / sekcja | nagłówek się liczy, „Kontakt" nie (same dane). Z ankiety: szkic AI + Twoja redakcja, jedna runda poprawek w cenie; klient odpowiada za fakty. Ok. 50 zł kosztu na sekcję — zmierz u 2 pierwszych klientów |
+| Blog / aktualności | 600 zł „na początek" | **tylko z panelem** — w „Wizytówce" doliczasz panel. Pierwsze zamówienie = budowa w starterze 6–10 h (dłuższy termin), potem 1,5–2 h na wdrożenie. Uprzedź klienta: przy wielu wpisach i zdjęciach koszt utrzymania może wzrosnąć (limity planu Free Sanity) |
 
 ### Budowane na zamówienie — wycena indywidualna
 
@@ -99,8 +100,8 @@ w starter (zasada z POSTEP, „Odłożone").
 
 | Dodatek | Dla Ciebie: szacunek z POSTEP |
 | --- | --- |
-| Blog / aktualności | 1,5–2 h na wdrożenie (po zbudowaniu raz) |
-| Druga wersja językowa | 15–25 h — najdroższa pozycja |
+| Druga wersja językowa | 15–25 h — najdroższa pozycja; to głównie jednorazowa infrastruktura w starterze (buduj dopiero po zapłacie), potem tłumaczenie AI + przegląd klienta. Każda późniejsza zmiana treści = podwójna praca |
+| Opinie z Google / Booksy | ręcznie w „Opiniach" (standard) / pobieranie przy buildzie z Places API (kilka h, sprawdź regulamin Google) / widżet (skrypt, baner zgody, niższy wynik). Klient dostaje pełną informację o skutkach (decyzja 2026-11-05) |
 | Menu restauracji (gastro) | 6–8 h; wymaga panelu i płatnego planu Sanity |
 | Dane na bieżąco (menu dnia, oferty pracy) | 4–6 h, ok. 10–15 kB JS na tych stronach |
 | Karuzela w opiniach | ok. 1 h; sens od 5–6 opinii |
@@ -143,6 +144,10 @@ Strona działa, a Ty nie zajmujesz się niczym technicznym — jedna opłata raz
 >   cenowa, ale marża jest mała, więc każda praca poza utrzymaniem idzie godzinowo.
 >   Netto czy brutto — zależnie od VAT.
 > - Bez gwarancji terminu realizacji zmian (bez SLA) — nie obiecuj „w 24 h".
+> - W umowie/regulaminie: 300 zł obejmuje usługi w obecnych progach dostawców (Cloudflare,
+>   Sanity, Resend, odnowienie domeny). Duży ruch, dużo zgłoszeń z formularza, rosnący blog,
+>   zmiana cenników dostawców albo podwyżka domeny = możliwa zmiana ceny, z wyprzedzeniem
+>   (np. 30 dni). Treść do prawnika (STAN.md, decyzja 2a).
 > - Co dokładnie dostaje klient przy rozstaniu (`dist/`, źródła?) — decyzja 1 w STAN.md;
 >   `PRZEKAZANIE.md` popraw po niej.
 
