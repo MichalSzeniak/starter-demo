@@ -11,7 +11,7 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 | Repo | Rola | Stan |
 | --- | --- | --- |
 | `D:\dev\sanity` | starter, źródło prawdy | GitHub = `86c1959`; lokalnie 11 commitów dokumentów ponad `origin/main` (OFERTA, checklista, POSTEP/STAN) — **niewypchnięte** |
-| `D:\dev\landing-oferta` | landing z ofertą (własny design) | lokalne, bez GitHuba; ostatni `6bb8379`; `starter` = `D:\dev\sanity` (push wyłączony), pobrany do `a929d60` |
+| `D:\dev\landing-oferta` | landing z ofertą (własny design) | lokalne, bez GitHuba; ostatni `6fcf643`; `starter` = `D:\dev\sanity` (push wyłączony), pobrany do `a929d60` |
 | `D:\dev\gabinet-demo` | projekt przykładowy (bez CMS-u, jedna strona) | lokalnie, ostatni `7deccf1`; `starter/main` nieodświeżony; przy pobraniu startera konflikt w `brand.ts` |
 | `D:\dev\zapytanie-ofertowe` | prototyp formularza zapytania (`node server.mjs` → :4400) | lokalne repo bez remote, ostatni `1b6424f`, tag `v1-przed-stylami` na `22f6872` |
 | `D:\dev\zlecenia\` | dokumenty zleceń (poza repo — dane klientów) | jedno aktywne zlecenie, niżej |
@@ -66,8 +66,9 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
    na landingu, Lighthouse przy oddaniu z raportem, do 20 adresów w przenoszeniu, nagranie 3–5 min
    zamiast szkolenia, „zgodna z WCAG” w „Czego nie obiecywać”, odnowienie .pl — sprawdzić przed
    pierwszą fakturą za utrzymanie.
-3. Minimalna jednostka zmian 30 min — na landingu od sesji 8 wprost: „co najmniej pół godziny (75 zł)”
-   za zlecenie, większe zmiany wyceniane przed pracą, zmiany obejmują też wygląd. Potwierdzić.
+3. ~~Minimalna jednostka zmian~~ — **zamknięte 2026-11-05:** pół godziny (75 zł), pisane łagodnie:
+   „Najmniejsze zlecenie liczę jako pół godziny (75 zł), więc drobne poprawki najlepiej zebrać
+   i przesłać razem.” Zmiany obejmują też wygląd; większe — wycena przed pracą.
 4. Formularz zapytania: „Co odwiedzający ma zobaczyć najpierw?” — dodać?
 5. Kierunek z osiami w całości (krój, hero, dekor, warianty sekcji, układy branżowe).
 6. Landing, telefon: pusty ekran ~0,35 s przy przejściach; czwarta strona (rek.: nie) — po obejrzeniu.

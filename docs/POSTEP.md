@@ -2648,3 +2648,27 @@ pracą za darmo i klientami, którzy „wchodzą na głowę”; podpisy pod nazw
 - Weryfikacja: `check` 0 błędów, build SEO 6/6, 179 linków; zrzut cennika 1280 px; w HTML nie ma
   już „Osobne strony na ofertę” ani `lp-ticket__tagline`. Lighthouse nieuruchamiany ponownie
   (zmiana samego tekstu i usunięcie elementu).
+
+## Teksty: kontakt ogólnie, łagodne minimum zmian — 2026-11-05 (sesja 8, ciąg dalszy)
+
+Uwagi właściciela: nocna kopia to zbędny szczegół; minimum pół godziny „delikatnie, żeby nie
+odstraszyć, ale żeby było wiadomo” (decyzja 3 zamknięta); „wszędzie piszemy o kontakcie mailowym —
+napiszmy ogólnie, żeby nie było, że tylko maile wchodzą w grę”.
+
+- `landing-oferta` `90c59d3`:
+  - zmiany: „Najmniejsze zlecenie liczę jako pół godziny (75 zł), więc drobne poprawki najlepiej
+    zebrać i przesłać razem.”;
+  - bez „a co noc robię kopię Twoich treści” (panel w cenniku i w FAQ); „kopie zapasowe” zostają
+    ogólnie w utrzymaniu;
+  - kontakt z wykonawcą ogólnie: „gdy coś trzeba zmienić, dajesz znać, a ja to wprowadzam”
+    („W obu pakietach”), „Większość ustaleń załatwiamy wiadomościami” („Jak to wygląda”),
+    „Uwagi zbierasz w jedną listę”, FAQ o panelu, formularz wiadomości („odpowiem w ciągu dwóch dni
+    roboczych”), kreator („Gdy coś się zmieni, daję znać.”, „Zmiany wprowadzam za Ciebie.”, krok 4
+    „Ofertę i ewentualne pytania wyślę na podany adres e-mail.”), wiersz maila „Zleca wykonawcy”.
+    E-mail zostaje tam, gdzie to fakt: formularz klienta, adres na ofertę, polityka prywatności,
+    „lista nie przyjdzie mailem”, ukryte pole `ustalenia` („Mailowo”, decyzja 2026-11-04).
+  - Ogólne sformułowania nie obiecują telefonu — zgodnie z celem „jak najmniej kontaktu”.
+- `6fcf643` LANDING.md; `sanity`: OFERTA.md (poprawki — „uwagi zebrane w jedną listę”), STAN
+  (decyzja 3 zamknięta).
+- Weryfikacja: `check` 0 błędów, build SEO 6/6, 179 linków; w zbudowanym HTML strony głównej
+  i `/zapytanie` „mail” tylko w znaczeniu adresu e-mail (formularz, polityka); „co noc” — brak.

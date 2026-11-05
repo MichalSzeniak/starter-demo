@@ -195,7 +195,7 @@ Strona działa, a Ty nie zajmujesz się niczym technicznym — jedna opłata raz
 
 - **50% po akceptacji oferty, 50% po akceptacji podglądu, przed publikacją** (podpięciem
   domeny). Pierwszy rok utrzymania płatny razem z drugą ratą.
-- **Poprawki: dwie rundy w cenie** (uwagi do podglądu mailem). Kolejne — jak zmiany treści.
+- **Poprawki: dwie rundy w cenie** (uwagi do podglądu zebrane w jedną listę). Kolejne — jak zmiany na stronie.
 - Start na **działalności nierejestrowanej**: rachunek, bez VAT — ceny na landingu są końcowe.
   Limit 2026: 10 813,50 zł przychodu należnego **na kwartał** (225% minimalnego wynagrodzenia);
   po przekroczeniu 7 dni na wpis do CEIDG. Wlicza się też utrzymanie i godziny zmian.
