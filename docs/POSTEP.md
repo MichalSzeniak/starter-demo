@@ -2521,3 +2521,56 @@ obiecuj”); CHECKLIST-WDROZENIE.md — Bing Webmaster Tools.
 - Kreator (c): suma „Razem od X zł + 300 zł rocznie”, dopisek „wymaga panelu, +800 zł” przy blogu,
   kroki „Wygląd i dodatki” / „Twoje dane”, ceny w kafelkach w jednym miejscu, „sekcja” → „fragment strony”.
 - Pokazać cennik tej samej osobie.
+
+## Cennik na landingu: czytelniejszy podział, Witryna 2 900 zł — 2026-11-05 (sesja 8)
+
+Zadanie: analiza sekcji „Ceny” na landingu (`D:\dev\landing-oferta`) i od razu poprawki — właściciel
+poza komputerem. W trakcie: Witryna 2 900 zł zamiast 3 100 zł (pytanie właściciela, rekomendacja: tak).
+
+### Analiza (co było nie tak)
+
+1. Karty mieszały trzy rodzaje informacji na jednej liście z ptaszkami: co jest na stronie, jak
+   wygląda współpraca (termin, zmiany mailem) i **płatny dodatek** („wolisz zmieniać sam? Panel:
+   +800 zł”) — ptaszek przy dopłacie sugeruje, że jest w cenie.
+2. Droższa Witryna miała uboższą kartę (5 pozycji, w tym „wszystko, co ma Wizytówka”) niż
+   Wizytówka (8) — wyglądała na mniej wartą. Różnica pakietów była tylko w podpisie pod nazwą.
+3. Termin, zmiany mailem i panel powtórzone w obu kartach; termin „od otrzymania materiałów”
+   niezgodny z FAQ („od akceptacji oferty, 1. raty i materiałów”).
+4. Osiem wierszy pod kartami jednym ciągiem: dopłaty do wyboru, obowiązkowe utrzymanie, stawka
+   za zmiany i gwarancja — laik nie wie, co musi zapłacić. Utrzymanie (jedyny stały koszt) było 4.
+5. Dwie rundy poprawek (ustalone w sesji 7) nie występowały w cenniku.
+6. Drobne: „Zapytaj o witrynę” małą literą przy „Wizytówkę” wielką; „Opisz to w zapytaniu. Opisz,
+   czego potrzebujesz”; przy blogu „wymaga panelu” bez kwoty.
+
+### Zrobione (`landing-oferta`)
+
+- `69683d6` — `PRICES.firma` 2 900 (z panelem 3 700). Jedno źródło: cennik, kreator, mail.
+- `c849397` — karty: opis + „Dobry wybór, gdy…” (Wizytówka: ofertę da się opisać krótko;
+  Witryna: kilka usług, każda opisana dokładnie) i po 4 pozycje o tym, co jest na stronie;
+  blok **„W obu pakietach”** (6 pozycji, w tym podgląd i dwie rundy poprawek, termin jak w FAQ);
+  wiersze w grupach **„Dodatki do wyboru”** (panel, teksty, blog, na miarę) i **„Po uruchomieniu”**
+  („Jedyny stały koszt to utrzymanie…”; utrzymanie, zmiany, naprawa błędów). Grupy:
+  `priceGroups` / `pricesIncluded` w `tresci/index.ts`; `Home.astro` dopasowuje po nazwie i przerywa
+  build przy wierszu bez grupy. Blog: „potrzebny jest panel (+800 zł)”; utrzymanie: „Pierwszy rok -
+  razem z drugą ratą”.
+- `7b7cd4a` — `docs/LANDING.md`: tabela cen, opis układu cennika.
+
+`sanity`: STAN.md — Witryna 2 900 w „Oferta” i w decyzji 2.
+
+### Weryfikacja
+
+- `pnpm --filter web check` 0 błędów; build: SEO 6/6, 179 linków, 0 martwych.
+- Zbudowany HTML: strona główna 1 900 / 2 900 zł, `/zapytanie` 1 900 / 2 700 / 2 900 / 3 700 zł;
+  nigdzie 3 100 ani 3 900.
+- Headless Chrome 390 px i 1280 px: zrzuty przed i po (poza repo).
+- Lighthouse: desktop 1/1/0,81/1, mobile 0,98–0,99/1/0,82/1, CLS 0 (BP = AdGuard, znane).
+- JS bez zmian (zmierzone w `dist/`): strona główna 1339 B, `/zapytanie` 274 B kreatora + 165 B
+  zamykania menu (wcześniejsze „275 B” liczyło sam kreator). Zmiana tylko w HTML i CSS.
+
+### Niezweryfikowane / uwagi
+
+- Cennik niepokazany osobie nietechnicznej.
+- Na telefonie (390 px) przy Witrynie „jednorazowo” spada pod kwotę, przy Wizytówce mieści się obok.
+- `landing-oferta/docs/STAN.md` to stara kopia STAN-u startera z klonu (sesja 3, „Firma od 3 900 zł”)
+  — nie jest źródłem prawdy; nie ruszana.
+- OFERTA.md startera nadal ma `____` przy cenach pakietów (decyzja 2).
