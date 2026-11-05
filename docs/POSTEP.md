@@ -2630,3 +2630,21 @@ Polecenie właściciela: „OFERTA.md — zaktualizuj”, „Kreator (c) — wyk
   braku obsługi wiersz ma zniknąć, nie pokazać złej kwoty; nie sprawdzone na żywo.
 - Cennik i kreator niepokazane osobie nietechnicznej.
 - Worker `/api/zapytanie` z nowym wierszem „Razem” — tylko `summaryRows` w Node, nie `wrangler dev`.
+
+## Cennik: „Zmiany na stronie”, bez podpisów pakietów — 2026-11-05 (sesja 8, ciąg dalszy)
+
+Uwagi właściciela: zmiany mają obejmować też projekt; „rozliczam od pół godziny” — obawa przed
+pracą za darmo i klientami, którzy „wchodzą na głowę”; podpisy pod nazwami pakietów powtarzają opis.
+
+- Analiza: „Drobna zmiana zwykle zajmuje kilkanaście minut, a rozliczam od pół godziny” osoba
+  nietechniczna może przeczytać jako „pierwsze pół godziny gratis” — odwrotnie do zamiaru.
+- `landing-oferta` `3314948`: wiersz **„Zmiany na stronie”** — „Nowy cennik, zdjęcie, godziny
+  otwarcia, ale też nowy fragment strony albo zmiana wyglądu. Każde zlecenie to co najmniej pół
+  godziny (75 zł), więc warto zebrać kilka zmian w jednym mailu. Większe zmiany najpierw wyceniam.
+  Przez 30 dni po uruchomieniu zmiany do 2 godzin są bez dopłaty.” Stawka w `PRICES.zmianyGodzina`
+  (75 zł liczone z niej); FAQ „Ile kosztuje utrzymanie strony?” z kwotą i limitem 2 h.
+- Podpisy pod nazwami pakietów usunięte (pole `tagline` z `packageOf`, styl `.lp-ticket__tagline`).
+- `6bb8379` LANDING.md; `sanity`: OFERTA.md (zmiany, podpis), STAN (decyzja 3 do potwierdzenia).
+- Weryfikacja: `check` 0 błędów, build SEO 6/6, 179 linków; zrzut cennika 1280 px; w HTML nie ma
+  już „Osobne strony na ofertę” ani `lp-ticket__tagline`. Lighthouse nieuruchamiany ponownie
+  (zmiana samego tekstu i usunięcie elementu).

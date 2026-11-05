@@ -68,7 +68,7 @@ strony (D), minimum 3 zdjęcia (E), adres do formularza (H), osoba do kontaktu (
 
 Dla firm i specjalistów, którzy chcą rozdzielić treść na osobne strony, np. Oferta, Cennik,
 O nas. Każda strona ma własny tytuł i opis w Google, więc każda usługa może pojawiać się
-w wynikach osobno. Podpis w cenniku: „Osobne strony na ofertę, cennik i kontakt” („Wizytówka”: „Wszystko na jednej stronie”). (Do 2026-11-05: „Firma” — myliła osoby spoza firm; „Strona z podstronami” — brzmiała technicznie.)
+w wynikach osobno. Bez podpisu pod nazwą w cenniku — powtarzał opis (2026-11-05). (Do 2026-11-05: „Firma” — myliła osoby spoza firm; „Strona z podstronami” — brzmiała technicznie.)
 
 | | |
 | --- | --- |
@@ -145,7 +145,7 @@ Strona działa, a Ty nie zajmujesz się niczym technicznym — jedna opłata raz
 | Kopie zapasowe | nocne, treści i zdjęcia (strony z panelem) — w cenie |
 | Poprawki techniczne | ulepszenia i poprawki bezpieczeństwa — w cenie |
 | Na start | przez 30 dni od uruchomienia zmiany za darmo, do 2 godzin pracy |
-| Później zmiany | płatne osobno: 150 zł / godz., rozliczane od 30 min |
+| Później zmiany | treść i wygląd, płatne osobno: 150 zł / godz., każde zlecenie co najmniej pół godziny (75 zł); większe zmiany — wycena przed pracą. Na landingu minimum podane kwotą, nie „od 30 min” (czytało się jak pół godziny gratis) |
 
 - **Błąd to nie zmiana.** Gdy coś na stronie nie działa tak, jak zostało oddane, poprawiamy
   to bez opłat — zawsze. Zmiana to coś nowego albo coś inaczej.
