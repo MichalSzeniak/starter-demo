@@ -151,6 +151,8 @@ Całą sekcję pomijasz w wariancie **[bez CMS]** — treści i obrazy są w rep
 - [ ] Search Console → Mapy witryn → `https://<domena>/sitemap.xml` → „Powodzenie".
 - [ ] Search Console → Sprawdzanie adresu URL → strona główna → „Poproś o zindeksowanie".
 - [ ] Przy zmianie domeny: Search Console starej domeny → „Zmiana adresu".
+- [ ] **Bing Webmaster Tools**: import witryny z Search Console (kilka minut) — z indeksu Binga
+      korzysta wyszukiwanie w ChatGPT i Copilot.
 - [ ] **Google Business Profile**: adres strony = domena kanoniczna, NAP i godziny zgodne
       ze Studio, kategoria główna ustawiona, profil zweryfikowany.
 

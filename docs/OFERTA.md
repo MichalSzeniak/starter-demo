@@ -108,6 +108,7 @@ Galeria (siatka albo przewijana) · Kontakt · Wezwanie do działania.
 | Projekt graficzny indywidualny | `____ zł` | starter daje motyw (kolor, font, zaokrąglenia); układ poza biblioteką = projekt |
 | Teksty na stronę (copywriting) | 80 zł / sekcja | nagłówek się liczy, „Kontakt" nie (same dane). Z ankiety: szkic AI + Twoja redakcja, jedna runda poprawek w cenie; klient odpowiada za fakty. Ok. 50 zł kosztu na sekcję — zmierz u 2 pierwszych klientów |
 | Blog / aktualności | 600 zł „na początek" | **tylko z panelem** — bez panelu doliczasz go (+800 zł). Pierwsze zamówienie = budowa w starterze 6–10 h (dłuższy termin), potem 1,5–2 h na wdrożenie. Uprzedź klienta: przy wielu wpisach i zdjęciach koszt utrzymania może wzrosnąć (limity planu Free Sanity) |
+| Mapy Google i katalogi | 350 zł | założenie albo uporządkowanie Profilu Firmy w Google, Bing Places, 3–5 katalogów (np. Panorama Firm; branżowe: ZnanyLekarz, Booksy) z identycznymi danymi (NAP). Ok. 2–3 h. Weryfikację profilu robi klient (nagranie albo kartka) — daj mu nagraną instrukcję. Bez obietnic pozycji i cytowań w AI (decyzja 2026-11-05) |
 
 ### Budowane na zamówienie — wycena indywidualna
 
@@ -179,9 +180,21 @@ Strona działa, a Ty nie zajmujesz się niczym technicznym — jedna opłata raz
 - **Formularza na hostingu klienta** — działa tylko na Cloudflare Workers. „Klient ma swój
   hosting" = strona tak, formularz nie.
 
+## Płatność i forma działalności (decyzja 2026-11-05)
+
+- **50% po akceptacji oferty, 50% po akceptacji podglądu, przed publikacją** (podpięciem
+  domeny). Pierwszy rok utrzymania płatny razem z drugą ratą.
+- Start na **działalności nierejestrowanej**: rachunek, bez VAT — ceny na landingu są końcowe.
+  Limit 2026: 10 813,50 zł przychodu należnego **na kwartał** (225% minimalnego wynagrodzenia);
+  po przekroczeniu 7 dni na wpis do CEIDG. Wlicza się też utrzymanie i godziny zmian.
+
+> Dla Ciebie: do prawnika — administrator danych w polityce prywatności landingu (Twoje dane),
+> prawo odstąpienia od umowy dla konsumentów i jednoosobowych firm.
+
 ## Terminy — do skalibrowania
 
-Brak pomiarów — pola `__` wypełnij po pierwszych wdrożeniach. Licz od kompletu materiałów
+Na landingu: „zwykle 1–2 tygodnie od akceptacji oferty i otrzymania materiałów” (oba pakiety,
+decyzja 2026-11-05). Brak pomiarów — pola `__` wypełnij po pierwszych wdrożeniach. Licz od kompletu materiałów
 z sekcji „Bez tego nie startuję" w briefie. Dopisuj w checkliście datę startu i uruchomienia.
 
 Na termin wpływa zwykle nie praca, a oczekiwanie: odpowiedź klienta, zmiana DNS u
