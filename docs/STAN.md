@@ -11,7 +11,7 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 | Repo | Rola | Stan |
 | --- | --- | --- |
 | `D:\dev\sanity` | starter, źródło prawdy | GitHub = `86c1959`; lokalnie 11 commitów dokumentów ponad `origin/main` (OFERTA, checklista, POSTEP/STAN) — **niewypchnięte** |
-| `D:\dev\landing-oferta` | landing z ofertą (własny design) | lokalne, bez GitHuba; ostatni `6fcf643`; `starter` = `D:\dev\sanity` (push wyłączony), pobrany do `a929d60` |
+| `D:\dev\landing-oferta` | landing z ofertą (własny design) | lokalne, bez GitHuba; ostatni `58d8110`; `starter` = `D:\dev\sanity` (push wyłączony), pobrany do `a929d60` |
 | `D:\dev\gabinet-demo` | projekt przykładowy (bez CMS-u, jedna strona) | lokalnie, ostatni `7deccf1`; `starter/main` nieodświeżony; przy pobraniu startera konflikt w `brand.ts` |
 | `D:\dev\zapytanie-ofertowe` | prototyp formularza zapytania (`node server.mjs` → :4400) | lokalne repo bez remote, ostatni `1b6424f`, tag `v1-przed-stylami` na `22f6872` |
 | `D:\dev\zlecenia\` | dokumenty zleceń (poza repo — dane klientów) | jedno aktywne zlecenie, niżej |
@@ -45,6 +45,8 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
   + 165 B zamykania menu.
 - Cennik (sesja 8): karty = tylko różnice pakietów; „W obu pakietach”; wiersze w grupach „Dodatki
   do wyboru” / „Po uruchomieniu”. Ptaszek = w cenie, dopłata nigdy na liście z ptaszkami.
+- Formularze (sesja 8): limit 32 kB liczony z odczytanych bajtów (`worker/body.ts`, starter `db60e0e`,
+  w landingu przez cherry-pick); limity znaków w `FIELD_LIMITS` i widoczne przy długich polach.
 - Kreator (sesja 8): „Razem od X zł + 300 zł rocznie” liczone w CSS regułą `totalPrice()` (ta sama
   suma w mailu i na stronie po wysłaniu); kroki Zakres / Zawartość / Wygląd i dodatki / Twoje dane;
   „fragment strony” zamiast „sekcji”. **Kwoty tylko w `PRICES`** — w CSS jako zmienne `--cena-*`.

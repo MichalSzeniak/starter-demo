@@ -2672,3 +2672,43 @@ napiszmy ogólnie, żeby nie było, że tylko maile wchodzą w grę”.
   (decyzja 3 zamknięta).
 - Weryfikacja: `check` 0 błędów, build SEO 6/6, 179 linków; w zbudowanym HTML strony głównej
   i `/zapytanie` „mail” tylko w znaczeniu adresu e-mail (formularz, polityka); „co noc” — brak.
+
+## Formularze: limit rozmiaru z odczytanych bajtów, widoczne limity znaków — 2026-11-05 (sesja 8, ciąg dalszy)
+
+Pytanie właściciela: czy pola mają walidację, czy da się wkleić olbrzymi tekst.
+
+### Stan przed zmianą (sprawdzony)
+
+- Każde pole tekstowe ma `maxlength`; Chrome przy wklejeniu 50 000 znaków do „Uwag” zostawił 2000.
+- Serwer: zapytanie przycina pola do tych samych limitów (1 000 000 znaków → 120/80/2000/200/1000),
+  nieznane wartości odrzuca; formularz kontaktowy odrzuca za długie pola z komunikatem.
+- **Luka 1:** przeglądarka ucina wklejony tekst po cichu — klient mógł nie zauważyć, że koniec
+  opisu zniknął.
+- **Luka 2:** limit 32 kB sprawdzany tylko z nagłówka `Content-Length`; zgłoszenie bez niego
+  (chunked) było czytane w całości przez `request.formData()` (do limitu Cloudflare).
+
+### Zrobione
+
+- Starter `db60e0e`: `web/worker/body.ts` — `readFormData(request, maxBytes)` czyta treść
+  strumieniem i przerywa po limicie (413), zły format → 400; `/api/kontakt` z niego korzysta.
+  `ContactForm`: „Wiadomość (do 5000 znaków)”.
+- Landing: ten sam commit przeniesiony `git cherry-pick` (`34e0335`, bez dokumentów startera);
+  `58d8110` — `/api/zapytanie` przez `readFormData`; `FIELD_LIMITS` w `lib/zapytanie.ts` (maxlength
+  i przycinanie z jednego źródła); dopiski „do 2000 znaków” przy „Uwagach” i „do 1000 znaków”
+  przy „Coś innego”.
+
+### Weryfikacja
+
+- `check` 0 błędów w obu repo; build startera SEO 5/5, landingu 6/6, 0 martwych linków.
+- Node, `readFormData`: mały formularz strumieniem (polskie znaki) OK; 10 MB strumieniem bez
+  `Content-Length` → 413 w 9 ms; za duży nagłówek → 413; multipart OK; zły typ → 400.
+- Zbundlowany Worker landingu (esbuild, atrapy Resend, assetów i limitów): kontakt i zapytanie
+  strumieniem — wysłane, po jednym mailu; 5 MB bez `Content-Length` — odrzucone, 0 maili.
+  (Kontakt przy odrzuceniu przekierowuje na domyślną kotwicę `#kontakt-niepoprawne`, bo formularz
+  nie został odczytany — tak samo jak wcześniej przy za dużym nagłówku.)
+- W HTML: `maxlength` 120/80/120/200/2000/1000 i dopiski „do 1000/2000/5000 znaków”.
+
+### Niezweryfikowane
+
+- `wrangler dev` i Cloudflare — zachowanie strumienia na prawdziwym Workerze (API standardowe).
+- gabinet-demo nie ma jeszcze poprawki (pobranie startera ma konflikt w `brand.ts` — STAN).
