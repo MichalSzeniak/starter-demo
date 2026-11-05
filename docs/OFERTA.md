@@ -59,11 +59,11 @@ strony (D), minimum 3 zdjęcia (E), adres do formularza (H), osoba do kontaktu (
 > Dla Ciebie: wariant bez CMS-u + strona jednostronicowa (`NOWY-PROJEKT.md`). Przykład:
 > `D:\dev\gabinet-demo`. Uprzedź klienta: jedna strona = jeden tytuł i opis w Google.
 
-## Pakiet „Strona z podstronami" — do 5 stron
+## Pakiet „Witryna" — do 5 stron
 
 Dla firm i specjalistów, którzy chcą rozdzielić treść na osobne strony, np. Oferta, Cennik,
 O nas. Każda strona ma własny tytuł i opis w Google, więc każda usługa może pojawiać się
-w wynikach osobno. (Do 2026-11-05: „Firma" — nazwa myliła osoby spoza firm.)
+w wynikach osobno. Podpis w cenniku: „Osobne strony na ofertę, cennik i kontakt” („Wizytówka”: „Wszystko na jednej stronie”). (Do 2026-11-05: „Firma” — myliła osoby spoza firm; „Strona z podstronami” — brzmiała technicznie.)
 
 | | |
 | --- | --- |
@@ -108,7 +108,7 @@ Galeria (siatka albo przewijana) · Kontakt · Wezwanie do działania.
 | Projekt graficzny indywidualny | `____ zł` | starter daje motyw (kolor, font, zaokrąglenia); układ poza biblioteką = projekt |
 | Teksty na stronę (copywriting) | 80 zł / sekcja | nagłówek się liczy, „Kontakt" nie (same dane). Z ankiety: szkic AI + Twoja redakcja, jedna runda poprawek w cenie; klient odpowiada za fakty. Ok. 50 zł kosztu na sekcję — zmierz u 2 pierwszych klientów |
 | Blog / aktualności | 600 zł „na początek" | **tylko z panelem** — bez panelu doliczasz go (+800 zł). Pierwsze zamówienie = budowa w starterze 6–10 h (dłuższy termin), potem 1,5–2 h na wdrożenie. Uprzedź klienta: przy wielu wpisach i zdjęciach koszt utrzymania może wzrosnąć (limity planu Free Sanity) |
-| Mapy Google i katalogi | 350 zł | założenie albo uporządkowanie Profilu Firmy w Google, Bing Places, 3–5 katalogów (np. Panorama Firm; branżowe: ZnanyLekarz, Booksy) z identycznymi danymi (NAP). Ok. 2–3 h. Weryfikację profilu robi klient (nagranie albo kartka) — daj mu nagraną instrukcję. Bez obietnic pozycji i cytowań w AI (decyzja 2026-11-05) |
+| Mapy Google i katalogi | ok. 350 zł — **nie w cenniku**, najpierw u 1–2 pierwszych klientów (zmierz czas, nagraj instrukcję weryfikacji) | założenie albo uporządkowanie Profilu Firmy w Google, Bing Places, 3–5 katalogów (np. Panorama Firm; branżowe: ZnanyLekarz, Booksy) z identycznymi danymi (NAP). Ok. 2–3 h. Weryfikację profilu robi klient (nagranie albo kartka) — daj mu nagraną instrukcję. Bez obietnic pozycji i cytowań w AI (decyzja 2026-11-05) |
 
 ### Budowane na zamówienie — wycena indywidualna
 
