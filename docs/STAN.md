@@ -1,8 +1,8 @@
 # Stan projektu
 
-**Aktualizacja: 2026-11-05 (sesja 8 — cennik na landingu, Witryna 2 900 zł, OFERTA.md, kreator (c)).** Ten plik się
-**nadpisuje** na koniec każdej sesji (`/koniec`). Historia: `docs/POSTEP.md` (tylko dopisywanie).
-Sesje: `docs/SESJE.md`.
+**Aktualizacja: 2026-11-05 (sesja 8 — cennik i kreator na landingu, OFERTA.md, limity formularzy).**
+Ten plik się **nadpisuje** na koniec każdej sesji (`/koniec`). Historia: `docs/POSTEP.md` (tylko
+dopisywanie). Sesje: `docs/SESJE.md`.
 
 ## Repozytoria
 
@@ -10,54 +10,37 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 
 | Repo | Rola | Stan |
 | --- | --- | --- |
-| `D:\dev\sanity` | starter, źródło prawdy | GitHub = `86c1959`; lokalnie commity ponad `origin/main`: dokumenty (OFERTA, checklista, POSTEP/STAN) i **kod `db60e0e`** (limit rozmiaru formularza) — **niewypchnięte** |
-| `D:\dev\landing-oferta` | landing z ofertą (własny design) | lokalne, bez GitHuba; ostatni `98cf025`; `starter` = `D:\dev\sanity` (push wyłączony), pobrany do `a929d60` |
-| `D:\dev\gabinet-demo` | **projekt podglądowy, do usunięcia** (decyzja 2026-11-05) — nie synchronizować ze starterem | ostatni `7deccf1`; cały jego kod jest w historii startera (sprawdzone 2026-11-05), usunięcie nic nie traci |
-| `D:\dev\zapytanie-ofertowe` | prototyp formularza zapytania (`node server.mjs` → :4400) | lokalne repo bez remote, ostatni `1b6424f`, tag `v1-przed-stylami` na `22f6872` |
+| `D:\dev\sanity` | starter, źródło prawdy | GitHub = `86c1959`; lokalnie ponad `origin/main` dokumenty i **kod `db60e0e`** (limit rozmiaru formularza) — **niewypchnięte** |
+| `D:\dev\landing-oferta` | landing z ofertą (własny design) | lokalne, bez GitHuba; ostatni `e2b9910`; `starter` = `D:\dev\sanity` (push wyłączony): scalony do `a929d60` + cherry-pick `db60e0e` (`34e0335`); „behind” = dokumenty startera |
+| `D:\dev\gabinet-demo` | **projekt podglądowy, do usunięcia** — nie synchronizować | ostatni `7deccf1`; cały kod jest w historii startera (sprawdzone), usunięcie nic nie traci |
+| `D:\dev\zapytanie-ofertowe` | prototyp formularza zapytania (`node server.mjs` → :4400) | lokalne, bez remote, ostatni `1b6424f`, tag `v1-przed-stylami` na `22f6872` |
 | `D:\dev\zlecenia\` | dokumenty zleceń (poza repo — dane klientów) | jedno aktywne zlecenie, niżej |
 
 ## Aktywne zlecenia
 
 - **Gabinet psychoterapii (Kraków)** — `D:\dev\zlecenia\gabinet-psychoterapii-krakow\ZLECENIE.md`.
-  Jedna strona, bez CMS-u. Mail z pytaniami gotowy, **niewysłany** (sekcja 7 do korekty).
-  Z sesji 7 są: cena (Wizytówka 1 900 zł), termin 1–2 tyg., 2 rundy poprawek, płatność 50/50,
-  bez VAT. Blokuje: umowa.
+  Jedna strona, bez CMS-u, Wizytówka 1 900 zł. Mail z pytaniami gotowy, **niewysłany** (sekcja 7
+  do korekty: domena, kontakt ogólnie). Blokuje ofertę: umowa.
 
-## Oferta (OFERTA.md startera; kwoty: `PRICES` w `landing-oferta/web/src/lib/zapytanie.ts`)
+## Oferta (OFERTA.md startera — uzupełniona; kwoty: `PRICES` w `landing-oferta/web/src/lib/zapytanie.ts`)
 
-- **Dwa pytania:** ile stron → **Wizytówka** od 1 900 zł („Wszystko na jednej stronie”) /
-  **Witryna** od **2 900 zł** (do 5 stron z główną, „Osobne strony na ofertę, cennik i kontakt”;
-  było 3 100 — zmiana 2026-11-05, sesja 8: pod progiem 3 000, różnica do Wizytówki równo 1 000 zł);
-  **panel +800 zł w każdym pakiecie** (blog wymaga panelu).
-- Teksty 80 zł za sekcję („fragment strony” na landingu), blog 600 zł; język i „Coś innego” — wycena.
-- Utrzymanie 300 zł/rok; zmiany 30 dni za darmo (do 2 h), potem 150 zł/h od 30 min; błędy naprawiane
-  bez opłat przez cały czas utrzymania.
-- **Działalność nierejestrowana:** ceny końcowe, bez VAT; limit 2026 **10 813,50 zł / kwartał**
-  (przychód należny, z utrzymaniem); po przekroczeniu 7 dni na CEIDG.
-- Płatność 50% po akceptacji oferty, 50% przed publikacją (+ 1. rok utrzymania); 2 rundy poprawek;
-  termin „zwykle 1–2 tygodnie od akceptacji oferty, 1. raty i materiałów”.
-- „Mapy Google i katalogi” (~350 zł) — poza cennikiem, najpierw u 1–2 klientów.
-- **Domena (decyzja 2026-11-05):** w utrzymaniu .pl, .com.pl albo .com; droższa — różnica w odnowieniu
-  doliczana do utrzymania, zakup z rynku wtórnego płaci klient; własna domena klienta — przeniesienie,
-  300 zł bez zmian (także gdy zostaje u swojego rejestratora, bez zniżki).
+- **Wizytówka 1 900 zł / Witryna 2 900 zł** (do 5 stron), **panel +800 zł** w każdym pakiecie
+  (z panelem 2 700 / 3 700 zł); teksty 80 zł za fragment strony; blog 600 zł (wymaga panelu).
+- Utrzymanie 300 zł/rok z domeną **.pl, .com.pl albo .com** (droższa — różnica w odnowieniu
+  doliczana; własną klienta przenoszę, kwota bez zmian). Błędy naprawiane bez opłat.
+- Zmiany (treść i wygląd) 150 zł/h, **najmniejsze zlecenie = pół godziny (75 zł)**, większe —
+  wycena przed pracą; 30 dni po uruchomieniu do 2 h bez dopłaty.
+- Bez VAT (działalność nierejestrowana, limit 10 813,50 zł / kwartał). Płatność 50/50, 2 rundy
+  poprawek, termin zwykle 1–2 tygodnie. „Mapy Google i katalogi” — poza cennikiem.
+- **Kwoty muszą się zgadzać** w cenniku, kreatorze, mailu i OFERTA.md — jedno źródło `PRICES`.
 
-## Landing `oferta.emes.dev` (szczegóły: `docs/LANDING.md` w repo landingu)
+## Landing `oferta.emes.dev` (szczegóły i decyzje: `docs/LANDING.md` w repo landingu)
 
-- Żółta góra, atrament, papier; znak „emes_”. Kreator na białym tle, kroki po kolei.
-- JS: strona główna 1339 B, `/zapytanie` 274 B kreatora (zapamiętuje najdalszy krok; zgoda 2026-11-05)
-  + 165 B zamykania menu.
-- Cennik (sesja 8): karty = tylko różnice pakietów; „W obu pakietach”; wiersze w grupach „Dodatki
-  do wyboru” / „Po uruchomieniu”. Ptaszek = w cenie, dopłata nigdy na liście z ptaszkami.
-- Kolejność sekcji (sesja 8): „Czym to się różni od kreatora stron albo WordPressa” tuż przed „Ceny”;
-  punkty: aktualizacje, „Ktoś za nią odpowiada”, „Nie budujesz jej sam”, „Jedna opłata na rok”.
-- Formularze (sesja 8): limit 32 kB liczony z odczytanych bajtów (`worker/body.ts`, starter `db60e0e`,
-  w landingu przez cherry-pick); limity znaków w `FIELD_LIMITS` i widoczne przy długich polach.
-- Kreator (sesja 8): „Razem od X zł + 300 zł rocznie” liczone w CSS regułą `totalPrice()` (ta sama
-  suma w mailu i na stronie po wysłaniu); kroki Zakres / Zawartość / Wygląd i dodatki / Twoje dane;
-  „fragment strony” zamiast „sekcji”. **Kwoty tylko w `PRICES`** — w CSS jako zmienne `--cena-*`.
-- Teksty pisane dla osoby nietechnicznej, bez obietnic bez pokrycia (statystyki zdjęte do czasu
-  Umami; „Gotowa pod Google” bez „formatu dla AI”). „Realizacje” = demo bez podpisu — świadomie,
-  do zmiany po pierwszych projektach.
+- Sekcje: co dostajesz → realizacje → o mnie → jak to wygląda → czym to się różni → ceny → pytania.
+- Cennik: karty = tylko różnice pakietów, blok „W obu pakietach”, wiersze „Dodatki do wyboru” /
+  „Po uruchomieniu”. Kreator: „Razem od X zł + 300 zł rocznie” (CSS = `totalPrice()`).
+- Kontakt z wykonawcą ogólnie („dajesz znać”), nie „mailem”. Bez przycisku „do góry” (odrzucone).
+- JS: strona główna 1339 B, `/zapytanie` 274 + 165 B. Formularze: limit 32 kB z odczytanych bajtów.
 - Przed publikacją: zdjęcie autora, obraz OG, polityka do prawnika, GitHub + wdrożenie.
 
 ## Różnorodność stron (w toku)
@@ -69,23 +52,16 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 
 1. **Eksport przy rozstaniu — wariant B**: `dist/` bez formularza + treści i oryginały zdjęć +
    README; źródła tylko przy wykupie. Oddawać zbudowany Worker? (rek.: nie).
-2. ~~OFERTA.md~~ — **zamknięte 2026-11-05 (sesja 8):** ceny 1 900 / 2 900 (+800 panel), termin jak
-   na landingu, Lighthouse przy oddaniu z raportem, do 20 adresów w przenoszeniu, nagranie 3–5 min
-   zamiast szkolenia, „zgodna z WCAG” w „Czego nie obiecywać”, odnowienie .pl — sprawdzić przed
-   pierwszą fakturą za utrzymanie.
-3. ~~Minimalna jednostka zmian~~ — **zamknięte 2026-11-05:** pół godziny (75 zł), pisane łagodnie:
-   „Najmniejsze zlecenie liczę jako pół godziny (75 zł), więc drobne poprawki najlepiej zebrać
-   i przesłać razem.” Zmiany obejmują też wygląd; większe — wycena przed pracą.
-4. Formularz zapytania: „Co odwiedzający ma zobaczyć najpierw?” — dodać?
-5. Kierunek z osiami w całości (krój, hero, dekor, warianty sekcji, układy branżowe).
-6. Landing, telefon: pusty ekran ~0,35 s przy przejściach; czwarta strona (rek.: nie) — po obejrzeniu.
-7. Landing: obraz OG (dziś atramentowy z tytułu); GitHub (prywatne) i wdrożenie.
-8. Blog (przy budowie): sekcja „Najnowsze wpisy” jako 10. typ sekcji? RSS ręcznie czy `@astrojs/rss`?
-9. Push startera (dokumenty + `db60e0e` z poprawką formularza) — wypchnąć?
+2. Formularz zapytania: „Co odwiedzający ma zobaczyć najpierw?” — dodać?
+3. Kierunek z osiami w całości (krój, hero, dekor, warianty sekcji, układy branżowe).
+4. Landing, telefon: pusty ekran ~0,35 s przy przejściach; czwarta strona (rek.: nie) — po obejrzeniu.
+5. Landing: obraz OG (dziś atramentowy z tytułu); GitHub (prywatne) i wdrożenie.
+6. Blog (przy budowie): sekcja „Najnowsze wpisy” jako 10. typ sekcji? RSS ręcznie czy `@astrojs/rss`?
+7. **Push startera** (dokumenty + `db60e0e` z poprawką formularza) — wypchnąć?
 
 ## Kolejka (uzgodniona kolejność)
 
-1. **Landing — domknięcie:** decyzje 6–7, zdjęcie autora, potem publikacja (wymaga zgody).
+1. **Landing — domknięcie:** decyzje 4–5, zdjęcie autora, potem publikacja (wymaga zgody).
 2. **Krój nagłówków** — Fraunces 70 kB, Instrument Serif 33 kB, Bricolage Grotesque 60 kB; pomiar.
 3. **Ankieta treści** z JSON-a zapytania → `web/src/tresci/index.ts` (+ `nowy-klient --z-zapytania`).
 4. Prawdziwy szkic strony z JSON-a pod adresem podglądu (wymaga 3).
@@ -96,42 +72,35 @@ Stan z końca sesji — `/start` porównuje go z `git status -sb`.
 9. Studio: etykiety „Nagłówek 2/3” → „Śródtytuł” / „Śródtytuł niższego rzędu” — zgoda 2026-11-04.
 10. `pnpm seed --z-tresci` — import `tresci/` do Sanity; ~2–3 h. Odłożone.
 
-**Na zamówienie** (buduje pierwszy płacący klient): blog w starterze 6–10 h (tylko z panelem);
-druga wersja językowa 15–25 h; opinie Google przy buildzie z Places API; „Mapy Google i katalogi”.
+**Na zamówienie** (buduje pierwszy płacący klient): blog 6–10 h (tylko z panelem); druga wersja
+językowa 15–25 h; opinie Google z Places API; „Mapy Google i katalogi”.
 
 ## Do zrobienia przez właściciela
 
-- Pokazać nowy cennik (sesja 8: nowy układ, Witryna 2 900 zł) osobie, która testowała landing.
-- Obejrzeć animację telefonu na żywo (`pnpm --filter web dev` w `landing-oferta`) → decyzja 6.
+- Pokazać nowy cennik i kreator osobie, która testowała landing.
+- Sprawdzić u rejestratora ceny odnowienia .pl / .com (próg „droższej” domeny) — przed ofertami.
+- Obejrzeć animację telefonu na żywo (`pnpm --filter web dev` w `landing-oferta`) → decyzja 4.
+- Usunąć gabinet-demo, gdy przestanie być potrzebny (odwołania w docs — „Propozycje odłożone”).
 - `pnpm --filter studio seed` — Sanity ma galerię w starym polu `images` i 2 opinie zamiast 6.
 - Zdjęcie do „Kto zrobi Twoją stronę” (pionowe 4:5, min. 800 px).
 
 ## Propozycje odłożone
 
-- Przy usuwaniu gabinet-demo: odwołania „Przykład: `D:\dev\gabinet-demo`” w `NOWY-PROJEKT.md` (2×) i `OFERTA.md`
-  (wariant bez CMS-u, jedna strona) — zastąpić opisem albo innym przykładem.
-- Cennik na telefonie: przy Witrynie „jednorazowo” spada pod kwotę (przy Wizytówce mieści się obok).
-- `landing-oferta/docs/STAN.md` — stara kopia STAN-u startera z klonu (m.in. „Firma od 3 900 zł”);
-  usunąć albo zastąpić odsyłaczem do STAN-u startera.
-- Mail z potwierdzeniem do klienta po wysłaniu zapytania (tylko stały tekst i zaznaczenia).
-- Umami na VPS (statystyki bez cookies, link dla klienta) — wtedy „Statystyki” wracają na landing.
-- Studio po polsku: `@sanity/locale-pl-pl` (nowa zależność — zgoda). Dziś przyciski po angielsku.
-- Zrzut panelu (np. zmiana godzin) na landingu przy opisie panelu.
-- ComfyUI jako lokalny skrypt do poprawy zdjęć klienta. Niski priorytet.
+- Przy usuwaniu gabinet-demo: odwołania w `NOWY-PROJEKT.md` (2×) i `OFERTA.md` — zastąpić opisem.
+- `landing-oferta/docs/STAN.md` — stara kopia STAN-u startera („Firma od 3 900 zł”); usunąć.
+- Cennik na telefonie: przy Witrynie „jednorazowo” spada pod kwotę.
+- Mail z potwierdzeniem do klienta po wysłaniu zapytania; Umami na VPS (wtedy „Statystyki” wracają).
+- Studio po polsku: `@sanity/locale-pl-pl` (zależność — zgoda); zrzut panelu na landingu.
 - Opcje „Telefonicznie” / „Rozmowa online” w polu `ustalenia` formularza zapytania.
-- Menu mobilne zostaje otwarte po kliknięciu bieżącej strony (zamknięcie = skrypt — wymaga zgody).
-- Pauza „—” w treściach przykładowych startera (`tresci/index.ts`, `fixtures.ts`, seed).
-- Animacja rozwijania FAQ (z landingu) do startera — `faq` i `<details>` w sekcjach startera.
+- Menu mobilne otwarte po kliknięciu bieżącej strony (zamknięcie = skrypt — zgoda).
+- Pauza „—” w treściach przykładowych startera; animacja FAQ z landingu do startera; ComfyUI.
 
 ## Niezweryfikowane
 
-- Do prawnika: polityka prywatności, licencja, klauzula wyjścia, wzrost kosztów utrzymania;
-  przy działalności nierejestrowanej — administrator danych w polityce landingu, prawo odstąpienia
-  dla konsumentów i jednoosobowych firm.
-- Landing: Worker `/api/zapytanie` w `wrangler dev` / na Cloudflare (logika tylko w Node); kreator,
-  cennik i telefon w Safari/Firefox i na prawdziwym telefonie.
+- Do prawnika: polityka prywatności, licencja, klauzula wyjścia, wzrost kosztów utrzymania,
+  administrator danych na landingu, prawo odstąpienia dla konsumentów.
+- `wrangler dev` / Cloudflare: Workery `/api/zapytanie` i `/api/kontakt` (w tym `readFormData`).
+- Safari/Firefox i prawdziwy telefon: kreator (suma `round()`/`mod()`), cennik, kształty zdjęć.
 - CI na GitHubie (Lighthouse bez AdGuarda) — nieuruchomione; lokalnie BP 0,81–0,82 przez AdGuarda.
-- Kształty zdjęć na telefonie i w Safari/Firefox; `:target-current` i wysokość nagłówka w Firefox/Safari.
-- Resend Free: 1 czy 3 domeny; ceny odnowienia .pl; Sanity Free: limit projektów na organizację.
-- Stawki copywritingu, Plausible (~9 USD/mies.), Google Places API — z pamięci, niesprawdzone.
-- `pnpm nowy-klient` na świeżym klonie — czy start jest bez błędów (nie uruchamiano).
+- Ceny odnowienia .pl/.com; Resend Free (1 czy 3 domeny); limity Sanity Free; stawki copywritingu,
+  Plausible, Places API — z pamięci. `pnpm nowy-klient` na świeżym klonie — nieuruchomiony.

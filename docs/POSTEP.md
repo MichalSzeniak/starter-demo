@@ -2747,3 +2747,37 @@ bez zmian, także gdy zostaje u swojego rejestratora (bez zniżki). 4. Poprawki 
 - Weryfikacja: `check` 0 błędów, build SEO 6/6, 179 linków; kolejność sekcji w HTML sprawdzona;
   zrzuty sekcji 390 i 1280 px. Lighthouse nieuruchamiany (zmiana tekstów i kolejności sekcji).
 - Niezweryfikowane: realne ceny odnowienia .pl/.com u rejestratora (próg „droższej” domeny).
+
+## Sesja 8 — podsumowanie: cennik, kreator, OFERTA, formularze — 2026-11-05
+
+Szczegóły w sześciu wpisach powyżej (od „Cennik na landingu: czytelniejszy podział”).
+
+### Co powstało
+
+- `landing-oferta` (14 commitów, `69683d6`…`e2b9910`): Witryna 2 900 zł; cennik przebudowany
+  (różnice w kartach, „W obu pakietach”, grupy wierszy, bez podpisów pakietów); kreator (c) z sumą
+  „Razem od X zł”; „Zmiany na stronie” z minimum 75 zł; kontakt ogólnie zamiast „mailem”; limity
+  znaków i rozmiaru formularzy; „Czym to się różni” przed cenami; domena w utrzymaniu doprecyzowana.
+- `sanity` (kod `db60e0e` — `worker/body.ts`, „Wiadomość (do 5000 znaków)”; dokumenty `750f76a`…
+  `e14be14`): OFERTA.md uzupełniona (ceny, termin, nagranie, domena, zmiany, „Czego nie obiecywać”).
+- `zlecenia/gabinet-psychoterapii-krakow/ZLECENIE.md` — wpis w dzienniku (poza repo).
+
+### Decyzje właściciela (zamknięte)
+
+Witryna 2 900 zł; OFERTA.md według rekomendacji (dawna decyzja 2); minimum zmian pół godziny,
+pisane łagodnie (dawna 3); zmiany obejmują wygląd; kontakt ogólnie, nie „mailem”; bez szczegółu
+„co noc kopia”; domena .pl/.com.pl/.com w utrzymaniu, droższa — różnica doliczana, własna klienta —
+przeniesienie bez zmiany kwoty; gabinet-demo = projekt podglądowy do usunięcia; bez przycisku „do góry”.
+
+### Weryfikacja (stan końcowy)
+
+- `check` 0 błędów (landing, starter); build: landing SEO 6/6, 179 linków; starter SEO 5/5, 140 linków.
+- Lighthouse landingu (po kreatorze): desktop 1/1/0,81/1, mobile 0,98–0,99/1/0,82/1 (BP = AdGuard).
+  Po późniejszych zmianach tekstów i kolejności sekcji — nieuruchamiany.
+- Kreator: 7 kombinacji, suma z CSS = `totalPrice()`; Worker (esbuild + atrapy): 4 scenariusze.
+
+### Następne kroki
+
+- Push startera (decyzja 7) — zawiera poprawkę formularza dla nowych projektów.
+- Pokazać cennik i kreator osobie nietechnicznej; sprawdzić ceny odnowienia domen.
+- Mail do gabinetu: korekta sekcji 7 (domena, kontakt) i wysyłka — klient czeka od 2026-11-03.
