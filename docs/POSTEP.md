@@ -2329,3 +2329,50 @@ Landing (`D:\dev\landing-oferta`, merge startera `fbe72f4`, `3ca8814`):
 - Zamiennik „dla małych firm” (tagline, metaTitle, „o mnie”) — propozycja: „dla lokalnych firm”.
 - Czwarta przykładowa strona w telefonie (okrążenie ~17 s) — rekomendacja: zostać przy trzech.
 - Plik zdjęcia do „o mnie”; obraz OG (dziś atramentowy z tytułu).
+
+## Landing: naprawa telefonu w hero i nowy tagline — 2026-11-05
+
+Sesja 5. Na starcie: starter był już wypchnięty (`origin/main` = `a929d60`), a dokumenty
+sesji 4 nie miały commita — zacommitowane razem z pierwszymi decyzjami sesji 5 (`a59d15d`).
+
+### Co powstało
+
+`D:\dev\landing-oferta`:
+
+- `187ef41` **naprawa animacji telefonu.** Opóźnienia `4.6s, 12.6s` stały w regule
+  `[data-motion] .lp-site + .lp-site` (szczegółowość 0,3,0), więc `.lp-site--cafe` (0,2,0)
+  ze swoim `8.6s` przegrywała: kawiarnia wjeżdżała razem z fizjoterapią, na wierzchu i pusta
+  (sekcje dopiero od ~9 s). Efekt: ~4 s białego ekranu, fizjoterapii nie widać, „trzeciej
+  strony nie ma”. Teraz opóźnienia tylko w regułach poszczególnych stron.
+  Do tego **powrót do pierwszej strony tak jak pozostałe przejścia** (prośba właściciela):
+  zamiast ścierania kawiarni w dół serwis rowerowy przeciera się od góry na wierzch
+  (`lp-site-return`, `z-index: 1` w klatkach) i jego sekcje wchodzą drugi raz po kolei
+  (`lp-mock-in, lp-mock-hide, lp-mock-in` — ukrycie od 12,6 s do drugiego wejścia; drugie
+  wejście z `fill-mode: forwards`, bez wypełnienia wstecz). `lp-site-out` usunięte.
+  Okrążenie ~14,5 s, potem stoi. Tylko CSS.
+- `611b357` tagline, `metaTitle` strony głównej (48 zn.) i „Kto zrobi Twoją stronę”:
+  **„Strony internetowe dla firm i specjalistów”** zamiast „dla małych firm”.
+
+### Weryfikacja
+
+- Landing: `pnpm --filter web check` 0 błędów; build: SEO 6 stron OK.
+- Animacja sprawdzona na klatkach: `puppeteer-core` z `node_modules` landingu (skrypt
+  w scratchpadzie, bez nowej zależności), `document.getAnimations()` → `pause()` +
+  `currentTime` dla animacji z `document.timeline` (scroll-driven trzeba pominąć — rzucają
+  wyjątek). Klatki 3 / 6,5 / 11 / 12,75 / 13,6 / 16 s: rower → fizjo → kawiarnia → pusty ekran
+  z paskiem roweru → sekcje po kolei → cała strona. Metoda z sesji 4 (ujemne opóźnienia)
+  błędu nie wyłapała — sprawdzała strony osobno, nie nakładanie się warstw.
+- JS strony głównej bez zmian (1339 B). Lighthouse w tej sesji nieuruchamiany.
+
+### Niezweryfikowane
+
+- Animacja na żywo w przeglądarce (właściciel ma obejrzeć), na telefonie, w Safari/Firefox.
+- Lighthouse landingu po zmianach (zmiana tylko w CSS animacji i tekstach — ryzyko małe).
+
+### Do decyzji
+
+- Pusty ekran ~0,35 s przy każdym przejściu w telefonie — zostawić czy skrócić.
+- Czwarta strona w telefonie — po obejrzeniu animacji na żywo.
+- Formularz zapytania: „Jakie masz zdjęcia?” odrzucone w tej formie; „Co odwiedzający ma
+  zobaczyć najpierw?” bez odpowiedzi.
+- Obraz OG, prywatne repo landingu na GitHubie i wdrożenie.
