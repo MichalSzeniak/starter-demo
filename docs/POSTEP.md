@@ -2376,3 +2376,72 @@ sesji 4 nie miały commita — zacommitowane razem z pierwszymi decyzjami sesji 
 - Formularz zapytania: „Jakie masz zdjęcia?” odrzucone w tej formie; „Co odwiedzający ma
   zobaczyć najpierw?” bez odpowiedzi.
 - Obraz OG, prywatne repo landingu na GitHubie i wdrożenie.
+
+## Ceny dodatków i panel w Wizytówce — kreator landingu — 2026-11-05
+
+Sesja 6. Zaczęła się od pytań właściciela (Sanity dla stron „bez CMS-u”, architektura bloków,
+model abonamentu z cudzej analizy), skończyła się poprawką kreatora i cennika na landingu.
+
+### Ustalenia (bez kodu)
+
+- **„Bez CMS-u też na Sanity”** — odrzucone jako domyślne. Każda Wizytówka dostałaby pozycje
+  **[panel]** z checklisty (projekt, CORS, webhook, Deploy Hook, kopia), a edycja treści przez AI
+  jest prostsza w `tresci/index.ts` (typy, diff) niż w Studio. Przejście na panel dziś: kod obsługuje
+  oba źródła (jedna zmienna), ręcznie trzeba przepisać treści (~1–2 h). Importer
+  `pnpm seed --z-tresci` (~2–3 h) — w kolejce, odłożony.
+- **Architektura bloków z artykułu** — starter ma ją już w lepszej wersji (`switch` zamiast
+  `Record<…, any>`, h1 z pozycji, link jako referencja, `alt`/SEO/`preview`). Studio pod `/admin`
+  = React w `web/` — zakazane. Jedyny pomysł wart uwagi (wariant hero) jest już w planie.
+- **Cudza analiza cen** — wzięte: punkty odniesienia (one-page 1 800–2 400, dopłata za edytor
+  800–1 200), sprawdzić odnowienie .pl i VAT przed ruszaniem 300 zł, nagranie zamiast szkolenia.
+  Odrzucone: „Opieka Pro” ze skrzynkami i priorytetowym wsparciem (więcej kontaktu), darmowe korekty
+  w abonamencie, tryb ciemny, i18n za 800–1 200 zł ryczałtem przed zbudowaniem infrastruktury,
+  hasła o „wirusach WordPressa” i „panelu jak Word”.
+- **Decyzje:** panel dopłatą **tylko w Wizytówce, +800 zł** (Firma 3 900 z panelem w cenie);
+  teksty **80 zł za sekcję** (nagłówek się liczy, Kontakt nie); blog **600 zł „na początek”**, tylko
+  z panelem, klient informowany, że przy wielu wpisach utrzymanie może podrożeć; druga wersja
+  językowa odłożona (w kreatorze „wycena”, budowa po zapłacie); opinie Google/Booksy — możliwe, ale
+  z pełną informacją o skutkach (RODO, baner, wynik, abonament widżetu); blog „czeka nas”, tylko
+  z panelem; w regulaminie zapis o możliwym wzroście kosztów zewnętrznych; przyciski kart cennika
+  zostają „Zapytaj o Wizytówkę / o Firmę”, bez „Zamów”; przełącznik ceny na karcie — nie.
+
+### Co powstało
+
+`landing-oferta`:
+- `318efaa` **feat: kreator — panel jako dopłata w Wizytówce, ceny dodatków, opis „Coś innego”** —
+  `PRICES` w `lib/zapytanie.ts` (jedyne źródło kwot); `packageFor(zakres)` bez edycji;
+  `needsPanel()` = Wizytówka + („Zmieniam je sam” albo blog); `Zapytanie` dostaje `panel`
+  i `dodatkiOpis`; ceny w rogu kafelków (`price` w `Option`); pytanie o edycję tylko przy jednej
+  stronie (przy podstronach „panel w cenie Firmy”); „Coś innego” odsłania pole opisu (`:has`);
+  kwota tekstów z licznika CSS `counter-increment: teksty 80` (ukryta sekcja się nie liczy,
+  Kontakt ma własny inkrement); karta Wizytówki „panel: +800 zł”, FAQ o panelu, blog zdjęty
+  z „Na miarę”.
+- `64522a8` chore: `docs/LANDING.md` — tabela cen.
+
+`sanity`:
+- `86c1959` chore: OFERTA.md — panel 800, teksty 80/sekcja, blog 600 (tylko z panelem, koszty
+  rosną z wpisami), opinie Google/Booksy, i18n, zapis o wzroście kosztów do regulaminu.
+- Push: GitHub `a929d60..86c1959` (zgoda w sesji).
+
+### Weryfikacja
+
+- `pnpm --filter web check` 0 błędów, 0 ostrzeżeń; build: SEO 6/6, linki 179/0 martwych.
+- Worker (`parseZapytanie`/`summaryRows`/`mailSubject` w Node): 6 przypadków — pakiet, panel,
+  blog → panel, Firma bez dopłaty, teksty 3 × 80 = 240 zł bez Kontaktu, opis odrzucany bez „inne”.
+- Headless Chrome, 5 układów: właściwy blok pakietu i uwagi; licznik 4 × 80 = 320 zł; ceny przy
+  prawej krawędzi kafelka (po poprawce `flex: 1`), także przy 390 px.
+- Lighthouse (`pnpm lh`): `/zapytanie` desktop 100/100/81/100, mobile 99/100/82/100; strona główna
+  mobile 98–99. BP 0,81–0,82 na wszystkich stronach = AdGuard (znane). JS: 0 plików `.js` w `dist/`,
+  kreator 0 B.
+
+### Niezweryfikowane
+
+- Worker `/api/zapytanie` w `wrangler dev` / na Cloudflare (logika sprawdzona tylko w Node).
+- Kreator w Safari/Firefox i na prawdziwym telefonie; czytnik ekranu a kwota z `::before`.
+- Rynkowe stawki copywritingu (50–150 zł / 1 000 zn.) i czas pisania 80 zł/sekcję — szacunki.
+- Sanity Free: limit liczby projektów na organizację; Google Places API — limit opinii, regulamin.
+
+### Następne kroki
+
+- Landing: domknięcie (decyzje 6–7, zdjęcie autora, publikacja).
+- Blog w starterze (6–10 h) — przy pierwszym zamówieniu; sekcja „Najnowsze wpisy” = 10. typ (zgoda).
