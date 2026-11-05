@@ -28,6 +28,7 @@ Uwagi wewnętrzne są oznaczone „Dla Ciebie".
 - **Dostępność** — wynik Lighthouse „Dostępność" 100, kontrast kolorów na poziomie WCAG AA
   (kolor firmowy sprawdzany automatycznie), menu i FAQ obsługiwane klawiaturą.
 - **Statystyki odwiedzin bez cookies** (Plausible albo Umami) — bez baneru zgody.
+  **Dziś nie obiecuj** (2026-11-05): brak narzędzia; wraca po postawieniu Umami na VPS.
 - **Subtelne animacje** albo wcale — do wyboru.
 - **Przeniesienie ze starej strony** — ważne adresy przekierowane, żeby nie stracić pozycji
   w Google.
