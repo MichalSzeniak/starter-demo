@@ -2781,3 +2781,60 @@ przeniesienie bez zmiany kwoty; gabinet-demo = projekt podglądowy do usunięcia
 - Push startera (decyzja 7) — zawiera poprawkę formularza dla nowych projektów.
 - Pokazać cennik i kreator osobie nietechnicznej; sprawdzić ceny odnowienia domen.
 - Mail do gabinetu: korekta sekcji 7 (domena, kontakt) i wysyłka — klient czeka od 2026-11-03.
+
+## Krój nagłówków: `brand.font.heading` — 2026-11-05 (sesja 9)
+
+Na starcie: decyzje z listy STAN — „Co odwiedzający ma zobaczyć najpierw?” usunięte (ustala się
+z klientem), pozostałe osie różnorodności odłożone (krój zostaje), animacja telefonu na landingu
+bez zmian i bez czwartej strony, wdrożenie landingu i push startera robi właściciel sam,
+RSS bloga przez `@astrojs/rss` (zgoda; przy budowie bloga).
+
+### Co powstało (starter, `b929ba6`)
+
+- `brand.font.heading: { family, weight, fallback: 'serif' | 'sans-serif' } | null` — osobny krój
+  tytułów sekcji (h1 i h2 z `Heading variant="section"`). **Domyślnie `null`** — starter wygląda
+  jak dotąd (sprawdzone na buildzie: ta sama rodzina, 800 / 700, `tracking-tight`).
+- `astro.config.ts`: drugi wpis w `fonts` (`--font-brand-heading`) tylko przy ustawionym kroju;
+  **jedna grubość** (jeden plik na podzbiór) zamiast zakresu wag. Typ wpisu jawny
+  (`FontFamilyConfig`) — warunkowy element tablicy traci typ kontekstowy.
+- `global.css`: `--font-heading: var(--font-brand-heading, var(--font-sans))` → klasa `font-heading`.
+- `Heading.astro`: przy osobnym kroju grubość z `--brand-heading-weight` (z `themeCss`) i **bez
+  `tracking-tight`** — zwężenie dobre dla Intera skleja litery w Instrument Serif („Dlaczego my”).
+- `BaseLayout.astro`: `<Font>` z preloadem dla kroju nagłówków (h1 = zwykle LCP). `CssVariable`
+  Astro generuje z bieżącej konfiguracji, więc przy `null` zmienna jest rzutowana.
+- Tytuły kart, pytania FAQ, nagłówki w Portable Text i obrazy OG — dalej krojem treści.
+
+### Pomiar (DEMO_CONTENT, 4 strony, Lighthouse mobile 3 przebiegi; BP 0,81–0,82 = AdGuard)
+
+| Krój | Grubość | woff2 (latin + latin-ext) | Mobile perf: `/` · pozostałe | LCP `/` |
+| --- | --- | --- | --- | --- |
+| bez (Inter) | — | 0 | 0,96 · 0,97–0,99 | 2,71 s |
+| Fraunces | 600 | 17,4 + 18,1 = 35,5 kB | 0,94 · 0,96–0,97 | 3,01 s |
+| Instrument Serif | 400 | 7,8 + 15,0 = 22,9 kB | 0,95 · 0,97 | 2,86 s |
+| Bricolage Grotesque | 700 | 10,6 + 22,4 = 33,0 kB | 0,95 · 0,97 | 2,86–2,93 s |
+
+Desktop z Fraunces (najcięższy): perf / a11y / SEO 100 na 4 stronach. CLS 0 wszędzie.
+Wcześniejsze 33–70 kB (2026-09-13) dotyczyły zakresu wag 600–800 — jedna grubość jest 2× lżejsza.
+Pomiar Lighthouse zrobiony przed zdjęciem `tracking-tight` (zmiana tylko w CSS, bez wpływu na wagę).
+Zrzuty (hero desktop i telefon dla 3 krojów) — w scratchpadzie sesji, nie w repo.
+
+### Weryfikacja
+
+- `pnpm --filter web check` 0 błędów; build: SEO 5/5, 140 linków, 0 martwych.
+- JS kliencki bez zmian.
+
+### Niezweryfikowane
+
+- Safari/Firefox i prawdziwy telefon; krój z innego dostawcy niż Google (dziś tylko Google).
+
+### Decyzje właściciela (zamknięte)
+
+Krój nagłówków zostaje jako opcja w `brand.ts` (pytanie „czy nie wystarczy dostosować każdy projekt
+osobno?” — nie: edycja wspólnych plików w repo klienta = konflikty przy ściąganiu poprawek
+ze startera). Commit kodu `b929ba6`.
+
+### Następne kroki
+
+- Przy pierwszym kliencie dobrać krój do branży (Fraunces — ciepły szeryf, Instrument Serif —
+  elegancki, Bricolage Grotesque — mocny bezszeryfowy) albo zostawić `null`.
+- Push startera (20 commitów ponad `origin/main`, w tym `db60e0e` i `b929ba6`) — właściciel.
